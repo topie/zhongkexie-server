@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.core.dao.ScoreItemOptionMapper" >
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.core.model.ScoreItemOption" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="option_title" property="optionTitle" jdbcType="VARCHAR" />
+    <result column="option_rate" property="optionRate" jdbcType="DECIMAL" />
+    <result column="option_desc" property="optionDesc" jdbcType="VARCHAR" />
+    <result column="option_sort" property="optionSort" jdbcType="INTEGER" />
+  </resultMap>
+</mapper>
