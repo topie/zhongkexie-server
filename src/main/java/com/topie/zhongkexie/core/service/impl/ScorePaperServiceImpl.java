@@ -84,6 +84,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
                     itemDto.setId(item.getId());
                     itemDto.setTitle(item.getTitle());
                     itemDto.setScore(item.getScore());
+                    itemDto.setItemType(item.getType());
                     List<OptionDto> itemOptions = new ArrayList<>();
                     for (ScoreItemOption itemOption : scoreItemOptions) {
                         if (itemOption.getItemId().intValue() == item.getId()) {

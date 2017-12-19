@@ -11,9 +11,19 @@ public class ItemDto {
 
     private String type = "item";
 
+    private Integer itemType;
+
     private BigDecimal score;
 
     private List<OptionDto> items;
+
+    public Integer getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(Integer itemType) {
+        this.itemType = itemType;
+    }
 
     public String getType() {
         return type;
