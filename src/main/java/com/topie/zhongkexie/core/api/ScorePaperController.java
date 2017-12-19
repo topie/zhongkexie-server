@@ -90,6 +90,22 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
+    
+    @RequestMapping(value = "/check", method = RequestMethod.GET)
+    @ResponseBody
+    public Result checkList(int id,short result) {
+         iScorePaperService.check(id,result);
+        return ResponseUtil.success("操作完成！");
+    }
+    
+    @RequestMapping(value = "/reportList", method = RequestMethod.GET)
+    @ResponseBody
+    public Result reportList(ScorePaper scorePaper,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
 
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
     @ResponseBody

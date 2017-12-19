@@ -143,4 +143,12 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
         }
     }
 
+	@Override
+	public void check(int id, short result) {
+		// TODO Auto-generated method stub
+		ScorePaper page = getMapper().selectByPrimaryKey(id);
+		page.setStatus(result);
+		getMapper().updateByPrimaryKey(page);
+	}
+
 }

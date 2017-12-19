@@ -17,4 +17,6 @@ public interface IScorePaperService extends IService<ScorePaper> {
 
     String getContentJson(String title);
 
+	void check(int id, short result);
+
 }
