@@ -60,5 +60,14 @@ public class ScorePaperController {
         iScorePaperService.delete(id);
         return ResponseUtil.success();
     }
+    
+    @RequestMapping(value = "/checkList", method = RequestMethod.GET)
+    @ResponseBody
+    public Result checkList(ScorePaper scorePaper,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
 
 }
