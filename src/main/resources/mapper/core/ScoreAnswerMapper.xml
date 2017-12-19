@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.core.dao.ScoreAnswerMapper" >
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.core.model.ScoreAnswer" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    <result column="index_id" property="indexId" jdbcType="INTEGER" />
+    <result column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="item_score" property="itemScore" jdbcType="DECIMAL" />
+    <result column="answer_value" property="answerValue" jdbcType="VARCHAR" />
+    <result column="answer_score" property="answerScore" jdbcType="DECIMAL" />
+    <result column="answer_reason" property="answerReason" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>
