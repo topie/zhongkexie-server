@@ -31,7 +31,7 @@ public class ScoreItem extends Sortable {
     private Integer type;
 
     @Column(name = "option_logic")
-    private Integer optionLogic;
+    private String optionLogic;
 
     /**
      * 题目分值
@@ -40,11 +40,11 @@ public class ScoreItem extends Sortable {
 
     private Integer sort;
 
-    public Integer getOptionLogic() {
+    public String getOptionLogic() {
         return optionLogic;
     }
 
-    public void setOptionLogic(Integer optionLogic) {
+    public void setOptionLogic(String optionLogic) {
         this.optionLogic = optionLogic;
     }
 
