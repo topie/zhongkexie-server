@@ -1,13 +1,12 @@
 package com.topie.zhongkexie.core.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
-import com.topie.zhongkexie.core.dto.IndexDto;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
+import com.topie.zhongkexie.core.dto.PaperIndexDto;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
@@ -58,97 +57,80 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 
     @Override
     public String getContentJson(String title) {
+        List<ScoreIndex> childIndices = new ArrayList<>();
         ScoreIndex scoreIndex = new ScoreIndex();
-        scoreIndex.setSort_("sort_asc");
         List<ScoreIndex> indices = iScoreIndexService.selectByFilter(scoreIndex);
-
-        ScoreItem scoreItem = new ScoreItem();
-        scoreIndex.setSort_("sort_asc");
-        List<ScoreItem> scoreItems = iScoreItemService.selectByFilter(scoreItem);
-
         ScoreItemOption scoreItemOption = new ScoreItemOption();
         scoreItemOption.setSort_("option_sort_asc");
         List<ScoreItemOption> scoreItemOptions = iScoreItemOptionService.selectByFilter(scoreItemOption);
-
-        List<IndexDto> indexDtos = new ArrayList<>();
         for (ScoreIndex index : indices) {
-            IndexDto indexDto = new IndexDto();
-            indexDto.setId(index.getId());
-            indexDto.setPid(index.getParentId());
-            indexDto.setTitle(index.getName());
-            indexDto.setScore(index.getScore());
-            List<ItemDto> ids = new ArrayList<>();
-            for (ScoreItem item : scoreItems) {
-                if (item.getIndexId().intValue() == index.getId()) {
-                    ItemDto itemDto = new ItemDto();
-                    itemDto.setId(item.getId());
-                    itemDto.setTitle(item.getTitle());
-                    itemDto.setScore(item.getScore());
-                    itemDto.setItemType(item.getType());
-                    List<OptionDto> itemOptions = new ArrayList<>();
-                    for (ScoreItemOption itemOption : scoreItemOptions) {
-                        if (itemOption.getItemId().intValue() == item.getId()) {
-                            OptionDto optionDto = new OptionDto();
-                            optionDto.setId(itemOption.getId());
-                            optionDto.setTitle(itemOption.getOptionTitle());
-                            itemOptions.add(optionDto);
-                        }
-                    }
-                    itemDto.setItems(itemOptions);
-                    ids.add(itemDto);
+            Boolean flag = true;
+            for (ScoreIndex index1 : indices) {
+                if (index.getId().intValue() == index1.getParentId().intValue()) {
+                    flag = false;
                 }
             }
-            indexDto.setIds(ids);
-            indexDtos.add(indexDto);
+            if (flag) {
+                childIndices.add(index);
+            }
+        }
+        List<PaperIndexDto> paperIndexDtos = new ArrayList<>();
+        for (ScoreIndex childIndex : childIndices) {
+            PaperIndexDto paperIndexDto = new PaperIndexDto();
+            String path = childIndex.getName();
+            path = getParentIndexString(path, childIndex, indices);
+            paperIndexDto.setIndexId(childIndex.getId());
+            paperIndexDto.setIndexTitle(childIndex.getName());
+            paperIndexDto.setParentIndexTitle(path);
+            ScoreItem scoreItem = new ScoreItem();
+            scoreItem.setSort_("sort_asc");
+            scoreItem.setIndexId(childIndex.getId());
+            List<ItemDto> ids = new ArrayList<>();
+            List<ScoreItem> scoreItems = iScoreItemService.selectByFilter(scoreItem);
+            for (ScoreItem item : scoreItems) {
+                ItemDto itemDto = new ItemDto();
+                itemDto.setId(item.getId());
+                itemDto.setTitle(item.getTitle());
+                itemDto.setScore(item.getScore());
+                itemDto.setItemType(item.getType());
+                List<OptionDto> itemOptions = new ArrayList<>();
+                for (ScoreItemOption itemOption : scoreItemOptions) {
+                    if (itemOption.getItemId().intValue() == item.getId()) {
+                        OptionDto optionDto = new OptionDto();
+                        optionDto.setId(itemOption.getId());
+                        optionDto.setTitle(itemOption.getOptionTitle());
+                        itemOptions.add(optionDto);
+                    }
+                }
+                itemDto.setItems(itemOptions);
+                ids.add(itemDto);
+            }
+            paperIndexDto.setItems(ids);
+            paperIndexDtos.add(paperIndexDto);
         }
         JSONObject jo = JSONObject.parseObject("{}");
         jo.put("title", title);
-        JSONArray jsonArray = JSONArray.parseArray("[]");
-        for (IndexDto index : indexDtos) {
-            if (index.getPid() == 0) {
-                JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(index));
-                jsonObject.put("type", "index");
-                getJson(jsonObject, indexDtos, index);
-                jsonObject.remove("ids");
-                jsonArray.add(jsonObject);
-            }
-        }
-        jo.put("data", jsonArray);
+        jo.put("data", paperIndexDtos);
         return jo.toJSONString();
     }
 
-    private void getJson(JSONObject jsonObject, List<IndexDto> indices, IndexDto index) {
-        if (index != null) {
-            for (IndexDto i : indices) {
-                if (i.getPid().intValue() == index.getId().intValue()) {
-                    JSONObject io = JSONObject.parseObject(JSONObject.toJSONString(i));
-                    io.remove("ids");
-                    if (jsonObject.get("items") != null) {
-                        JSONArray items = (JSONArray) jsonObject.get("items");
-                        io.put("type", "index");
-                        items.add(io);
-                        getJson(io, indices, i);
-                    } else {
-                        JSONArray items = JSONArray.parseArray("[]");
-                        items.add(io);
-                        io.put("type", "index");
-                        jsonObject.put("items", items);
-                    }
-                    getJson(io, indices, i);
-                }
-            }
-            if (jsonObject.get("items") == null) {
-                jsonObject.put("items", index.getIds());
-            }
-        }
+    @Override
+    public void check(int id, short result) {
+        // TODO Auto-generated method stub
+        ScorePaper page = getMapper().selectByPrimaryKey(id);
+        page.setStatus(result);
+        getMapper().updateByPrimaryKey(page);
     }
 
-	@Override
-	public void check(int id, short result) {
-		// TODO Auto-generated method stub
-		ScorePaper page = getMapper().selectByPrimaryKey(id);
-		page.setStatus(result);
-		getMapper().updateByPrimaryKey(page);
-	}
+    private String getParentIndexString(String path, ScoreIndex childIndex, List<ScoreIndex> indices) {
+        Integer parentId = childIndex.getParentId();
+        for (ScoreIndex index : indices) {
+            if (index.getId().intValue() == parentId) {
+                path = index.getName() + ">" + path;
+                path = getParentIndexString(path, index, indices);
+            }
+        }
+        return path;
+    }
 
 }

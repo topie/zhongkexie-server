@@ -81,7 +81,7 @@ public class ScorePaperController {
         iScorePaperService.delete(id);
         return ResponseUtil.success();
     }
-    
+
     @RequestMapping(value = "/checkList", method = RequestMethod.GET)
     @ResponseBody
     public Result checkList(ScorePaper scorePaper,
@@ -90,14 +90,14 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
-    
+
     @RequestMapping(value = "/check", method = RequestMethod.GET)
     @ResponseBody
-    public Result checkList(int id,short result) {
-         iScorePaperService.check(id,result);
+    public Result checkList(int id, short result) {
+        iScorePaperService.check(id, result);
         return ResponseUtil.success("操作完成！");
     }
-    
+
     @RequestMapping(value = "/reportList", method = RequestMethod.GET)
     @ResponseBody
     public Result reportList(ScorePaper scorePaper,
@@ -146,6 +146,17 @@ public class ScorePaperController {
             }
         }
         return ResponseUtil.success();
+    }
+
+    @RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
+    @ResponseBody
+    public Result getAnswer(@RequestParam(value = "paperId") Integer paperId) {
+        Integer userId = SecurityUtil.getCurrentUserId();
+        ScoreAnswer scoreAnswer = new ScoreAnswer();
+        scoreAnswer.setUserId(userId);
+        scoreAnswer.setPaperId(paperId);
+        List<ScoreAnswer> ans = iScoreAnswerService.selectByFilter(scoreAnswer);
+        return ResponseUtil.success(ans);
     }
 
 }

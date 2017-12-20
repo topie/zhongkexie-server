@@ -6,7 +6,7 @@
       WARNING - @mbggenerated
     -->
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="item_id" property="indexId" jdbcType="INTEGER" />
     <result column="option_title" property="optionTitle" jdbcType="VARCHAR" />
     <result column="option_rate" property="optionRate" jdbcType="DECIMAL" />
     <result column="option_desc" property="optionDesc" jdbcType="VARCHAR" />

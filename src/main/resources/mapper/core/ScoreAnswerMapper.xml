@@ -9,7 +9,7 @@
     <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="paper_id" property="paperId" jdbcType="INTEGER" />
     <result column="index_id" property="indexId" jdbcType="INTEGER" />
-    <result column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="item_id" property="indexId" jdbcType="INTEGER" />
     <result column="item_score" property="itemScore" jdbcType="DECIMAL" />
     <result column="answer_value" property="answerValue" jdbcType="VARCHAR" />
     <result column="answer_score" property="answerScore" jdbcType="DECIMAL" />
