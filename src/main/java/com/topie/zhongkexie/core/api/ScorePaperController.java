@@ -7,18 +7,9 @@ import com.topie.zhongkexie.common.utils.Result;
 import com.topie.zhongkexie.core.dto.AnswerDto;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperAnswerDto;
-import com.topie.zhongkexie.core.service.IScoreAnswerService;
-import com.topie.zhongkexie.core.service.IScoreItemOptionService;
-import com.topie.zhongkexie.core.service.IScoreItemService;
-import com.topie.zhongkexie.core.service.IScorePagerUserService;
-import com.topie.zhongkexie.core.service.IScorePaperService;
-import com.topie.zhongkexie.database.core.model.ScorePaperUser;
-import com.topie.zhongkexie.database.core.model.ScoreAnswer;
-import com.topie.zhongkexie.database.core.model.ScoreItem;
-import com.topie.zhongkexie.database.core.model.ScoreItemOption;
-import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.core.service.*;
+import com.topie.zhongkexie.database.core.model.*;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +37,10 @@ public class ScorePaperController {
 
     @Autowired
     private IScoreItemOptionService iScoreItemOptionService;
-    
+
     @Autowired
-    private 
-    IScorePagerUserService iScorePagerUserService;
-    
+    private IScorePagerUserService iScorePagerUserService;
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(ScorePaper scorePaper,
@@ -59,7 +49,7 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
-    
+
     @RequestMapping(value = "/reportCheck", method = RequestMethod.GET)
     @ResponseBody
     public Result reportCheck(ScorePaper scorePaper,
@@ -67,16 +57,14 @@ public class ScorePaperController {
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         List<PagerUserDto> listDto = new ArrayList<PagerUserDto>();
-        for(ScorePaper sp:pageInfo.getList())
-        {
-        	 PagerUserDto dto = new PagerUserDto();
-        	 BeanUtils.copyProperties(sp, dto);
-        	 ScorePaperUser dScorePaperUser = iScorePagerUserService.selectByKey(sp.getId());
-        	 if(dScorePaperUser!=null)
-        	 {
-        		 dto.setCheckStatus(dScorePaperUser.getStatus());
-        	 }
-        	 listDto.add(dto); 
+        for (ScorePaper sp : pageInfo.getList()) {
+            PagerUserDto dto = new PagerUserDto();
+            BeanUtils.copyProperties(sp, dto);
+            ScorePaperUser dScorePaperUser = iScorePagerUserService.selectByKey(sp.getId());
+            if (dScorePaperUser != null) {
+                dto.setCheckStatus(dScorePaperUser.getStatus());
+            }
+            listDto.add(dto);
         }
         return ResponseUtil.success(PageConvertUtil.grid(new PageInfo<>(listDto)));
     }
@@ -84,11 +72,10 @@ public class ScorePaperController {
     @RequestMapping(value = "/check", method = RequestMethod.GET)
     @ResponseBody
     public Result checkList(int id, short result) {
-    	iScorePaperService.check(id, result);
+        iScorePaperService.check(id, result);
         return ResponseUtil.success("操作完成！");
     }
-    
-    
+
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
     @ResponseBody
     public Result insert(ScorePaper scorePaper) {
@@ -133,7 +120,7 @@ public class ScorePaperController {
     @RequestMapping(value = "/reportContentCheck", method = RequestMethod.GET)
     @ResponseBody
     public Result reportContentCheck(int id, short result) {
-    	iScorePagerUserService.check(id, result);
+        iScorePagerUserService.check(id, result);
         return ResponseUtil.success("操作完成！");
     }
 
@@ -179,13 +166,13 @@ public class ScorePaperController {
                     //多选
                     String logic = scoreItem.getOptionLogic();
                 }
-
+                iScoreAnswerService.saveNotNull(sa);
                 //todo 计算分数
             }
         }
         return ResponseUtil.success();
     }
-    
+
     @RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
     @ResponseBody
     public Result getAnswer(@RequestParam(value = "paperId") Integer paperId) {
