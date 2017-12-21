@@ -120,12 +120,12 @@ CREATE TABLE d_score_answer (
   COMMENT '题库评审填报表';
 
 
-INSERT INTO d_function VALUES ('7', '0', '题库管理', '1', '1', NULL, '#', '3', NULL, NULL);
+INSERT INTO d_function VALUES ('7', '0', '评价表管理', '1', '1', NULL, '#', '3', NULL, NULL);
 INSERT INTO d_role_function (role_id, function_id) VALUES ('1', '7');
-INSERT INTO d_function VALUES ('8', '7', '题库指标管理', '1', '1', NULL, '/api/core/scoreIndex/list', '1', NULL, NULL);
+INSERT INTO d_function VALUES ('8', '7', '评价指标管理', '1', '1', NULL, '/api/core/scoreIndex/list', '1', NULL, NULL);
 INSERT INTO d_role_function (role_id, function_id) VALUES ('1', '8');
-INSERT INTO d_function VALUES ('9', '7', '题库题目管理', '1', '1', NULL, '/api/core/scoreItem/list', '2', NULL, NULL);
+INSERT INTO d_function VALUES ('9', '7', '评价表题目管理', '1', '1', NULL, '/api/core/scoreItem/list', '2', NULL, NULL);
 INSERT INTO d_role_function (role_id, function_id) VALUES ('1', '9');
-INSERT INTO d_function VALUES ('10', '7', '题库试卷管理', '1', '1', NULL, '/api/core/scorePaper/list', '3', NULL, NULL);
+INSERT INTO d_function VALUES ('10', '7', '评价表试卷管理', '1', '1', NULL, '/api/core/scorePaper/list', '3', NULL, NULL);
 INSERT INTO d_role_function (role_id, function_id) VALUES ('1', '10');
 
