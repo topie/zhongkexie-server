@@ -72,8 +72,11 @@ public class ScorePaperController {
         	 PagerUserDto dto = new PagerUserDto();
         	 BeanUtils.copyProperties(sp, dto);
         	 ScorePaperUser dScorePaperUser = iScorePagerUserService.selectByKey(sp.getId());
-        	 dto.setCheckStatus(dScorePaperUser.getStatus());
-        	 listDto.add(dto);
+        	 if(dScorePaperUser!=null)
+        	 {
+        		 dto.setCheckStatus(dScorePaperUser.getStatus());
+        	 }
+        	 listDto.add(dto); 
         }
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
