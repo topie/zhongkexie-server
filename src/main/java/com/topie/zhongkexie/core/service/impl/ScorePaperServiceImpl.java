@@ -6,18 +6,24 @@ import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
+import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperIndexDto;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
+import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
@@ -37,6 +43,9 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 
     @Autowired
     private IScoreItemOptionService iScoreItemOptionService;
+    
+    @Autowired
+    ScorePaperUserMapper dScorePaperUserMapper;
 
     @Override
     public PageInfo<ScorePaper> selectByFilterAndPage(ScorePaper scorePaper, int pageNum, int pageSize) {

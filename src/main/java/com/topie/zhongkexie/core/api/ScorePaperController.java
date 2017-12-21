@@ -5,21 +5,27 @@ import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
 import com.topie.zhongkexie.core.dto.AnswerDto;
+import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperAnswerDto;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
+import com.topie.zhongkexie.core.service.IScorePagerUserService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
+
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,13 +46,35 @@ public class ScorePaperController {
 
     @Autowired
     private IScoreItemOptionService iScoreItemOptionService;
-
+    
+    @Autowired
+    private 
+    IScorePagerUserService iScorePagerUserService;
+    
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
+    
+    @RequestMapping(value = "/reportCheck", method = RequestMethod.GET)
+    @ResponseBody
+    public Result reportCheck(ScorePaper scorePaper,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        List<PagerUserDto> listDto = new ArrayList<PagerUserDto>();
+        for(ScorePaper sp:pageInfo.getList())
+        {
+        	 PagerUserDto dto = new PagerUserDto();
+        	 BeanUtils.copyProperties(sp, dto);
+        	 ScorePaperUser dScorePaperUser = iScorePagerUserService.selectByKey(sp.getId());
+        	 dto.setCheckStatus(dScorePaperUser.getStatus());
+        	 listDto.add(dto);
+        }
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
 
@@ -148,6 +176,7 @@ public class ScorePaperController {
         return ResponseUtil.success();
     }
 
+    
     @RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
     @ResponseBody
     public Result getAnswer(@RequestParam(value = "paperId") Integer paperId) {
