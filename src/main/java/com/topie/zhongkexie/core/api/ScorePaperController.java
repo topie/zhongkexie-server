@@ -78,9 +78,17 @@ public class ScorePaperController {
         	 }
         	 listDto.add(dto); 
         }
-        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+        return ResponseUtil.success(PageConvertUtil.grid(new PageInfo<>(listDto)));
     }
 
+    @RequestMapping(value = "/check", method = RequestMethod.GET)
+    @ResponseBody
+    public Result checkList(int id, short result) {
+    	iScorePaperService.check(id, result);
+        return ResponseUtil.success("操作完成！");
+    }
+    
+    
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
     @ResponseBody
     public Result insert(ScorePaper scorePaper) {
@@ -122,10 +130,10 @@ public class ScorePaperController {
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
 
-    @RequestMapping(value = "/check", method = RequestMethod.GET)
+    @RequestMapping(value = "/reportContentCheck", method = RequestMethod.GET)
     @ResponseBody
-    public Result checkList(int id, short result) {
-        iScorePaperService.check(id, result);
+    public Result reportContentCheck(int id, short result) {
+    	iScorePagerUserService.check(id, result);
         return ResponseUtil.success("操作完成！");
     }
 
@@ -173,12 +181,10 @@ public class ScorePaperController {
                 }
 
                 //todo 计算分数
-                iScoreAnswerService.saveNotNull(sa);
             }
         }
         return ResponseUtil.success();
     }
-
     
     @RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
     @ResponseBody

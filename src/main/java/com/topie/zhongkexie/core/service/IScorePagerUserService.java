@@ -5,4 +5,6 @@ import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 
 public interface IScorePagerUserService extends IService<ScorePaperUser>{
 
+	void check(int id, short result);
+
 }

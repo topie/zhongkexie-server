@@ -18,6 +18,7 @@ import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.security.utils.SecurityUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;

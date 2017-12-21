@@ -10,4 +10,10 @@
     <result column="status" property="status" jdbcType="SMALLINT" />
     <result column="feedback" property="feedback" jdbcType="VARCHAR" />
   </resultMap>
+  
+  <select id="selectByPagerId" resultMap="BaseResultMap">
+        select
+        * from d_score_paper_user t where t.paper_id = #{pageId,jdbcType=INTEGER}
+    </select>
+  
 </mapper>
