@@ -13,6 +13,7 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
+import com.topie.zhongkexie.common.exception.DefaultBusinessException;
 import com.topie.zhongkexie.common.utils.date.DateStyle;
 import com.topie.zhongkexie.common.utils.date.DateUtil;
 import com.topie.zhongkexie.core.service.ICommonStaticsService;
@@ -70,8 +71,14 @@ public class MessageServiceImpl extends BaseService<Message> implements IMessage
 		message.setCreateUserId(SecurityUtil.getCurrentUserId());
     	message.setCreateUser(SecurityUtil.getCurrentUserName());
     	message.setCreateTime(DateUtil.DateToString(new Date(), DateStyle.YYYY_MM_DD_HH_MM_SS));
-    	String title = iCommonStaticsService.selectByKey(CommonStaticsS.MESSAGE_TITLE_TEMPLATE).getsValue();
-    	String content = iCommonStaticsService.selectByKey(CommonStaticsS.MESSAGE_CONTENT_TEMPLATE).getsValue();
+    	String title="";
+    	String content="";
+    	try{
+    		title = iCommonStaticsService.selectByKey(CommonStaticsS.MESSAGE_TITLE_TEMPLATE).getsValue();
+    	    content = iCommonStaticsService.selectByKey(CommonStaticsS.MESSAGE_CONTENT_TEMPLATE).getsValue();
+    	}catch(NullPointerException e){
+    		throw new DefaultBusinessException("通知模板未设置！");
+    	}
     	ScorePaper sp = iScorePaperService.selectByKey(message.getSpId());
     	title = title.replace("${paperName}",sp.getTitle());
     	message.setTitle(title);
