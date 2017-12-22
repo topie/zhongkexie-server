@@ -1,0 +1,14 @@
+UPDATE `zhongkexie_server`.`d_function` SET `id`='1', `icon`='fa-home' WHERE (`id`='1');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='2', `icon`='fa fa-cogs' WHERE (`id`='2');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='3', `icon`='fa fa-user' WHERE (`id`='3');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='4', `icon`='fa fa-group' WHERE (`id`='4');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='5', `icon`='fa fa-tasks' WHERE (`id`='5');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='6', `icon`='fa fa-th' WHERE (`id`='6');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='7', `icon`='fa fa-align-left' WHERE (`id`='7');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='8', `icon`='fa fa-navicon' WHERE (`id`='8');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='9', `icon`='fa fa-square-o' WHERE (`id`='9');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='10', `icon`='fa fa-list-alt ' WHERE (`id`='10');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='12', `icon`='fa fa-check-square-o' WHERE (`id`='12');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='13', `icon`='fa fa-pencil-square-o' WHERE (`id`='13');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='14', `icon`='fa fa-pencil' WHERE (`id`='14');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='15', `icon`='fa fa-check-square-o' WHERE (`id`='15');
