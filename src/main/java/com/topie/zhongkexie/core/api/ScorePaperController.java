@@ -180,6 +180,7 @@ public class ScorePaperController {
         ScoreAnswer scoreAnswer = new ScoreAnswer();
         scoreAnswer.setUserId(userId);
         scoreAnswer.setPaperId(paperId);
+        scoreAnswer.setSort_("item_id_asc");
         List<ScoreAnswer> ans = iScoreAnswerService.selectByFilter(scoreAnswer);
         return ResponseUtil.success(ans);
     }
