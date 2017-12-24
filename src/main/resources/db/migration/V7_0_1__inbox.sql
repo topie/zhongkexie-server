@@ -17,3 +17,6 @@ CREATE TABLE `d_message` (
   `content` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`m_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE d_score_item add responsible_department varchar(200);
+ALTER TABLE d_score_item add related_field varchar(200); 

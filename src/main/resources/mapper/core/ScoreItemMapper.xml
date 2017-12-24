@@ -12,5 +12,7 @@
         <result column="score" property="score" jdbcType="DECIMAL"/>
         <result column="option_logic" property="optionLogic" jdbcType="VARCHAR" />
         <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="responsible_department" property="responsibleDepartment" jdbcType="VARCHAR" />
+        <result column="related_field" property="relatedField" jdbcType="VARCHAR"/>
     </resultMap>
 </mapper>

@@ -36,6 +36,12 @@ public class ScoreItem extends Sortable {
     /**
      * 题目分值
      */
+    @Column(name = "responsible_department")
+    private String responsibleDepartment;
+    
+    @Column(name = "related_field")
+    private String relatedField;
+    
     private BigDecimal score;
 
     private Integer sort;
@@ -135,4 +141,21 @@ public class ScoreItem extends Sortable {
     public void setScore(BigDecimal score) {
         this.score = score;
     }
+
+	public String getResponsibleDepartment() {
+		return responsibleDepartment;
+	}
+
+	public void setResponsibleDepartment(String responsibleDepartment) {
+		this.responsibleDepartment = responsibleDepartment;
+	}
+
+	public String getRelatedField() {
+		return relatedField;
+	}
+
+	public void setRelatedField(String relatedField) {
+		this.relatedField = relatedField;
+	}
+
 }
