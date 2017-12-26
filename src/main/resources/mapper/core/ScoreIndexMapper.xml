@@ -10,5 +10,6 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="score" property="score" jdbcType="DECIMAL"/>
         <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="paper_id" property="paperId" jdbcType="INTEGER"/>
     </resultMap>
 </mapper>

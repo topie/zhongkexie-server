@@ -1,9 +1,14 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_score_index")
 public class ScoreIndex extends Sortable {
@@ -22,6 +27,11 @@ public class ScoreIndex extends Sortable {
      */
     @Column(name = "parent_id")
     private Integer parentId;
+    /**
+     * 评价表Id
+     */
+    @Column(name = "paper_id")
+    private Integer paperId;
 
     /**
      * 指标名称
@@ -114,4 +124,19 @@ public class ScoreIndex extends Sortable {
     public void setScore(BigDecimal score) {
         this.score = score;
     }
+    /**
+     * 评价表ID
+     * @return
+     */
+	public Integer getPaperId() {
+		return paperId;
+	}
+	/**
+     * 评价表ID
+     * 
+     */
+	public void setPaperId(Integer paperId) {
+		this.paperId = paperId;
+	}
+    
 }

@@ -26,7 +26,7 @@ public class MessageController {
     @ResponseBody
     public Result list(Message message,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "5") int pageSize) {
+            @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageInfo<Message> pageInfo = iMessageService.selectByFilterAndPage(message, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }

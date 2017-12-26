@@ -1,5 +1,23 @@
 package com.topie.zhongkexie.core.api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
@@ -7,17 +25,17 @@ import com.topie.zhongkexie.common.utils.Result;
 import com.topie.zhongkexie.core.dto.AnswerDto;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperAnswerDto;
-import com.topie.zhongkexie.core.service.*;
-import com.topie.zhongkexie.database.core.model.*;
+import com.topie.zhongkexie.core.service.IScoreAnswerService;
+import com.topie.zhongkexie.core.service.IScoreItemOptionService;
+import com.topie.zhongkexie.core.service.IScoreItemService;
+import com.topie.zhongkexie.core.service.IScorePagerUserService;
+import com.topie.zhongkexie.core.service.IScorePaperService;
+import com.topie.zhongkexie.database.core.model.ScoreAnswer;
+import com.topie.zhongkexie.database.core.model.ScoreItem;
+import com.topie.zhongkexie.database.core.model.ScoreItemOption;
+import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -79,8 +97,8 @@ public class ScorePaperController {
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
     @ResponseBody
     public Result insert(ScorePaper scorePaper) {
-        String contentJson = iScorePaperService.getContentJson(scorePaper.getTitle());
-        scorePaper.setContentJson(contentJson);
+        //String contentJson = iScorePaperService.getContentJson(scorePaper.getTitle());
+        //scorePaper.setContentJson(contentJson);
         int result = iScorePaperService.saveNotNull(scorePaper);
         return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
     }
@@ -88,7 +106,7 @@ public class ScorePaperController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public Result update(ScorePaper scorePaper) {
-        String contentJson = iScorePaperService.getContentJson(scorePaper.getTitle());
+        String contentJson = iScorePaperService.getContentJson(scorePaper.getId(),scorePaper.getTitle());
         scorePaper.setContentJson(contentJson);
         iScorePaperService.updateNotNull(scorePaper);
         return ResponseUtil.success();
@@ -183,6 +201,22 @@ public class ScorePaperController {
         scoreAnswer.setSort_("item_id_asc");
         List<ScoreAnswer> ans = iScoreAnswerService.selectByFilter(scoreAnswer);
         return ResponseUtil.success(ans);
+    }
+    
+    @RequestMapping(value="/getPaperOptions",method=RequestMethod.GET)
+    @ResponseBody
+    public Result getPaperOptions(){
+    	Example example = new Example(ScorePaper.class);
+    	example.setOrderByClause("create_time desc");
+    	List<ScorePaper> list = iScorePaperService.selectByExample(example);
+    	List<Map> maps = new ArrayList<Map>();
+    	for(ScorePaper s:list){
+    		Map<String,Object> map = new HashMap<String,Object>();
+    		map.put("name", s.getTitle());
+    		map.put("id", s.getId());
+    		maps.add(map);
+    	}
+    	return ResponseUtil.success(maps);
     }
 
 }

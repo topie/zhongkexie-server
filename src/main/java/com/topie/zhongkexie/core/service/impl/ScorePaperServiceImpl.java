@@ -1,34 +1,30 @@
 package com.topie.zhongkexie.core.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import tk.mybatis.mapper.entity.Example;
+
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
-import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperIndexDto;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
-import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
-import com.topie.zhongkexie.security.utils.SecurityUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import tk.mybatis.mapper.entity.Example;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -66,9 +62,10 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
     }
 
     @Override
-    public String getContentJson(String title) {
+    public String getContentJson(Integer paperId,String title) {
         List<ScoreIndex> childIndices = new ArrayList<>();
         ScoreIndex scoreIndex = new ScoreIndex();
+        scoreIndex.setPaperId(paperId);
         List<ScoreIndex> indices = iScoreIndexService.selectByFilter(scoreIndex);
         ScoreItemOption scoreItemOption = new ScoreItemOption();
         scoreItemOption.setSort_("option_sort_asc");
