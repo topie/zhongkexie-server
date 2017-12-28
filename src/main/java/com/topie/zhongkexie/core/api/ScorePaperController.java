@@ -58,7 +58,13 @@ public class ScorePaperController {
 
     @Autowired
     private IScorePagerUserService iScorePagerUserService;
-
+    /**
+     * 评价表列表
+     * @param scorePaper
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(ScorePaper scorePaper,
@@ -67,7 +73,13 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
-
+    /**
+     * 评价表审核列表
+     * @param scorePaper
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "/reportCheck", method = RequestMethod.GET)
     @ResponseBody
     public Result reportCheck(ScorePaper scorePaper,
@@ -86,7 +98,12 @@ public class ScorePaperController {
         }
         return ResponseUtil.success(PageConvertUtil.grid(new PageInfo<>(listDto)));
     }
-
+    /**
+     * 评价表审核
+     * @param id
+     * @param result
+     * @return
+     */
     @RequestMapping(value = "/check", method = RequestMethod.GET)
     @ResponseBody
     public Result checkList(int id, short result) {
@@ -125,7 +142,13 @@ public class ScorePaperController {
         iScorePaperService.delete(id);
         return ResponseUtil.success();
     }
-
+    /**
+     * 地方学会审核列表
+     * @param scorePaper
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "/checkList", method = RequestMethod.GET)
     @ResponseBody
     public Result checkList(ScorePaper scorePaper,
@@ -134,14 +157,25 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
-
+    /**
+     * 地方学会审核
+     * @param id
+     * @param result
+     * @return
+     */
     @RequestMapping(value = "/reportContentCheck", method = RequestMethod.GET)
     @ResponseBody
     public Result reportContentCheck(int id, short result) {
         iScorePagerUserService.check(id, result);
         return ResponseUtil.success("操作完成！");
     }
-
+    /**
+     * 填報用户评价表 列表
+     * @param scorePaper
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "/reportList", method = RequestMethod.GET)
     @ResponseBody
     public Result reportList(ScorePaper scorePaper,
@@ -150,7 +184,11 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
-
+    /**
+     * 提交答案
+     * @param paperAnswerDto
+     * @return
+     */
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
     @ResponseBody
     public Result submit(@RequestBody PaperAnswerDto paperAnswerDto) {
@@ -185,12 +223,16 @@ public class ScorePaperController {
                     String logic = scoreItem.getOptionLogic();
                 }
                 iScoreAnswerService.saveNotNull(sa);
-                //todo 计算分数
+                //TODO 计算分数
             }
         }
         return ResponseUtil.success();
     }
-
+	/**
+	 * 获取当前用户的答案
+	 * @param paperId
+	 * @return
+	 */
     @RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
     @ResponseBody
     public Result getAnswer(@RequestParam(value = "paperId") Integer paperId) {
@@ -203,6 +245,10 @@ public class ScorePaperController {
         return ResponseUtil.success(ans);
     }
     
+    /**
+     * 回复所有评价表 下拉框
+     * @return
+     */
     @RequestMapping(value="/getPaperOptions",method=RequestMethod.GET)
     @ResponseBody
     public Result getPaperOptions(){
