@@ -1,4 +1,4 @@
-INSERT INTO `d_function` (`id`, `parent_id`, `function_name`, `display`, `state`, `icon`, `action`, `function_desc`, `insert_time`, `update_time`) VALUES ('17', '7', '2017', '1', '1', 'fa fa-file-code-o', '/api/core/importConf/list', '5', '2017-12-27 15:58:01', '2017-12-27 15:59:52');
+INSERT INTO `d_function` (`id`, `parent_id`, `function_name`, `display`, `state`, `icon`, `action`, `function_desc`, `insert_time`, `update_time`) VALUES ('17', '7', '导入配置', '1', '1', 'fa fa-file-code-o', '/api/core/importConf/list', '5', '2017-12-27 15:58:01', '2017-12-27 15:59:52');
 INSERT INTO `d_role_function` (`function_id`, `role_id`) VALUES ('17', '1');
 UPDATE `d_function` SET `id`='1', `parent_id`='0', `function_name`='首页', `display`='1', `state`='1', `icon`='fa fa-home', `action`='/api/index', `function_desc`='1', `insert_time`='2017-12-21 21:28:15', `update_time`='2017-12-27 16:23:24' WHERE (`id`='1');
 DROP TABLE IF EXISTS d_score_paper_import_conf;

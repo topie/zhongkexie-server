@@ -1,15 +1,17 @@
 package com.topie.zhongkexie.core.service.impl;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.entity.Example;
-
-import java.util.List;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -31,6 +33,7 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements 
         if (scoreAnswer.getIndexId() != null) criteria.andEqualTo("indexId", scoreAnswer.getItemId());
         if (scoreAnswer.getItemId() != null) criteria.andEqualTo("itemId", scoreAnswer.getItemId());
         if (scoreAnswer.getPaperId() != null) criteria.andEqualTo("paperId", scoreAnswer.getPaperId());
+        if (scoreAnswer.getUserId() != null) criteria.andEqualTo("userId", scoreAnswer.getUserId());
         if (StringUtils.isNotEmpty(scoreAnswer.getSortWithOutOrderBy()))
             example.setOrderByClause(scoreAnswer.getSortWithOutOrderBy());
         return getMapper().selectByExample(example);

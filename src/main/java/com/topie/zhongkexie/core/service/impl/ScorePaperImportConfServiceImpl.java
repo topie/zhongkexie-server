@@ -97,9 +97,10 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
     			continue;
     		if(i>end) 
     			break;
-    		System.out.println("第"+ i +"行");
+    		//System.out.println("第"+ i +"行");
     		try{
 	    		for(int j=0;j<jsonIndex.size();j++){
+	    			try{
 	    			JSONObject jo = (JSONObject)jsonIndex.get(j);
 	    			int index_col = jo.getIntValue("index");//获取指标列数
 	    			String index =ls.get(index_col)==null?null:(String)ls.get(index_col);//获取指标名称
@@ -111,8 +112,15 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    				//插入操作
 	    				if(j==0){//若果是第一列  则pid=0 为顶级指标
 	    					ScoreIndex entity = new ScoreIndex();
+	    					if(StringUtils.isEmpty(index)){
+	    						throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+index_col)+"列,指标名称为空");
+	    					}
 	    					entity.setName(index);
-	    					entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+	    					try {
+	    						entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+							} catch (Exception e) {
+								throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+score_col)+"列,解析数字时发生错误->【"+score+"】");
+							}
 	    					entity.setPaperId(paperId);
 	    					entity.setParentId(0);
 	    					entity.setSort(0);
@@ -122,7 +130,14 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    					int pid = map.get(j-1);
 	    					ScoreIndex entity = new ScoreIndex();
 	    					entity.setName(index);
-	    					entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+	    					if(StringUtils.isEmpty(index)){
+	    						throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+index_col)+"列,指标名称为空");
+	    					}
+	    					try {
+	    						entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+							} catch (Exception e) {
+								throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+score_col)+"列,解析数字时发生错误->【"+score+"】");
+							}
 	    					entity.setPaperId(paperId);
 	    					entity.setParentId(pid);
 	    					entity.setSort(0);
@@ -130,13 +145,20 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    					map.put(j, entity.getId());//记录当前列数 最后一次更新的 指标ID 供下级取Pid
 	    				}
 	    			}
+	    			}catch(Exception e){
+	        			e.printStackTrace();
+	        			Map m = new HashMap();
+	        			m.put("index", i);
+	        			m.put("msg", e.getMessage());
+	        			errorList.add(m);
+	        		}
 	    		}
 	    		int pid = map.get(jsonIndex.size()-1);
 	    		String title =ls.get(jsonItem.getIntValue("title"))==null?null:(String)ls.get(jsonItem.getIntValue("title"));
 	    		String score =ls.get(jsonItem.getIntValue("score"))==null?null:(String)ls.get(jsonItem.getIntValue("score"));
 	    		String desc =ls.get(jsonItem.getIntValue("desc"))==null?null:(String)ls.get(jsonItem.getIntValue("desc"));
 	    		String org =ls.get(jsonItem.getIntValue("org"))==null?null:(String)ls.get(jsonItem.getIntValue("org"));
-	    		if(org==null){
+	    		if(StringUtils.isEmpty(org)){
 	    			org = orgName;
 	    		}else{
 	    			orgName = org;
@@ -146,9 +168,16 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		ScoreItem entity = new ScoreItem();
 	    		entity.setIndexId(pid);
 	    		entity.setTitle(title);
+	    		if(StringUtils.isEmpty(title)){
+	    			throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("title"))+"列,题目名称为空");
+	    		}
 	    		entity.setType(0);
 	    		entity.setOptionLogic(desc);
-	    		entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+	    		try {
+					entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+				} catch (Exception e) {
+					throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("score"))+"列,解析数字时发生错误->【"+score+"】");
+				}
 	    		entity.setSort(0);
 	    		entity.setResponsibleDepartment(org);
 	    		this.iScoreItemService.saveNotNull(entity);

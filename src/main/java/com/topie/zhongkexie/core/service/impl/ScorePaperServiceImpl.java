@@ -55,6 +55,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
     public List<ScorePaper> selectByFilter(ScorePaper scorePaper) {
         Example example = new Example(ScorePaper.class);
         Example.Criteria criteria = example.createCriteria();
+        if(scorePaper.getStatus()!=null)criteria.andEqualTo("status",scorePaper.getStatus());
         if (StringUtils.isNotEmpty(scorePaper.getTitle())) criteria.andLike("title", "%" + scorePaper.getTitle() + "%");
         if (StringUtils.isNotEmpty(scorePaper.getSortWithOutOrderBy()))
             example.setOrderByClause(scorePaper.getSortWithOutOrderBy());

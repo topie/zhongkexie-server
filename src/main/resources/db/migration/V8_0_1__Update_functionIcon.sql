@@ -1,4 +1,4 @@
-UPDATE `zhongkexie_server`.`d_function` SET `id`='1', `icon`='fa-home' WHERE (`id`='1');
+UPDATE `zhongkexie_server`.`d_function` SET `id`='1', `icon`='fa fa-home' WHERE (`id`='1');
 UPDATE `zhongkexie_server`.`d_function` SET `id`='2', `icon`='fa fa-cogs' WHERE (`id`='2');
 UPDATE `zhongkexie_server`.`d_function` SET `id`='3', `icon`='fa fa-user' WHERE (`id`='3');
 UPDATE `zhongkexie_server`.`d_function` SET `id`='4', `icon`='fa fa-group' WHERE (`id`='4');

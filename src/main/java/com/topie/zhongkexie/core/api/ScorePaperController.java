@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +34,8 @@ import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.ScorePaperUser;
+import com.topie.zhongkexie.security.security.SecurityUser;
+import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
 
 /**
@@ -58,8 +59,10 @@ public class ScorePaperController {
 
     @Autowired
     private IScorePagerUserService iScorePagerUserService;
+    @Autowired
+    private UserService userService;
     /**
-     * 评价表列表
+     * 编辑评价表列表
      * @param scorePaper
      * @param pageNum
      * @param pageSize
@@ -73,8 +76,41 @@ public class ScorePaperController {
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
+    
+
     /**
-     * 评价表审核列表
+     * 中科协审核发布列表
+     * @param scorePaper
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/checkList", method = RequestMethod.GET)
+    @ResponseBody
+    public Result checkList(ScorePaper scorePaper,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
+    /**
+     * 中科协 查看各个学会提交信息
+     * @param scorePaper
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/zkxcheckList", method = RequestMethod.GET)
+    @ResponseBody
+    public Result zkxcheckList(PagerUserDto pagerUserDto,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+        PageInfo<PagerUserDto> pageInfo = iScorePagerUserService.selectAllUserCommit(pagerUserDto, pageNum, pageSize);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
+    
+    /**
+     * 学会评价表审核列表
      * @param scorePaper
      * @param pageNum
      * @param pageSize
@@ -85,18 +121,9 @@ public class ScorePaperController {
     public Result reportCheck(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
-        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
-        List<PagerUserDto> listDto = new ArrayList<PagerUserDto>();
-        for (ScorePaper sp : pageInfo.getList()) {
-            PagerUserDto dto = new PagerUserDto();
-            BeanUtils.copyProperties(sp, dto);
-            ScorePaperUser dScorePaperUser = iScorePagerUserService.selectByKey(sp.getId());
-            if (dScorePaperUser != null) {
-                dto.setCheckStatus(dScorePaperUser.getStatus());
-            }
-            listDto.add(dto);
-        }
-        return ResponseUtil.success(PageConvertUtil.grid(new PageInfo<>(listDto)));
+    	scorePaper.setStatus(new Short("1"));
+        PageInfo<ScorePaper> pageInfo = iScorePagerUserService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
     /**
      * 评价表审核
@@ -143,21 +170,6 @@ public class ScorePaperController {
         return ResponseUtil.success();
     }
     /**
-     * 地方学会审核列表
-     * @param scorePaper
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @RequestMapping(value = "/checkList", method = RequestMethod.GET)
-    @ResponseBody
-    public Result checkList(ScorePaper scorePaper,
-            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
-        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
-        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
-    }
-    /**
      * 地方学会审核
      * @param id
      * @param result
@@ -181,7 +193,8 @@ public class ScorePaperController {
     public Result reportList(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
-        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+    	scorePaper.setStatus(new Short("1"));
+        PageInfo<ScorePaper> pageInfo = iScorePagerUserService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
     /**
@@ -235,8 +248,25 @@ public class ScorePaperController {
 	 */
     @RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
     @ResponseBody
-    public Result getAnswer(@RequestParam(value = "paperId") Integer paperId) {
-        Integer userId = SecurityUtil.getCurrentUserId();
+    public Result getAnswer(@RequestParam(value = "paperId") Integer paperId,@RequestParam(value = "userId",required=false) Integer userId) {
+    	if(userId==null){
+	    	ScorePaperUser scorePagerUser = new ScorePaperUser();
+	    	SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+	    	String CUname = user.getLoginName();
+	    	String Mname = CUname ;
+	    	userId = user.getId();
+	    	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";  
+	    	if(CUname.endsWith("-001")){//如果学会审核员
+	    		Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";
+	    		userId = userService.findUserByLoginName(Mname).getId();
+	    	}else if(CUname.endsWith("-002")){
+	    		//Mname = CUname ;
+	    	}
+	    	else{//如果不是学会审核员 返回空 
+	    		
+	    	}
+    	
+    	}
         ScoreAnswer scoreAnswer = new ScoreAnswer();
         scoreAnswer.setUserId(userId);
         scoreAnswer.setPaperId(paperId);

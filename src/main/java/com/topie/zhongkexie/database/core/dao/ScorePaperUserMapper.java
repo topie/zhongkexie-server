@@ -1,9 +1,13 @@
 package com.topie.zhongkexie.database.core.dao;
 
-import com.topie.zhongkexie.database.core.model.ScorePaperUser;
+import java.util.List;
+
 import tk.mybatis.mapper.common.Mapper;
+
+import com.topie.zhongkexie.core.dto.PagerUserDto;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 
 public interface ScorePaperUserMapper extends Mapper<ScorePaperUser> {
 
-	ScorePaperUser selectByPagerId(int pagerId);
+	List<PagerUserDto> selectUserCommitPaper(PagerUserDto pagerUserDto);
 }

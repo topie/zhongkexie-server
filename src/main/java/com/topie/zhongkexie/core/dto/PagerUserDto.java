@@ -50,6 +50,15 @@ public class PagerUserDto {
 	     * 审核状态
 	     */
 	    private short checkStatus;
+	    /**
+	     * 提交人 （学会）
+	     */
+	    private String userName;
+	    /**
+	     * 
+	     * @return
+	     */
+	    private Integer userId;
 
 		public Integer getId() {
 			return id;
@@ -130,5 +139,21 @@ public class PagerUserDto {
 		public void setCheckStatus(short checkStatus) {
 			this.checkStatus = checkStatus;
 		}
-	    
+
+		public String getUserName() {
+			return userName;
+		}
+
+		public void setUserName(String userName) {
+			this.userName = userName;
+		}
+
+		public Integer getUserId() {
+			return userId;
+		}
+
+		public void setUserId(Integer userId) {
+			this.userId = userId;
+		}
+		
 }

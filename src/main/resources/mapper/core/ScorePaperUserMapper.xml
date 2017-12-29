@@ -10,10 +10,27 @@
     <result column="status" property="status" jdbcType="SMALLINT" />
     <result column="feedback" property="feedback" jdbcType="VARCHAR" />
   </resultMap>
-  
+  <resultMap id="PagerUserDtoResultMap" type="com.topie.zhongkexie.core.dto.PagerUserDto" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="begin" property="begin" jdbcType="TIMESTAMP" />
+    <result column="end" property="end" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="approve_status" property="approveStatus" jdbcType="SMALLINT" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+    <result column="user_id" property="userId" jdbcType="INTEGER"/>
+    <result column="user_status" property="checkStatus" jdbcType="VARCHAR"/>
+    <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" />
+  </resultMap>
   <select id="selectByPagerId" resultMap="BaseResultMap">
         select
         * from d_score_paper_user t where t.paper_id = #{pageId,jdbcType=INTEGER}
     </select>
   
+  <select id="selectUserCommitPaper" resultMap="PagerUserDtoResultMap">
+  	SELECT spu.`status` user_status,u.id userId,sp.*,u.display_name user_name FROM d_score_paper_user spu LEFT JOIN d_score_paper sp ON spu.paper_id=sp.id 
+LEFT JOIN d_user u ON spu.user_id = u.id
+  </select>
 </mapper>
