@@ -32,12 +32,12 @@ public class PagerUserDto {
 	    private Date updateTime;
 
 	    /**
-	     * 状态
+	     * 状态  开启填报 关闭填报
 	     */
 	    private Short status;
 
 	    /**
-	     * 审批状态
+	     * 审批状态  新建  待审核   通过  驳回
 	     */
 	    private Short approveStatus;
 
@@ -47,7 +47,7 @@ public class PagerUserDto {
 	    private String contentJson;
 	    
 	    /**
-	     * 审核状态
+	     * 用户提交答案 的审核状态
 	     */
 	    private short checkStatus;
 	    /**
@@ -131,11 +131,17 @@ public class PagerUserDto {
 		public void setContentJson(String contentJson) {
 			this.contentJson = contentJson;
 		}
-
+		/**
+		 * 用户提交答案 的审核状态
+		 * @return
+		 */
 		public short getCheckStatus() {
 			return checkStatus;
 		}
-
+		/**
+		 * 用户提交答案 的审核状态
+		 * @param checkStatus
+		 */
 		public void setCheckStatus(short checkStatus) {
 			this.checkStatus = checkStatus;
 		}

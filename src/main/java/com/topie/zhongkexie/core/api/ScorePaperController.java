@@ -33,7 +33,6 @@ import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
-import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
@@ -250,16 +249,15 @@ public class ScorePaperController {
     @ResponseBody
     public Result getAnswer(@RequestParam(value = "paperId") Integer paperId,@RequestParam(value = "userId",required=false) Integer userId) {
     	if(userId==null){
-	    	ScorePaperUser scorePagerUser = new ScorePaperUser();
 	    	SecurityUser user = SecurityUtil.getCurrentSecurityUser();
 	    	String CUname = user.getLoginName();
 	    	String Mname = CUname ;
 	    	userId = user.getId();
 	    	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";  
-	    	if(CUname.endsWith("-001")){//如果学会审核员
-	    		Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";
+	    	if(CUname.endsWith("001")){//如果学会审核员
+	    		Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";
 	    		userId = userService.findUserByLoginName(Mname).getId();
-	    	}else if(CUname.endsWith("-002")){
+	    	}else if(CUname.endsWith("002")){
 	    		//Mname = CUname ;
 	    	}
 	    	else{//如果不是学会审核员 返回空 

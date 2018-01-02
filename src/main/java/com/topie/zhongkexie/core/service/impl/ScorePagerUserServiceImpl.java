@@ -41,8 +41,8 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
     	String Mname = CUname ;
     	int userId = user.getId();
     	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";  
-    	if(CUname.endsWith("-001")){//如果学会审核员
-    		Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";
+    	if(CUname.endsWith("001")){//如果学会审核员
+    		Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";
     		userId = userService.findUserByLoginName(Mname).getId();
     	}else {
     		throw new DefaultBusinessException("学会管理员才能审核!");
@@ -77,10 +77,10 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
         	String Mname = CUname ;
         	int userId = user.getId();
         	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";  
-        	if(CUname.endsWith("-001")){//如果学会审核员
-        		Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";
+        	if(CUname.endsWith("001")){//如果学会审核员
+        		Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";
         		userId = userService.findUserByLoginName(Mname).getId();
-        	}else if(CUname.endsWith("-002")){
+        	}else if(CUname.endsWith("002")){
         		//Mname = CUname ;
         	}
         	else{//如果不是学会审核员 返回空 
