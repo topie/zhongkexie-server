@@ -41,10 +41,13 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
     	String Mname = CUname ;
     	int userId = user.getId();
     	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";  
-    	if(CUname.endsWith("001")){//如果学会审核员
+    	if(CUname.endsWith("001")){//如果学会审核员 （通过 退回）
     		Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";
     		userId = userService.findUserByLoginName(Mname).getId();
-    	}else {
+    	}else if(CUname.endsWith("002")&& PagerUserDto.PAPERSTATUS_SUBMMIT.equals(result)){//填报员 提交审核
+    		System.out.println(CUname+"=》提交审核");
+    	}
+    	else {
     		throw new DefaultBusinessException("学会管理员才能审核!");
     	}
     	scorePagerUser.setUserId(userId);
@@ -94,7 +97,7 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
         	if(su!=null){
         		status = su.getStatus();
         	}
-        	sp.setStatus(status);
+        	sp.setApproveStatus(status);
         }
         return page;
     }

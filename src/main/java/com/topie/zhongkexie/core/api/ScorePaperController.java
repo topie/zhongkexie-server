@@ -89,6 +89,7 @@ public class ScorePaperController {
     public Result checkList(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+    	scorePaper.setApproveStatus(PagerUserDto.PAPERSTATUS_SUBMMIT);
         PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
@@ -120,9 +121,18 @@ public class ScorePaperController {
     public Result reportCheck(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
-    	scorePaper.setStatus(new Short("1"));
+    	scorePaper.setStatus(PagerUserDto.PAPERSTATUS_SUBMMIT);
         PageInfo<ScorePaper> pageInfo = iScorePagerUserService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
+    /**
+     * 开启、关闭 填报
+     */
+    @RequestMapping(value = "/paperStatus", method = RequestMethod.POST)
+    @ResponseBody
+    public Result paperStatus(ScorePaper scorePaper) {
+    	iScorePaperService.updateNotNull(scorePaper);
+        return ResponseUtil.success("操作完成！");
     }
     /**
      * 评价表审核
@@ -142,6 +152,8 @@ public class ScorePaperController {
     public Result insert(ScorePaper scorePaper) {
         //String contentJson = iScorePaperService.getContentJson(scorePaper.getTitle());
         //scorePaper.setContentJson(contentJson);
+    	scorePaper.setApproveStatus(PagerUserDto.PAPERSTATUS_NEW);//开启填报
+    	scorePaper.setStatus(PagerUserDto.PAPERSTATUS_END);//未开启填报
         int result = iScorePaperService.saveNotNull(scorePaper);
         return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
     }
@@ -169,6 +181,18 @@ public class ScorePaperController {
         return ResponseUtil.success();
     }
     /**
+     * 提交到 地方学会审核答案
+     * @param id
+     * @param result
+     * @return
+     */
+    @RequestMapping(value = "/reportContentSubmit", method = RequestMethod.GET)
+    @ResponseBody
+    public Result reportContentSubmit(int id) {
+        iScorePagerUserService.check(id, PagerUserDto.PAPERSTATUS_SUBMMIT);
+        return ResponseUtil.success("操作完成！");
+    }
+    /**
      * 地方学会审核
      * @param id
      * @param result
@@ -192,7 +216,7 @@ public class ScorePaperController {
     public Result reportList(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
-    	scorePaper.setStatus(new Short("1"));
+    	scorePaper.setApproveStatus(PagerUserDto.PAPERSTATUS_EGIS);//审核通过的
         PageInfo<ScorePaper> pageInfo = iScorePagerUserService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
@@ -274,7 +298,7 @@ public class ScorePaperController {
     }
     
     /**
-     * 回复所有评价表 下拉框
+     * 获取所有评价表 下拉框
      * @return
      */
     @RequestMapping(value="/getPaperOptions",method=RequestMethod.GET)

@@ -56,6 +56,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
         Example example = new Example(ScorePaper.class);
         Example.Criteria criteria = example.createCriteria();
         if(scorePaper.getStatus()!=null)criteria.andEqualTo("status",scorePaper.getStatus());
+        if(scorePaper.getApproveStatus()!=null)criteria.andEqualTo("approveStatus",scorePaper.getApproveStatus());
         if (StringUtils.isNotEmpty(scorePaper.getTitle())) criteria.andLike("title", "%" + scorePaper.getTitle() + "%");
         if (StringUtils.isNotEmpty(scorePaper.getSortWithOutOrderBy()))
             example.setOrderByClause(scorePaper.getSortWithOutOrderBy());
@@ -126,7 +127,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
     public void check(int id, short result) {
         // TODO Auto-generated method stub
         ScorePaper page = getMapper().selectByPrimaryKey(id);
-        page.setStatus(result);
+        page.setApproveStatus(result);
         getMapper().updateByPrimaryKey(page);
     }
 
