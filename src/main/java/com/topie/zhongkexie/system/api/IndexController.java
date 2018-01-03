@@ -1,17 +1,10 @@
 package com.topie.zhongkexie.system.api;
 
-import com.topie.zhongkexie.common.tools.cache.RedisCache;
-import com.topie.zhongkexie.common.utils.ResponseUtil;
-import com.topie.zhongkexie.common.utils.Result;
-import com.topie.zhongkexie.database.core.model.User;
-import com.topie.zhongkexie.security.constants.SecurityConstant;
-import com.topie.zhongkexie.security.dto.FunctionDTO;
-import com.topie.zhongkexie.security.exception.AuBzConstant;
-import com.topie.zhongkexie.security.exception.AuthBusinessException;
-import com.topie.zhongkexie.security.security.UserCache;
-import com.topie.zhongkexie.security.security.SecurityUser;
-import com.topie.zhongkexie.security.service.UserService;
-import com.topie.zhongkexie.security.utils.SecurityUtil;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,9 +13,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.topie.zhongkexie.common.tools.cache.RedisCache;
+import com.topie.zhongkexie.common.utils.ResponseUtil;
+import com.topie.zhongkexie.common.utils.Result;
+import com.topie.zhongkexie.database.core.model.User;
+import com.topie.zhongkexie.security.constants.SecurityConstant;
+import com.topie.zhongkexie.security.dto.FunctionDTO;
+import com.topie.zhongkexie.security.exception.AuBzConstant;
+import com.topie.zhongkexie.security.exception.AuthBusinessException;
+import com.topie.zhongkexie.security.security.SecurityUser;
+import com.topie.zhongkexie.security.security.UserCache;
+import com.topie.zhongkexie.security.service.UserService;
+import com.topie.zhongkexie.security.utils.SecurityUtil;
 
 /**
  * Created by chenguojun on 8/23/16.
@@ -97,6 +99,7 @@ public class IndexController {
         if (StringUtils.isNotEmpty(newPassword)) {
             user.setPassword(newPassword);
         }
+        user.setLastPasswordReset(new Date());
         userService.updateUser(user);
         return ResponseUtil.success();
     }
