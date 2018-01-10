@@ -89,8 +89,7 @@ public class ScorePaperController {
     public Result checkList(ScorePaper scorePaper,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
-    	scorePaper.setApproveStatus(PagerUserDto.PAPERSTATUS_SUBMMIT);
-        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPage(scorePaper, pageNum, pageSize);
+        PageInfo<ScorePaper> pageInfo = iScorePaperService.selectByFilterAndPageForCheck(scorePaper, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
     /**

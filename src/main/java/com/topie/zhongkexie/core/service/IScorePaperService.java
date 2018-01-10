@@ -18,5 +18,14 @@ public interface IScorePaperService extends IService<ScorePaper> {
     String getContentJson(Integer paperId, String title);
 
 	void check(int id, short result);
+	/**
+	 * 中科协 评价表 审核列表
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	PageInfo<ScorePaper> selectByFilterAndPageForCheck(ScorePaper scorePaper,
+			int pageNum, int pageSize);
 
 }

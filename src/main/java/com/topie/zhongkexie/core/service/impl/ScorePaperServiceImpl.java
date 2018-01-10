@@ -15,6 +15,7 @@ import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
+import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperIndexDto;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
@@ -50,6 +51,28 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
         List<ScorePaper> list = selectByFilter(scorePaper);
         return new PageInfo<>(list);
     }
+    
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+	public PageInfo<ScorePaper> selectByFilterAndPageForCheck(
+			ScorePaper scorePaper, int pageNum, int pageSize) {
+    	 PageHelper.startPage(pageNum, pageSize);
+    	 Example example = new Example(ScorePaper.class);
+         Example.Criteria criteria = example.createCriteria();
+         if(scorePaper.getStatus()!=null)criteria.andEqualTo("status",scorePaper.getStatus());
+         List ls = new ArrayList();
+         ls.add(PagerUserDto.PAPERSTATUS_SUBMMIT);
+         ls.add(PagerUserDto.PAPERSTATUS_EGIS);
+         criteria.andIn("approveStatus",ls);
+         if (StringUtils.isNotEmpty(scorePaper.getTitle())) criteria.andLike("title", "%" + scorePaper.getTitle() + "%");
+         if (StringUtils.isNotEmpty(scorePaper.getSortWithOutOrderBy()))
+             example.setOrderByClause(scorePaper.getSortWithOutOrderBy());
+         List<ScorePaper> list  = getMapper().selectByExample(example);
+         
+         return new PageInfo<>(list);
+	}
+
 
     @Override
     public List<ScorePaper> selectByFilter(ScorePaper scorePaper) {
@@ -125,7 +148,6 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 
     @Override
     public void check(int id, short result) {
-        // TODO Auto-generated method stub
         ScorePaper page = getMapper().selectByPrimaryKey(id);
         page.setApproveStatus(result);
         getMapper().updateByPrimaryKey(page);
@@ -142,4 +164,5 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
         return path;
     }
 
+	
 }
