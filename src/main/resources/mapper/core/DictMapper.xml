@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topie.zhongkexie.database.core.dao.DictMapper">
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.core.model.Dict">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="dict_id" jdbcType="INTEGER" property="dictId" />
+    <result column="dict_desc" jdbcType="VARCHAR" property="dictDesc" />
+    <result column="dict_name" jdbcType="VARCHAR" property="dictName" />
+    <result column="dict_seq" jdbcType="INTEGER" property="dictSeq" />
+    <result column="dict_status" jdbcType="INTEGER" property="dictStatus" />
+    <result column="dict_type" jdbcType="VARCHAR" property="dictType" />
+    <result column="dict_code" jdbcType="VARCHAR" property="dictCode" />
+  </resultMap>
+</mapper>

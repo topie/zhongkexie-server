@@ -46,6 +46,8 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
     		userId = userService.findUserByLoginName(Mname).getId();
     	}else if(CUname.endsWith("002")&& PagerUserDto.PAPERSTATUS_SUBMMIT.equals(result)){//填报员 提交审核
     		System.out.println(CUname+"=》提交审核");
+    	}else if(CUname.equals("admin")){
+    		
     	}
     	else {
     		throw new DefaultBusinessException("学会管理员才能审核!");
@@ -85,6 +87,9 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
         		userId = userService.findUserByLoginName(Mname).getId();
         	}else if(CUname.endsWith("002")){
         		//Mname = CUname ;
+        	}
+        	else if(CUname.equals("admin")){
+        		
         	}
         	else{//如果不是学会审核员 返回空 
         		//TODO 如果不是学会审核员 返回空 是否正确
