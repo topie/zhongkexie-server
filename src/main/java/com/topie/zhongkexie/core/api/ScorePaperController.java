@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import tk.mybatis.mapper.entity.Example;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
@@ -164,6 +165,12 @@ public class ScorePaperController {
         scorePaper.setContentJson(contentJson);
         iScorePaperService.updateNotNull(scorePaper);
         return ResponseUtil.success();
+    }
+    @RequestMapping(value = "/getPaperJson", method = RequestMethod.POST)
+    @ResponseBody
+    public Result getPaperJson(Integer paperId ,String indexIds , String orgIds) {
+    	JSONObject contentJson = iScorePaperService.getContentJson(paperId,indexIds,orgIds);
+        return ResponseUtil.success(contentJson);
     }
 
     @RequestMapping(value = "/load/{id}", method = RequestMethod.GET)

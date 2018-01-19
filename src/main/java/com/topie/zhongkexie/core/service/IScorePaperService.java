@@ -2,6 +2,7 @@ package com.topie.zhongkexie.core.service;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
@@ -27,5 +28,7 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	 */
 	PageInfo<ScorePaper> selectByFilterAndPageForCheck(ScorePaper scorePaper,
 			int pageNum, int pageSize);
+
+	JSONObject getContentJson(Integer paperId, String indexIds, String orgIds);
 
 }
