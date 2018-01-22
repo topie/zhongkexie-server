@@ -231,5 +231,69 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 	        return jo;
 	}
 
+
+	@Override
+	public int saveNotNull(ScorePaper scorePaper, Integer copyPaperId) {
+		int result = this.saveNotNull(scorePaper);
+		int paperId = scorePaper.getId();
+		ScoreIndex scoreIndex = new ScoreIndex();
+		scoreIndex.setPaperId(copyPaperId);
+		scoreIndex.setParentId(0);
+		List<ScoreIndex> indexList = iScoreIndexService.selectByFilter(scoreIndex);
+		for(ScoreIndex index:indexList){
+			Integer oldid = index.getId();
+			index.setId(null);
+			index.setPaperId(paperId);
+			iScoreIndexService.saveNotNull(index);
+			saveChildIndex(paperId,index.getId(),oldid);
+			
+		}
+		scorePaper.setContentJson(getContentJson(scorePaper.getId(),scorePaper.getTitle()));
+		this.updateNotNull(scorePaper);
+		return result;
+	}
+
+	/**
+	 * 复制指标和题目
+	 * @param paperId
+	 * @param newParentId 
+	 * @param oldParentId
+	 */
+	private void saveChildIndex(Integer paperId,Integer newParentId, Integer oldParentId) {
+		ScoreIndex scoreIndex = new ScoreIndex();
+		scoreIndex.setParentId(oldParentId);
+		List<ScoreIndex> indexList = iScoreIndexService.selectByFilter(scoreIndex);
+		for(ScoreIndex index:indexList){
+			Integer oldid = index.getId();
+			index.setId(null);
+			index.setPaperId(paperId);
+			index.setParentId(newParentId);
+			iScoreIndexService.saveNotNull(index);
+			saveChildIndex(paperId,index.getId(),oldid);
+			
+		}
+		if(indexList.size()==0){//如果是最底层节点
+			ScoreItem scoreItem = new ScoreItem();
+			scoreItem.setIndexId(oldParentId);
+			List<ScoreItem> itemList = iScoreItemService.selectByFilter(scoreItem);//查询题目
+			for(ScoreItem item:itemList){
+				Integer oldItemId = item.getId();
+				item.setId(null);
+				item.setIndexId(newParentId);
+				iScoreItemService.saveNotNull(item);
+				Integer newItemId = item.getId();
+				ScoreItemOption scoreItemOption = new ScoreItemOption();
+				scoreItemOption.setItemId(oldItemId);
+				List<ScoreItemOption> optionList = iScoreItemOptionService.selectByFilter(scoreItemOption);
+				for(ScoreItemOption option:optionList){//查询选项
+					option.setId(null);
+					option.setItemId(newItemId);
+					iScoreItemOptionService.saveNotNull(option);
+				}
+			}
+		}
+		
+	}
+
 	
 }

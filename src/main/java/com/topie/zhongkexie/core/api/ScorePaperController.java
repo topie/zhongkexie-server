@@ -149,12 +149,17 @@ public class ScorePaperController {
 
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
     @ResponseBody
-    public Result insert(ScorePaper scorePaper) {
+    public Result insert(ScorePaper scorePaper,@RequestParam(value="copyPaperId",required=false) Integer copyPaperId) {
         //String contentJson = iScorePaperService.getContentJson(scorePaper.getTitle());
         //scorePaper.setContentJson(contentJson);
     	scorePaper.setApproveStatus(PagerUserDto.PAPERSTATUS_NEW);//开启填报
     	scorePaper.setStatus(PagerUserDto.PAPERSTATUS_END);//未开启填报
-        int result = iScorePaperService.saveNotNull(scorePaper);
+    	int result=0;
+    	if(copyPaperId==null){
+    		result = iScorePaperService.saveNotNull(scorePaper);
+    	}else{
+    		result = iScorePaperService.saveNotNull(scorePaper,copyPaperId);
+    	}
         return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
     }
 

@@ -31,4 +31,6 @@ public interface IScorePaperService extends IService<ScorePaper> {
 
 	JSONObject getContentJson(Integer paperId, String indexIds, String orgIds);
 
+	int saveNotNull(ScorePaper scorePaper, Integer copyPaperId);
+
 }
