@@ -59,12 +59,13 @@ public class ScorePaperImportConfController {
     	List<Map> list = iScorePaperImportConfigService.insertImports(conf,false);
     	return ResponseUtil.success(list);
     }
-    @RequestMapping(value="/importTest", method = RequestMethod.POST)
-    @ResponseBody
-    public Result importTest(ScorePaperImportConf conf){
-    	List<Map> list = iScorePaperImportConfigService.insertImports(conf,true);
-    	return ResponseUtil.success(list);
-    }
+    
+   //@RequestMapping(value="/importTest", method = RequestMethod.POST)
+    //@ResponseBody
+//    public Result importTest(ScorePaperImportConf conf){
+//    	List<Map> list = iScorePaperImportConfigService.insertImports(conf,true);
+//    	return ResponseUtil.success(list);
+//    }
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
     @ResponseBody
     public Result insert(ScorePaperImportConf conf) {

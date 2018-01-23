@@ -2,6 +2,8 @@ package com.topie.zhongkexie.core.service;
 
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
@@ -30,7 +32,19 @@ public interface IScorePaperService extends IService<ScorePaper> {
 			int pageNum, int pageSize);
 
 	JSONObject getContentJson(Integer paperId, String indexIds, String orgIds);
-
+	/**
+	 * 传入copyPaperId 复制paperId 下的所有指标和题目
+	 * @param scorePaper
+	 * @param copyPaperId
+	 * @return
+	 */
 	int saveNotNull(ScorePaper scorePaper, Integer copyPaperId);
+	/**
+	 * 导出数据 可选择指标  选择汇总各个学会提交的答案
+	 * @param paperId
+	 * @param indexIds
+	 * @param orgIds
+	 */
+	HSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds);
 
 }

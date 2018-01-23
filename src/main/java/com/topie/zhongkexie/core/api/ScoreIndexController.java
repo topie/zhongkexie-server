@@ -1,5 +1,16 @@
 package com.topie.zhongkexie.core.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
@@ -7,12 +18,6 @@ import com.topie.zhongkexie.common.utils.Result;
 import com.topie.zhongkexie.common.utils.TreeNode;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -57,6 +62,12 @@ public class ScoreIndexController {
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     @ResponseBody
     public Result delete(@RequestParam(value = "id") Integer id) {
+    	ScoreIndex scoreIndex = new ScoreIndex();
+    	scoreIndex.setParentId(id);
+    	List list = iScoreIndexService.selectByFilter(scoreIndex);
+    	if(list.size()>0){
+    		return ResponseUtil.error("请先删除下级节点");
+    	}
         iScoreIndexService.delete(id);
         return ResponseUtil.success();
     }

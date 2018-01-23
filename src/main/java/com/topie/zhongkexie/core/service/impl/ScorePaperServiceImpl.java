@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,19 +18,27 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
+import com.topie.zhongkexie.common.utils.ExcelExportUtils;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperIndexDto;
+import com.topie.zhongkexie.core.exception.RuntimeBusinessException;
+import com.topie.zhongkexie.core.service.IDeptService;
+import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
+import com.topie.zhongkexie.database.core.model.Dept;
+import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.database.core.model.User;
+import com.topie.zhongkexie.security.service.UserService;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -45,7 +56,15 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
     private IScoreItemOptionService iScoreItemOptionService;
     
     @Autowired
-    ScorePaperUserMapper dScorePaperUserMapper;
+    private ScorePaperUserMapper dScorePaperUserMapper;
+
+    @Autowired
+    private IDeptService deptService;
+
+    @Autowired
+    private IScoreAnswerService iScoreAnswerService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public PageInfo<ScorePaper> selectByFilterAndPage(ScorePaper scorePaper, int pageNum, int pageSize) {
@@ -293,6 +312,127 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 			}
 		}
 		
+	}
+
+
+	@Override
+	public HSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds) {
+		ScorePaper p = this.getMapper().selectByPrimaryKey(paperId);
+		if(p==null) throw new RuntimeBusinessException("paperId不能为空");
+		String title = p.getTitle();
+		Example ex = new Example(ScoreIndex.class);
+        Criteria c = ex.createCriteria();
+        c.andEqualTo("paperId", paperId);
+        List list = Arrays.asList(indexIds.split(","));
+        c.andIn("id",list);
+        List<ScoreIndex> indexList = iScoreIndexService.selectByExample(ex);
+        List<ScoreIndex> indexParentList = new ArrayList<ScoreIndex>();
+        List<ScoreIndex> indexChildList = new ArrayList<ScoreIndex>();
+        for(ScoreIndex index:indexList){
+        	if(index.getParentId()==0){
+        		indexParentList.add(index);
+        	}else{
+        		indexChildList.add(index);
+        	}
+        }
+		Example example = new Example(Dept.class);
+		example.createCriteria().andIn("id", Arrays.asList(orgIds.split(",")));
+		List<Dept> depts = deptService.selectByExample(example);
+		String[] indexTitle = "一级指标,二级指标,三级指标,四级指标,五级指标,六级指标,七级指标,八级指标".split(",");
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = ExcelExportUtils.getInstance().createSheet(wb, "sheet1");
+		int row = 0;//行
+		for(ScoreIndex index:indexParentList){
+			int num = 0;
+			int col = 0;//列
+			row  = exportIndex(sheet,index,num,indexTitle,depts,paperId,row,col,indexChildList);
+			
+		}
+		return wb;
+	}
+
+
+	private int exportIndex(HSSFSheet sheet, ScoreIndex index, int num,
+			String[] indexTitle,List<Dept> depts,int paperId, int row, int col,List<ScoreIndex> indexChildList) {
+		col = writeIndex(sheet,index,row,col,indexTitle,num);
+		boolean f = true;
+		for(ScoreIndex one:indexChildList){
+			if(index.getId().intValue()==one.getParentId().intValue()){
+				row = exportIndex(sheet,one,num,indexTitle,depts,paperId,row,col,indexChildList);
+				f = false;
+			}
+		}
+		if(f){//如果是最底层指标添加题目
+			ScoreItem scoreItem = new ScoreItem();
+			scoreItem.setIndexId(index.getId());
+			List<ScoreItem> items = iScoreItemService.selectByFilter(scoreItem);
+			for(ScoreItem item:items){
+				writeItem(sheet,item,row,col,depts);
+				row++;
+			}
+		}
+		return row;
+	}
+
+
+	private void writeItem(HSSFSheet sheet, ScoreItem item, int row , int col,
+			List<Dept> depts) {
+		if(row==0){//生成标题
+			HSSFRow headRow = sheet.getRow(row)==null?sheet.createRow(row):sheet.getRow(row);
+			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
+			int i = 0;
+			for(Dept dept:depts){
+				headRow.createCell(col+i++).setCellValue(dept.getName());
+				ScoreAnswer scoreAnswer = new ScoreAnswer();
+				scoreAnswer.setItemId(item.getId());
+				List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
+				String value = "";
+				for(ScoreAnswer s:answers){
+					value+= s.getAnswerValue();
+				}
+				dataRow.createCell(col+i++).setCellValue(value);
+			}
+		}
+		HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
+		int i = 0;
+		for(Dept dept:depts){
+			String userLoginName = dept.getCode()+"002";
+			User user = userService.findUserByLoginName(userLoginName);
+			String value = "";
+			if(user!=null){
+				ScoreAnswer scoreAnswer = new ScoreAnswer();
+				scoreAnswer.setItemId(item.getId());
+				scoreAnswer.setUserId(user.getId());
+				List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
+				for(ScoreAnswer s:answers){
+					value+= s.getAnswerValue();
+				}
+			}
+			dataRow.createCell(col+i++).setCellValue(value);
+		}
+		
+	}
+
+
+	private int writeIndex(HSSFSheet sheet, ScoreIndex index, int row,
+			int col, String[] indexTitle,int num) {
+		if(row==0){//生成标题
+			
+			HSSFRow headRow = null;
+			headRow = sheet.getRow(row)==null?sheet.createRow(row):sheet.getRow(row);
+			headRow.createCell(col).setCellValue(indexTitle[num]);
+			headRow.createCell(col+1).setCellValue("分值");
+			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
+			dataRow.createCell(col).setCellValue(index.getName());
+			dataRow.createCell(col+1).setCellValue(index.getScore().intValue());
+		}else{
+			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
+			dataRow.createCell(col).setCellValue(index.getName());
+			dataRow.createCell(col+1).setCellValue(index.getScore().intValue());
+		}
+		col+=2;
+		
+		return col;
 	}
 
 	
