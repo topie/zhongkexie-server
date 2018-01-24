@@ -1,13 +1,20 @@
 package com.topie.zhongkexie.core.service.impl;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +25,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
-import com.topie.zhongkexie.common.utils.ExcelExportUtils;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
@@ -338,27 +344,120 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 		Example example = new Example(Dept.class);
 		example.createCriteria().andIn("id", Arrays.asList(orgIds.split(",")));
 		List<Dept> depts = deptService.selectByExample(example);
-		String[] indexTitle = "一级指标,二级指标,三级指标,四级指标,五级指标,六级指标,七级指标,八级指标".split(",");
+		String[] indexTitle = "一级指标,,二级指标,,三级指标,,四级指标,,五级指标,,六级指标,,七级指标,,八级指标,".split(",");
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = ExcelExportUtils.getInstance().createSheet(wb, "sheet1");
+		HSSFSheet sheet = wb.createSheet("sheet1");
+		sheet.autoSizeColumn(1);// 设置每个单元格宽度根据字多少自适应
+		HSSFCellStyle style = getStyle(wb);
 		int row = 0;//行
 		for(ScoreIndex index:indexParentList){
-			int num = 0;
 			int col = 0;//列
-			row  = exportIndex(sheet,index,num,indexTitle,depts,paperId,row,col,indexChildList);
-			
+			row  = exportIndex(sheet,index,indexTitle,depts,paperId,row,col,indexChildList);
 		}
+		List<Integer> collist =getNeedMergeCell(sheet);
+		mergeCell(sheet,collist,style);
 		return wb;
 	}
 
 
-	private int exportIndex(HSSFSheet sheet, ScoreIndex index, int num,
+	private void mergeCell(HSSFSheet sheet, List<Integer> collist, HSSFCellStyle style) {
+		//获得总列数
+		int maxRowNum=sheet.getLastRowNum();//获得总行数
+		for(int j:collist){
+			int startRow = 1;
+			String startValue = "";
+			for(int rowIndex=1;rowIndex<=maxRowNum;rowIndex++){
+				HSSFCell cell = sheet.getRow(rowIndex).getCell(j);
+				if(cell==null){
+					if(rowIndex==maxRowNum && startRow<(rowIndex-1)){
+						CellRangeAddress region = new CellRangeAddress(startRow, rowIndex-1, j, j); //参数1：起始行 参数2：终止行 参数3：起始列 参数4：终止列   
+						sheet.addMergedRegion(region);  
+					}
+					continue;
+				}
+				cell.setCellStyle(style);
+				String value = getCellValue(cell);
+				if(StringUtils.isNotEmpty(value)){
+					if(startRow<rowIndex-1){
+						CellRangeAddress region = new CellRangeAddress(startRow, rowIndex-1, j, j); //参数1：起始行 参数2：终止行 参数3：起始列 参数4：终止列   
+						sheet.addMergedRegion(region);  
+					}
+					startValue = value;
+					startRow = rowIndex;
+				}
+				if(rowIndex==maxRowNum && startRow<(rowIndex-1)){
+					CellRangeAddress region = new CellRangeAddress(startRow, rowIndex-1, j, j); //参数1：起始行 参数2：终止行 参数3：起始列 参数4：终止列   
+					sheet.addMergedRegion(region);  
+				}
+			}
+			
+		}
+		
+	}
+
+
+	private List<Integer> getNeedMergeCell(HSSFSheet sheet) {
+		List<Integer> collist = new ArrayList();
+		for(int i=0;;i++){
+			String value = sheet.getRow(0).getCell(i).getStringCellValue();
+			if(value.endsWith("指标")){
+				collist.add(i);
+			}
+			if(value.equals("分值")){
+				collist.add(i);
+			}
+			if(value.endsWith("题目")){
+				break;
+			}
+			if(value.endsWith("学会")){
+				break;
+			}
+			if(i>20){
+				break;
+			}
+		}
+		return collist;
+	}
+
+
+	private HSSFCellStyle getStyle(HSSFWorkbook wb) {
+		HSSFCellStyle style = wb.createCellStyle(); // style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		// // 创建一个居中格式
+		HSSFFont fontSearch = wb.createFont();
+		fontSearch.setFontHeightInPoints((short)12);;// 设置字体大小fontSearch.setFontHeightInPoints((short)
+		// 13);
+		style.setAlignment(XSSFCellStyle.ALIGN_CENTER); // 居中  
+		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);//垂直  
+		style.setFont(fontSearch);// 将该字体样式放入style这个样式中，其他单元格样式也是这么加的，这里只是给一个例子
+		//style.setBorderBottom(HSSFCellStyle.BORDER_DOUBLE);// 设置单元格下边框
+		//style.setBorderLeft(HSSFCellStyle.BORDER_DOUBLE);
+		return style;
+	}
+
+
+	private String getCellValue(HSSFCell cell) {
+
+        DecimalFormat nf = new DecimalFormat("0.00");// 格式化数字  
+		String value = "";
+		switch (cell.getCellType()) {  
+        case XSSFCell.CELL_TYPE_STRING:  
+            value = cell.getStringCellValue();  
+            break;  
+        case XSSFCell.CELL_TYPE_NUMERIC:  
+            value = nf.format(cell.getNumericCellValue());  
+            break;  
+		}
+		return value;
+	}
+
+
+	private int exportIndex(HSSFSheet sheet, ScoreIndex index,
 			String[] indexTitle,List<Dept> depts,int paperId, int row, int col,List<ScoreIndex> indexChildList) {
-		col = writeIndex(sheet,index,row,col,indexTitle,num);
+		col = writeIndex(sheet,index,row,col,indexTitle);
 		boolean f = true;
 		for(ScoreIndex one:indexChildList){
 			if(index.getId().intValue()==one.getParentId().intValue()){
-				row = exportIndex(sheet,one,num,indexTitle,depts,paperId,row,col,indexChildList);
+				row = exportIndex(sheet,one,indexTitle,depts,paperId,row,col,indexChildList);
 				f = false;
 			}
 		}
@@ -380,47 +479,60 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 		if(row==0){//生成标题
 			HSSFRow headRow = sheet.getRow(row)==null?sheet.createRow(row):sheet.getRow(row);
 			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
-			int i = 0;
+			headRow.createCell(col).setCellValue("题目");
+			headRow.createCell(col+1).setCellValue("分值");
+			dataRow.createCell(col).setCellValue(item.getTitle());
+			dataRow.createCell(col+1).setCellValue(item.getScore()+"");
+			int i = 2;
 			for(Dept dept:depts){
-				headRow.createCell(col+i++).setCellValue(dept.getName());
+				headRow.createCell(col+i).setCellValue(dept.getName());
 				ScoreAnswer scoreAnswer = new ScoreAnswer();
-				scoreAnswer.setItemId(item.getId());
-				List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
+				String userLoginName = dept.getCode()+"002";
+				User user = userService.findUserByLoginName(userLoginName);
 				String value = "";
-				for(ScoreAnswer s:answers){
-					value+= s.getAnswerValue();
+				if(user!=null){
+					scoreAnswer.setItemId(item.getId());
+					scoreAnswer.setUserId(user.getId());
+					List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
+					for(ScoreAnswer s:answers){
+						value+= s.getAnswerValue();
+					}
+				}
+				dataRow.createCell(col+i).setCellValue(value);
+				i++;
+			}
+		}else{
+			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
+			dataRow.createCell(col).setCellValue(item.getTitle());
+			dataRow.createCell(col+1).setCellValue(item.getScore()+"");
+			int i = 2;
+			for(Dept dept:depts){
+				String userLoginName = dept.getCode()+"002";
+				User user = userService.findUserByLoginName(userLoginName);
+				String value = "";
+				if(user!=null){
+					ScoreAnswer scoreAnswer = new ScoreAnswer();
+					scoreAnswer.setItemId(item.getId());
+					scoreAnswer.setUserId(user.getId());
+					List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
+					for(ScoreAnswer s:answers){
+						value+= s.getAnswerValue();
+					}
 				}
 				dataRow.createCell(col+i++).setCellValue(value);
 			}
-		}
-		HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
-		int i = 0;
-		for(Dept dept:depts){
-			String userLoginName = dept.getCode()+"002";
-			User user = userService.findUserByLoginName(userLoginName);
-			String value = "";
-			if(user!=null){
-				ScoreAnswer scoreAnswer = new ScoreAnswer();
-				scoreAnswer.setItemId(item.getId());
-				scoreAnswer.setUserId(user.getId());
-				List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
-				for(ScoreAnswer s:answers){
-					value+= s.getAnswerValue();
-				}
-			}
-			dataRow.createCell(col+i++).setCellValue(value);
 		}
 		
 	}
 
 
 	private int writeIndex(HSSFSheet sheet, ScoreIndex index, int row,
-			int col, String[] indexTitle,int num) {
+			int col, String[] indexTitle) {
 		if(row==0){//生成标题
 			
 			HSSFRow headRow = null;
 			headRow = sheet.getRow(row)==null?sheet.createRow(row):sheet.getRow(row);
-			headRow.createCell(col).setCellValue(indexTitle[num]);
+			headRow.createCell(col).setCellValue(indexTitle[col]);
 			headRow.createCell(col+1).setCellValue("分值");
 			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
 			dataRow.createCell(col).setCellValue(index.getName());
