@@ -34,13 +34,13 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 	UserService userService;
 
 	@Override
-	public void check(int id, short result) {
+	public void check(int id, short result,String feedback) {
 		ScorePaperUser scorePagerUser = new ScorePaperUser();
     	SecurityUser user = SecurityUtil.getCurrentSecurityUser();
     	String CUname = user.getLoginName();
     	String Mname = CUname ;
     	int userId = user.getId();
-    	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";  
+    	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";  
     	if(CUname.endsWith("001")){//如果学会审核员 （通过 退回）
     		Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";
     		userId = userService.findUserByLoginName(Mname).getId();
@@ -58,6 +58,7 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 		if(su!=null)
 		{
 			scorePagerUser.setStatus(result);
+			scorePagerUser.setFeedback(feedback);
 			getMapper().updateByPrimaryKey(scorePagerUser);
 		}
 		else
@@ -66,6 +67,7 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 			scorePagerUser.setUserId(userId);
 			scorePagerUser.setPaperId(id);
             scorePagerUser.setStatus(result);	
+			scorePagerUser.setFeedback(feedback);
             getMapper().insert(scorePagerUser);
 		}
 	}
@@ -114,6 +116,31 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 		List<PagerUserDto> list = this.scorePagerUserMapper.selectUserCommitPaper(pagerUserDto);
 		
 		return new PageInfo<PagerUserDto>(list);
+	}
+
+	@Override
+	public ScorePaperUser getCurrentUserScorePaperUser(Integer paperId) {
+		ScorePaperUser scorePagerUser = new ScorePaperUser();
+    	SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+    	String CUname = user.getLoginName();
+    	String Mname = CUname ;
+    	int userId = user.getId();
+    	//TODO 审核员 查看 填报员填报得信息 Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";  
+    	if(CUname.endsWith("001")){//如果学会审核员 （通过 退回）
+    		Mname = CUname.substring(0,CUname.lastIndexOf("001"))+"002";
+    		userId = userService.findUserByLoginName(Mname).getId();
+    	}else if(CUname.endsWith("002")){//填报员 提交审核
+    		System.out.println(CUname+"=》提交审核");
+    	}else if(CUname.equals("admin")){
+    		
+    	}
+    	else {
+    		return null;
+    	}
+    	scorePagerUser.setUserId(userId);
+    	scorePagerUser.setPaperId(paperId);
+    	ScorePaperUser su = getMapper().selectOne(scorePagerUser);
+    	return su;
 	}
 
 	

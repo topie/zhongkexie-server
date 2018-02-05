@@ -12,8 +12,13 @@ import com.topie.zhongkexie.database.core.model.ScorePaperUser;
  *
  */
 public interface IScorePagerUserService extends IService<ScorePaperUser>{
-
-	void check(int id, short result);
+	/**
+	 * 学会提交答案后审核
+	 * @param id
+	 * @param result
+	 * @param feedback
+	 */
+	void check(int id, short result,String feedback);
 	/**
 	 * 获取当前学会 对应得填报员得填报信息
 	 * @param scorePaper
@@ -32,5 +37,11 @@ public interface IScorePagerUserService extends IService<ScorePaperUser>{
 	 */
 	PageInfo<PagerUserDto> selectAllUserCommit(PagerUserDto pagerUserDto,
 			int pageNum, int pageSize);
+	/**
+	 * 获取当前用户的提交状态
+	 * @param paperId
+	 * @return
+	 */
+	ScorePaperUser getCurrentUserScorePaperUser(Integer paperId);
 
 }

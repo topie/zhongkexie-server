@@ -40,6 +40,7 @@ import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
@@ -144,6 +145,19 @@ public class ScorePaperController {
 				.selectByFilterAndPage(scorePaper, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
 	}
+	
+	/**
+	 * 获取退回意见
+	 * @param paperId
+	 * @return
+	 */
+	@RequestMapping(value = "/getFeedback", method = RequestMethod.GET)
+	@ResponseBody
+	public Result getFeedback(
+			Integer paperId) {
+		ScorePaperUser user = this.iScorePagerUserService.getCurrentUserScorePaperUser(paperId);
+		return ResponseUtil.success(user);
+	}
 
 	/**
 	 * 开启、关闭 填报
@@ -211,14 +225,13 @@ public class ScorePaperController {
 			HttpServletRequest request, HttpServletResponse response) {
 		HSSFWorkbook wb = iScorePaperService.exportPaper(paperId, indexIds,
 				orgIds);
-		String fileName = "1234.xls";
 		try {
-			outWrite(request, response, wb, fileName);
+			String p = this.iScorePaperService.selectByKey(paperId).getTitle();
+			outWrite(request, response, wb, p);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		;
 	}
 
 	private static void outWrite(HttpServletRequest request,
@@ -228,9 +241,11 @@ public class ScorePaperController {
 		try {
 			output = response.getOutputStream();
 			response.reset();
-			// String name = new String(fileName.getBytes(),"ISO-8895-1");
+			// String name = new String(fileName.getBytes(),"ISO8859_1");
+			fileName=new String((fileName+"导出数据.xls").getBytes(), "ISO8859_1");
 			response.setHeader("Content-disposition", "attachment; filename="
 					+ fileName);
+
 			response.setContentType("application/vnd.ms-excel;charset=utf-8");
 			response.setCharacterEncoding("utf-8");
 			wb.write(output);
@@ -268,7 +283,7 @@ public class ScorePaperController {
 	@RequestMapping(value = "/reportContentSubmit", method = RequestMethod.GET)
 	@ResponseBody
 	public Result reportContentSubmit(int id) {
-		iScorePagerUserService.check(id, PagerUserDto.PAPERSTATUS_SUBMMIT);
+		iScorePagerUserService.check(id, PagerUserDto.PAPERSTATUS_SUBMMIT,null);
 		return ResponseUtil.success("操作完成！");
 	}
 
@@ -281,8 +296,9 @@ public class ScorePaperController {
 	 */
 	@RequestMapping(value = "/reportContentCheck", method = RequestMethod.GET)
 	@ResponseBody
-	public Result reportContentCheck(int id, short result) {
-		iScorePagerUserService.check(id, result);
+	public Result reportContentCheck(int id, short result,
+			@RequestParam(value="feedback",required=false)String feedback) {
+		iScorePagerUserService.check(id, result,feedback);
 		return ResponseUtil.success("操作完成！");
 	}
 
