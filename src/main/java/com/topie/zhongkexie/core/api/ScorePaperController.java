@@ -2,6 +2,7 @@ package com.topie.zhongkexie.core.api;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -241,11 +242,12 @@ public class ScorePaperController {
 		try {
 			output = response.getOutputStream();
 			response.reset();
-			// String name = new String(fileName.getBytes(),"ISO8859_1");
-			fileName=new String((fileName+"导出数据.xls").getBytes(), "ISO8859_1");
+			//fileName=new String((fileName+"导出数据.xls").getBytes(), "ISO_8859_1");
+			fileName=URLEncoder.encode(fileName+"导出数据.xls","UTF-8");
 			response.setHeader("Content-disposition", "attachment; filename="
 					+ fileName);
-
+//			response.setHeader("Content-disposition", "attachment;filename*=UTF-8 "
+//					+ URLEncoder.encode(fileName,"UTF-8"));
 			response.setContentType("application/vnd.ms-excel;charset=utf-8");
 			response.setCharacterEncoding("utf-8");
 			wb.write(output);
