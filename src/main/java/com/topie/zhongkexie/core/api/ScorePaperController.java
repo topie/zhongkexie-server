@@ -2,6 +2,7 @@ package com.topie.zhongkexie.core.api;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
@@ -303,6 +305,21 @@ public class ScorePaperController {
 		iScorePagerUserService.check(id, result,feedback);
 		return ResponseUtil.success("操作完成！");
 	}
+	
+	/**
+	 * 中科协特殊渠道退回到填报员
+	 * 
+	 * @param id
+	 * @param result
+	 * @return
+	 */
+	@RequestMapping(value = "/reportBack", method = RequestMethod.GET)
+	@ResponseBody
+	public Result reportContentCheck(int id, int userId,
+			@RequestParam(value="feedback",required=false)String feedback) {
+		iScorePagerUserService.check(id,new Short("0") ,userId,feedback);
+		return ResponseUtil.success("操作完成！");
+	}
 
 	/**
 	 * 填報用户评价表 列表
@@ -428,5 +445,68 @@ public class ScorePaperController {
 		}
 		return ResponseUtil.success(maps);
 	}
+	
+	/**
+	 * 获取所有答题不真实的item
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/getPaperAnswerReal", method = RequestMethod.GET)
+	@ResponseBody
+	public Result getPaperAnswerReal(Integer paperId,Integer userId) {
+		Example example = new Example(ScoreAnswer.class);
+		Criteria c = example.createCriteria();
+		c.andEqualTo("paperId", paperId);
+		c.andEqualTo("userId", userId);
+		c.andEqualTo("answerReal", false);
+		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
+		return ResponseUtil.success(list);
+	}
+	/**
+	 * 更新答题的真实情况
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/updateAnswerReal", method = RequestMethod.POST)
+	@ResponseBody
+	public Result updateAnswerReal(Integer paperId,Integer userId,Integer itemId,Boolean answerReal) {
+		Example example = new Example(ScoreAnswer.class);
+		Criteria c = example.createCriteria();
+		c.andEqualTo("paperId", paperId);
+		c.andEqualTo("userId", userId);
+		c.andEqualTo("itemId", itemId);
+		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
+		if(list.size()>0){
+			ScoreAnswer one = list.get(0);
+			one.setAnswerReal(answerReal);
+			iScoreAnswerService.updateAll(one);
+			return ResponseUtil.success();
+		}
+		return ResponseUtil.error();
+	}
+	
+	/**
+	 * 更新答题的分数
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/updateAnswerScore", method = RequestMethod.POST)
+	@ResponseBody
+	public Result updateAnswerScore(Integer paperId,Integer userId,Integer itemId,BigDecimal answerScore) {
+		Example example = new Example(ScoreAnswer.class);
+		Criteria c = example.createCriteria();
+		c.andEqualTo("paperId", paperId);
+		c.andEqualTo("userId", userId);
+		c.andEqualTo("itemId", itemId);
+		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
+		if(list.size()>0){
+			ScoreAnswer one = list.get(0);
+			one.setAnswerScore(answerScore);
+			iScoreAnswerService.updateAll(one);
+			return ResponseUtil.success();
+		}
+		return ResponseUtil.error();
+	}
+	
 
 }

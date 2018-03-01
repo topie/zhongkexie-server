@@ -1,9 +1,14 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_score_answer")
 public class ScoreAnswer extends Sortable {
@@ -64,6 +69,12 @@ public class ScoreAnswer extends Sortable {
      */
     @Column(name = "answer_reason")
     private String answerReason;
+    
+    /**
+     * 答题是否真实
+     */
+    @Column(name = "answer_real")
+    private Boolean answerReal;
 
     /**
      * 获取ID
@@ -226,4 +237,13 @@ public class ScoreAnswer extends Sortable {
     public void setAnswerReason(String answerReason) {
         this.answerReason = answerReason;
     }
+
+	public Boolean getAnswerReal() {
+		return answerReal;
+	}
+
+	public void setAnswerReal(Boolean answerReal) {
+		this.answerReal = answerReal;
+	}
+    
 }

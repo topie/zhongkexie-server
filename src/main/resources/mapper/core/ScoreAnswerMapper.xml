@@ -14,5 +14,6 @@
     <result column="answer_value" property="answerValue" jdbcType="VARCHAR" />
     <result column="answer_score" property="answerScore" jdbcType="DECIMAL" />
     <result column="answer_reason" property="answerReason" jdbcType="VARCHAR" />
+    <result column="answer_real" property="answerReal" jdbcType="BIT" />
   </resultMap>
 </mapper>

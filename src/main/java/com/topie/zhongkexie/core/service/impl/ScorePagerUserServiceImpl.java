@@ -71,6 +71,28 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
             getMapper().insert(scorePagerUser);
 		}
 	}
+	@Override
+	public void check(int id, short result,int userId ,String feedback) {
+		ScorePaperUser scorePagerUser = new ScorePaperUser();
+    	scorePagerUser.setUserId(userId);
+    	scorePagerUser.setPaperId(id);
+    	ScorePaperUser su = getMapper().selectOne(scorePagerUser);
+		if(su!=null)
+		{
+			scorePagerUser.setStatus(result);
+			scorePagerUser.setFeedback(feedback);
+			getMapper().updateByPrimaryKey(scorePagerUser);
+		}
+		else
+		{
+			scorePagerUser = new ScorePaperUser();
+			scorePagerUser.setUserId(userId);
+			scorePagerUser.setPaperId(id);
+            scorePagerUser.setStatus(result);	
+			scorePagerUser.setFeedback(feedback);
+            getMapper().insert(scorePagerUser);
+		}
+	}
 
 	@Override
     public PageInfo<ScorePaper> selectByFilterAndPage(ScorePaper scorePaper, int pageNum, int pageSize) {

@@ -20,6 +20,13 @@ public interface IScorePagerUserService extends IService<ScorePaperUser>{
 	 */
 	void check(int id, short result,String feedback);
 	/**
+	 * 学会提交答案后审核
+	 * @param id
+	 * @param result
+	 * @param feedback
+	 */
+	void check(int id, short result,int userId,String feedback);
+	/**
 	 * 获取当前学会 对应得填报员得填报信息
 	 * @param scorePaper
 	 * @param pageNum

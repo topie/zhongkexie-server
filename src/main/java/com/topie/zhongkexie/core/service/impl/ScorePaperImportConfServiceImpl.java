@@ -24,11 +24,13 @@ import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.common.exception.DefaultBusinessException;
 import com.topie.zhongkexie.common.utils.ExcelReader;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
+import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePaperImportConfigService;
 import com.topie.zhongkexie.database.core.model.Attachment;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
+import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaperImportConf;
 import com.topie.zhongkexie.system.service.IAttachmentService;
 
@@ -41,6 +43,8 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	private IScoreIndexService iScoreIndexService;
 	@Autowired
 	private IScoreItemService iScoreItemService;
+	@Autowired
+	private IScoreItemOptionService iScoreItemOptionService;
 	@Override
 	public PageInfo<ScorePaperImportConf> selectByFilterAndPage(ScorePaperImportConf searchModel, int pageNum,
 			int pageSize) {
@@ -171,7 +175,10 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		if(StringUtils.isEmpty(title)){
 	    			throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("title"))+"列,题目名称为空");
 	    		}
-	    		entity.setType(0);
+	    		entity.setType(0);//填空
+	    		if(title.contains("是否")){
+	    			entity.setType(1);//单选
+	    		}
 	    		entity.setOptionLogic(desc);
 	    		try {
 					entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
@@ -181,6 +188,19 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		entity.setSort(0);
 	    		entity.setResponsibleDepartment(org);
 	    		this.iScoreItemService.saveNotNull(entity);
+	    		if(title.contains("是否")){
+	    			int itemId = entity.getId();
+	    			ScoreItemOption option = new ScoreItemOption();
+	    			option.setItemId(itemId);
+	    			option.setOptionTitle("是");
+	    			option.setOptionRate(BigDecimal.valueOf(Long.valueOf(score)));
+	    			iScoreItemOptionService.saveNotNull(option);
+	    			ScoreItemOption option1 = new ScoreItemOption();
+	    			option.setItemId(itemId);
+	    			option.setOptionTitle("否");
+	    			option.setOptionRate(BigDecimal.valueOf(0l));
+	    			iScoreItemOptionService.saveNotNull(option1);
+	    		}
     		}catch(Exception e){
     			e.printStackTrace();
     			Map m = new HashMap();
