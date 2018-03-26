@@ -82,6 +82,7 @@ public class ScoreIndexController {
             treeNode.setId(nodeInfo.getId());
             treeNode.setpId(nodeInfo.getParentId());
             treeNode.setName(nodeInfo.getName());
+            treeNode.setS(nodeInfo.getScore().toString());
             nodes.add(treeNode);
         }
         return nodes;

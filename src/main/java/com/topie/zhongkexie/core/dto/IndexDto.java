@@ -11,6 +11,8 @@ public class IndexDto {
 
     private String title;
 
+    private BigDecimal weight;
+
     private BigDecimal score;
 
     private List<ItemDto> ids;
@@ -47,7 +49,15 @@ public class IndexDto {
         this.title = title;
     }
 
-    public BigDecimal getScore() {
+    public BigDecimal getWeight() {
+		return weight;
+	}
+
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
+
+	public BigDecimal getScore() {
         return score;
     }
 

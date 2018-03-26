@@ -1,11 +1,18 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.topie.zhongkexie.common.handler.Sortable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_score_paper")
 public class ScorePaper extends Sortable {
@@ -54,6 +61,11 @@ public class ScorePaper extends Sortable {
      * 状态
      */
     private Short status;
+    
+    /**
+     * 总分值
+     */
+    private BigDecimal score;
 
     /**
      * 审批状态
@@ -232,4 +244,14 @@ public class ScorePaper extends Sortable {
     public void setContentJson(String contentJson) {
         this.contentJson = contentJson;
     }
+
+	public BigDecimal getScore() {
+		return score;
+	}
+
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
+    
+    
 }

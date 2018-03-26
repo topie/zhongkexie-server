@@ -13,6 +13,8 @@ public class ItemDto {
 
     private Integer itemType;
 
+    private BigDecimal weight;
+    
     private BigDecimal score;
 
     private List<OptionDto> items;
@@ -37,7 +39,15 @@ public class ItemDto {
         return items;
     }
 
-    public void setItems(List<OptionDto> items) {
+    public BigDecimal getWeight() {
+		return weight;
+	}
+
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
+
+	public void setItems(List<OptionDto> items) {
         this.items = items;
     }
 

@@ -441,6 +441,7 @@ public class ScorePaperController {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("name", s.getTitle());
 			map.put("id", s.getId());
+			map.put("score", s.getScore());
 			maps.add(map);
 		}
 		return ResponseUtil.success(maps);

@@ -1,9 +1,14 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_score_item")
 public class ScoreItem extends Sortable {
@@ -33,15 +38,20 @@ public class ScoreItem extends Sortable {
     @Column(name = "option_logic")
     private String optionLogic;
 
-    /**
-     * 题目分值
-     */
     @Column(name = "responsible_department")
     private String responsibleDepartment;
     
     @Column(name = "related_field")
     private String relatedField;
     
+    /**
+     * 题目权重
+     */
+    private BigDecimal weight;
+
+    /**
+     * 题目分值
+     */
     private BigDecimal score;
 
     private Integer sort;
@@ -123,8 +133,24 @@ public class ScoreItem extends Sortable {
     public void setTitle(String title) {
         this.title = title;
     }
-
+    
     /**
+     * 获取题目权重
+     * @return
+     */
+    public BigDecimal getWeight() {
+		return weight;
+	}
+    
+    /**
+     * 题目权重
+     * 
+     */
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
+
+	/**
      * 获取题目分值
      *
      * @return score - 题目分值

@@ -39,6 +39,11 @@ public class ScoreIndex extends Sortable {
     private String name;
 
     /**
+     * 指标权重
+     */
+    private BigDecimal weight;
+
+    /**
      * 指标分值
      */
     private BigDecimal score;
@@ -108,6 +113,20 @@ public class ScoreIndex extends Sortable {
     }
 
     /**
+     * 指标权重
+     */
+    public BigDecimal getWeight() {
+		return weight;
+	}
+
+    /**
+     * 指标权重
+     */
+	public void setWeight(BigDecimal weight) {
+		this.weight = weight;
+	}
+
+	/**
      * 获取指标分值
      *
      * @return score - 指标分值
