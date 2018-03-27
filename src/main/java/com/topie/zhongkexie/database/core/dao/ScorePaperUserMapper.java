@@ -10,4 +10,6 @@ import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 public interface ScorePaperUserMapper extends Mapper<ScorePaperUser> {
 
 	List<PagerUserDto> selectUserCommitPaper(PagerUserDto pagerUserDto);
+	
+	List<ScorePaperUser> selectByPagerId(Integer paperId);
 }

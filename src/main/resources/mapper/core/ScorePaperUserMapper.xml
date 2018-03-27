@@ -8,6 +8,7 @@
     <id column="paper_id" property="paperId" jdbcType="INTEGER" />
     <id column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="score" property="score" jdbcType="DECIMAL" />
     <result column="feedback" property="feedback" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="PagerUserDtoResultMap" type="com.topie.zhongkexie.core.dto.PagerUserDto" >
@@ -20,6 +21,8 @@
     <result column="status" property="status" jdbcType="SMALLINT" />
     <result column="approve_status" property="approveStatus" jdbcType="SMALLINT" />
     <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+    <result column="score" property="score" jdbcType="DECIMAL" />
+    <result column="subjective_score" property="subjectiveScore" jdbcType="DECIMAL" />
     <result column="user_id" property="userId" jdbcType="INTEGER"/>
     <result column="user_status" property="checkStatus" jdbcType="VARCHAR"/>
     <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" />
@@ -30,7 +33,17 @@
     </select>
   
   <select id="selectUserCommitPaper" resultMap="PagerUserDtoResultMap">
-  	SELECT spu.`status` user_status,u.id userId,sp.*,u.display_name user_name FROM d_score_paper_user spu LEFT JOIN d_score_paper sp ON spu.paper_id=sp.id 
-LEFT JOIN d_user u ON spu.user_id = u.id
+  	SELECT spu.`status` user_status,spu.score,spu.subjective_score,u.id userId,sp.*,u.display_name user_name 
+  	FROM d_score_paper_user spu 
+  	LEFT JOIN d_score_paper sp ON spu.paper_id=sp.id 
+	LEFT JOIN d_user u ON spu.user_id = u.id
+	<where>
+		<if test="paperId!=null">
+			and spu.paper_id=#{paperId}
+		</if>
+		<if test="userId!=null">
+			and spu.user_id=#{userId}
+		</if>
+	</where>
   </select>
 </mapper>

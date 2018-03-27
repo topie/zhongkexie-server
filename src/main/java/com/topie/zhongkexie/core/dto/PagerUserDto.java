@@ -1,5 +1,6 @@
 package com.topie.zhongkexie.core.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class PagerUserDto {
@@ -78,6 +79,35 @@ public class PagerUserDto {
 	 * 提交人 （学会）
 	 */
 	private String userName;
+	
+	private Integer paperId;
+	/**
+	 * 总分
+	 */
+	private BigDecimal score;
+	/**
+	 * 主观分 附加分
+	 */
+	private BigDecimal subjectiveScore;
+
+	public BigDecimal getSubjectiveScore() {
+		return subjectiveScore;
+	}
+
+	public void setSubjectiveScore(BigDecimal subjectiveScore) {
+		this.subjectiveScore = subjectiveScore;
+	}
+
+	
+	public Integer getPaperId() {
+		return paperId;
+	}
+
+	public void setPaperId(Integer paperId) {
+		this.paperId = paperId;
+	}
+
+
 	/**
 	 * 
 	 * @return
@@ -106,6 +136,14 @@ public class PagerUserDto {
 
 	public void setBegin(Date begin) {
 		this.begin = begin;
+	}
+
+	public BigDecimal getScore() {
+		return score;
+	}
+
+	public void setScore(BigDecimal score) {
+		this.score = score;
 	}
 
 	public Date getEnd() {

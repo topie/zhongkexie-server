@@ -383,6 +383,8 @@ public class ScorePaperController {
 					// 多选
 					String logic = scoreItem.getOptionLogic();
 				}
+				Integer indexId = iScoreItemService.selectByKey(a.getItemId()).getIndexId();
+				sa.setIndexId(indexId);
 				iScoreAnswerService.saveNotNull(sa);
 				// TODO 计算分数
 			}
@@ -435,6 +437,7 @@ public class ScorePaperController {
 	public Result getPaperOptions() {
 		Example example = new Example(ScorePaper.class);
 		example.setOrderByClause("create_time desc");
+		//TODO 查询编辑状态的
 		List<ScorePaper> list = iScorePaperService.selectByExample(example);
 		List<Map> maps = new ArrayList<Map>();
 		for (ScorePaper s : list) {
@@ -445,6 +448,30 @@ public class ScorePaperController {
 			maps.add(map);
 		}
 		return ResponseUtil.success(maps);
+	}
+	
+	/**
+	 * 获取所有评价表 下拉框
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/getPaperSelect")
+	@ResponseBody
+	public Object getPaperSelect(String status) {
+		Example example = new Example(ScorePaper.class);
+		example.setOrderByClause("create_time desc");
+		//TODO 查询编辑状态的
+		List<ScorePaper> list = iScorePaperService.selectByExample(example);
+		List<Map> maps = new ArrayList<Map>();
+		for (ScorePaper s : list) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("text", s.getTitle());
+			map.put("value", s.getId());
+			map.put("score", s.getScore());
+			map.put("status", s.getStatus());
+			maps.add(map);
+		}
+		return maps;
 	}
 	
 	/**
@@ -480,6 +507,9 @@ public class ScorePaperController {
 		if(list.size()>0){
 			ScoreAnswer one = list.get(0);
 			one.setAnswerReal(answerReal);
+			if(!answerReal){
+				one.setAnswerScore(new BigDecimal(0));
+			}
 			iScoreAnswerService.updateAll(one);
 			return ResponseUtil.success();
 		}
@@ -503,10 +533,63 @@ public class ScorePaperController {
 		if(list.size()>0){
 			ScoreAnswer one = list.get(0);
 			one.setAnswerScore(answerScore);
+			if(!one.getAnswerReal()){
+				one.setAnswerScore(new BigDecimal(0));
+				iScoreAnswerService.updateAll(one);
+				return ResponseUtil.error("信息虚假，不能修改分数");
+			}
 			iScoreAnswerService.updateAll(one);
 			return ResponseUtil.success();
 		}
 		return ResponseUtil.error();
+	}
+	
+	/**
+	 * 计算得分
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/getUserScore", method = RequestMethod.GET)
+	@ResponseBody
+	public Result getUserScore(Integer paperId,Integer userId) {
+		BigDecimal score = this.iScoreAnswerService.getUserScore(paperId,userId);
+		Example example = new Example(ScorePaperUser.class);
+		example.createCriteria().andEqualTo("paperId",paperId).andEqualTo("userId",userId);
+		List<ScorePaperUser> list = this.iScorePagerUserService.selectByExample(example);
+		if(list.size()>0){
+			ScorePaperUser user = list.get(0);
+			user.setScore(score);
+			iScorePagerUserService.updateNotNull(user);
+		}
+		return ResponseUtil.success(score);
+	}
+	
+	/**
+	 * 计算所有得分
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/updatePaperScore", method = RequestMethod.GET)
+	@ResponseBody
+	public Result updateUserScore(Integer paperId) {
+		this.iScorePagerUserService.updatePaperScore(paperId);
+		return ResponseUtil.success();
+	}
+	/**
+	 * 更新附加分数 主观分
+	 */
+	@RequestMapping(value = "/updateSubjectiveScore", method = RequestMethod.GET)
+	@ResponseBody
+	public Result updateSubjectiveScore(Integer paperId,Integer userId,BigDecimal subjectiveScore) {
+		Example example = new Example(ScorePaperUser.class);
+		example.createCriteria().andEqualTo("paperId",paperId).andEqualTo("userId",userId);
+		List<ScorePaperUser> list = this.iScorePagerUserService.selectByExample(example);
+		if(list.size()>0){
+			ScorePaperUser user = list.get(0);
+			user.setSubjectiveScore(subjectiveScore);
+			iScorePagerUserService.updateNotNull(user);
+		}
+		return ResponseUtil.success();
 	}
 	
 

@@ -1,6 +1,7 @@
 package com.topie.zhongkexie.core.service.impl;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -13,6 +14,7 @@ import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.common.exception.DefaultBusinessException;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
+import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.core.service.IScorePagerUserService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
@@ -32,6 +34,8 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 	IScorePaperService iScorePaperService;
 	@Autowired
 	UserService userService;
+	@Autowired
+	IScoreAnswerService iScoreAnswerService;
 
 	@Override
 	public void check(int id, short result,String feedback) {
@@ -163,6 +167,17 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
     	scorePagerUser.setPaperId(paperId);
     	ScorePaperUser su = getMapper().selectOne(scorePagerUser);
     	return su;
+	}
+	@Override
+	public void updatePaperScore(Integer paperId) {
+		List<ScorePaperUser> list = this.scorePagerUserMapper.selectByPagerId(paperId);
+		for(ScorePaperUser pu:list){
+			Integer userId = pu.getUserId();
+			BigDecimal score = this.iScoreAnswerService.getUserScore(paperId, userId);
+			pu.setScore(score);
+			this.updateNotNull(pu);
+		}
+		
 	}
 
 	

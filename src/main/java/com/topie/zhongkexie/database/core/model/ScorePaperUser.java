@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_score_paper_user")
 public class ScorePaperUser {
@@ -24,8 +28,25 @@ public class ScorePaperUser {
     private Short status;
 
     private String feedback;
-
     /**
+	 * 总分
+	 */
+	private BigDecimal score;
+	/**
+	 * 主观分 附加分
+	 */
+	private BigDecimal subjectiveScore;
+
+	
+    public BigDecimal getSubjectiveScore() {
+		return subjectiveScore;
+	}
+
+	public void setSubjectiveScore(BigDecimal subjectiveScore) {
+		this.subjectiveScore = subjectiveScore;
+	}
+
+	/**
      * ��ȡ�Ծ�ID
      *
      * @return paper_id - �Ծ�ID
@@ -43,7 +64,16 @@ public class ScorePaperUser {
         this.paperId = paperId;
     }
 
-    /**
+    
+    public BigDecimal getScore() {
+		return score;
+	}
+
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
+
+	/**
      * ��ȡ�û�ID
      *
      * @return user_id - �û�ID

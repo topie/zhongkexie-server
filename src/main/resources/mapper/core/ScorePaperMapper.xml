@@ -12,7 +12,11 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="score" property="score" jdbcType="DECIMAL" />
     <result column="approve_status" property="approveStatus" jdbcType="SMALLINT" />
     <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" />
+    <result column="falsity_count" property="falsityCount" jdbcType="INTEGER" />
+    <result column="falsity_count_item" property="falsityCountItem" jdbcType="INTEGER" />
+
   </resultMap>
 </mapper>

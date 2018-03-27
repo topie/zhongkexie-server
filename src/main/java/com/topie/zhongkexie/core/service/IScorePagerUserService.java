@@ -50,5 +50,6 @@ public interface IScorePagerUserService extends IService<ScorePaperUser>{
 	 * @return
 	 */
 	ScorePaperUser getCurrentUserScorePaperUser(Integer paperId);
+	void updatePaperScore(Integer paperId);
 
 }
