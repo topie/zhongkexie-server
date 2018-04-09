@@ -60,7 +60,7 @@
                 <value>classpath*:mapper/core/**/*.xml</value>
             </array>
         </property>
-        <property name="typeAliasesPackage" value="com.topie.zhongkexie.database.core.model"/>
+        <property name="typeAliasesPackage" value="com.topie.zhongkexie.database.*.model"/>
         <property name="plugins">
             <array>
                 <bean class="com.github.pagehelper.PageHelper">

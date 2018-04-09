@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.core.dao.ScoreIndexCollectionMapper" >
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.core.model.ScoreIndexCollection" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="item_collection" property="itemCollection" jdbcType="VARCHAR" />
+    <result column="index_collection" property="indexCollection" jdbcType="VARCHAR" />
+    <result column="content_json" property="contentJson" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>
