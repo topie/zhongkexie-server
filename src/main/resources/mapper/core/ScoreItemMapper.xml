@@ -10,9 +10,14 @@
         <result column="title" property="title" jdbcType="VARCHAR"/>
         <result column="type" property="type" jdbcType="INTEGER" />
         <result column="score" property="score" jdbcType="DECIMAL"/>
+        <result column="weight" property="weight" jdbcType="DECIMAL"/>
         <result column="option_logic" property="optionLogic" jdbcType="VARCHAR" />
         <result column="sort" property="sort" jdbcType="INTEGER"/>
         <result column="responsible_department" property="responsibleDepartment" jdbcType="VARCHAR" />
         <result column="related_field" property="relatedField" jdbcType="VARCHAR"/>
+        <result column="refer_item" property="referItem" jdbcType="VARCHAR" />
+        <result column="show_level" property="showLevel" jdbcType="INTEGER"/>
+        <result column="max_value" property="maxValue" jdbcType="INTEGER" />
+        <result column="score_type" property="scoreType" jdbcType="VARCHAR"/>
     </resultMap>
 </mapper>

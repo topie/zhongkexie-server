@@ -17,5 +17,12 @@ public interface IScoreAnswerService extends IService<ScoreAnswer> {
     List<ScoreAnswer> selectByFilter(ScoreAnswer scoreAnswer);
 
     BigDecimal getUserScore(Integer paperId, Integer userId);
+    /**
+     * 获取 这个答案的排名
+     * @param itemId
+     * @param answer
+     * @return
+     */
+	String getAnswerOfRanking(Integer itemId, String answer);
 
 }

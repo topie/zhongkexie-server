@@ -72,7 +72,12 @@ public class ScorePaperImportConfController {
         int result = iScorePaperImportConfigService.saveNotNull(conf);
         return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
     }
-
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @ResponseBody
+    public Result update(ScorePaperImportConf conf) {
+        int result = iScorePaperImportConfigService.updateNotNull(conf);
+        return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
+    }
     @RequestMapping(value = "/load/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Result load(@PathVariable(value = "id") Integer id) {

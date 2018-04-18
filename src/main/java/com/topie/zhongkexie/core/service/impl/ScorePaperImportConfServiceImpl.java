@@ -111,8 +111,11 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    			if(index==null){//没有指标 则不添加
 	    				
 	    			}else{//添加指标
-	    				int score_col = jo.getIntValue("score");//获取指标 分值列数
-	    				String score = ls.get(score_col)==null?null:(String)ls.get(score_col);//获取指标 分值
+	    				Integer score_col = jo.getString("score")==null?null:jo.getInteger("score");//获取指标 分值列数
+	    				String score = "0";
+	    				if(score_col!=null){
+	    					score = ls.get(score_col)==null?null:(String)ls.get(score_col);//获取指标 分值
+	    				}
 	    				//插入操作
 	    				if(j==0){//若果是第一列  则pid=0 为顶级指标
 	    					ScoreIndex entity = new ScoreIndex();
@@ -127,6 +130,7 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 							}
 	    					entity.setPaperId(paperId);
 	    					entity.setParentId(0);
+	    					entity.setWeight(new BigDecimal("0"));
 	    					entity.setSort(0);
 	    					this.iScoreIndexService.saveNotNull(entity);
 	    					map.put(j, entity.getId());//记录当前列数 最后一次更新的 指标ID 供下级取Pid
@@ -134,6 +138,7 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    					int pid = map.get(j-1);
 	    					ScoreIndex entity = new ScoreIndex();
 	    					entity.setName(index);
+	    					entity.setWeight(new BigDecimal("0"));
 	    					if(StringUtils.isEmpty(index)){
 	    						throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+index_col)+"列,指标名称为空");
 	    					}
@@ -159,9 +164,9 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		}
 	    		int pid = map.get(jsonIndex.size()-1);
 	    		String title =ls.get(jsonItem.getIntValue("title"))==null?null:(String)ls.get(jsonItem.getIntValue("title"));
-	    		String score =ls.get(jsonItem.getIntValue("score"))==null?null:(String)ls.get(jsonItem.getIntValue("score"));
-	    		String desc =ls.get(jsonItem.getIntValue("desc"))==null?null:(String)ls.get(jsonItem.getIntValue("desc"));
-	    		String org =ls.get(jsonItem.getIntValue("org"))==null?null:(String)ls.get(jsonItem.getIntValue("org"));
+	    		String score =jsonItem.getString("score")==null?"0":ls.get(jsonItem.getIntValue("score"))==null?null:(String)ls.get(jsonItem.getIntValue("score"));
+	    		String desc =jsonItem.getString("desc")==null?"":ls.get(jsonItem.getIntValue("desc"))==null?null:(String)ls.get(jsonItem.getIntValue("desc"));
+	    		String org =jsonItem.getString("org")==null?"":ls.get(jsonItem.getIntValue("org"))==null?null:(String)ls.get(jsonItem.getIntValue("org"));
 	    		if(StringUtils.isEmpty(org)){
 	    			org = orgName;
 	    		}else{
@@ -172,6 +177,7 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		ScoreItem entity = new ScoreItem();
 	    		entity.setIndexId(pid);
 	    		entity.setTitle(title);
+				entity.setWeight(new BigDecimal("0"));
 	    		if(StringUtils.isEmpty(title)){
 	    			throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("title"))+"列,题目名称为空");
 	    		}
@@ -196,9 +202,9 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    			option.setOptionRate(BigDecimal.valueOf(Long.valueOf(score)));
 	    			iScoreItemOptionService.saveNotNull(option);
 	    			ScoreItemOption option1 = new ScoreItemOption();
-	    			option.setItemId(itemId);
-	    			option.setOptionTitle("否");
-	    			option.setOptionRate(BigDecimal.valueOf(0l));
+	    			option1.setItemId(itemId);
+	    			option1.setOptionTitle("否");
+	    			option1.setOptionRate(BigDecimal.valueOf(0l));
 	    			iScoreItemOptionService.saveNotNull(option1);
 	    		}
     		}catch(Exception e){

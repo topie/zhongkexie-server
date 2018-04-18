@@ -149,6 +149,10 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
                 itemDto.setTitle(item.getTitle());
                 itemDto.setScore(item.getScore());
                 itemDto.setItemType(item.getType());
+                itemDto.setReferItem(item.getReferItem());
+                itemDto.setShowLevel(item.getShowLevel());
+                itemDto.setScoreType(item.getScoreType());
+                itemDto.setMaxValue(item.getMaxValue());
                 List<OptionDto> itemOptions = new ArrayList<>();
                 ScoreItemOption scoreItemOption = new ScoreItemOption();
     	        scoreItemOption.setSort_("option_sort_asc");
@@ -233,6 +237,10 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 	                itemDto.setTitle(item.getTitle());
 	                itemDto.setScore(item.getScore());
 	                itemDto.setItemType(item.getType());
+	                itemDto.setReferItem(item.getReferItem());
+	                itemDto.setShowLevel(item.getShowLevel());
+	                itemDto.setScoreType(item.getScoreType());
+	                itemDto.setMaxValue(item.getMaxValue());
 	                List<OptionDto> itemOptions = new ArrayList<>();
 	                ScoreItemOption scoreItemOption = new ScoreItemOption();
 	    	        scoreItemOption.setSort_("option_sort_asc");

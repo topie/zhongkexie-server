@@ -14,8 +14,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
+import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
+import com.topie.zhongkexie.database.core.dao.ScoreAnswerMapper;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
+import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 
 /**
@@ -26,7 +29,11 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		IScoreAnswerService {
 	@Autowired
 	IScorePaperService iScorePaperService;
-
+	@Autowired
+	IScoreItemService iScoreItemService;
+	@Autowired
+	ScoreAnswerMapper scoreAnswerMapper;
+	
 	@Override
 	public PageInfo<ScoreAnswer> selectByFilterAndPage(ScoreAnswer scoreAnswer,
 			int pageNum, int pageSize) {
@@ -93,6 +100,56 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		}
 		return totalScore;
 
+	}
+
+	@Override
+	public String getAnswerOfRanking(Integer itemId, String answer) {
+		ScoreItem item = this.iScoreItemService.selectByKey(itemId);
+		String scoreType = item.getScoreType();
+		switch(scoreType){
+			case "1"://统计项
+				break;
+			case "2"://线性打分
+				break;
+			case "3"://专家打分
+				return "";
+			default:break;
+		}
+		Integer type = item.getType();
+		switch(type){
+			case 0://填空
+				return "";
+			case 1://单选
+				
+			case 2://多选
+				return ranking_check(itemId,answer);
+			case 3://填空 多
+				return "";
+			case 4://数字填空
+				return ranking_input(itemId,answer);
+			default:break;
+		}
+		
+		return "";
+	}
+
+	private String ranking_input(Integer itemId, String answer) {
+		Integer rank = this.scoreAnswerMapper.selectRankingInput(itemId,answer);
+		ScoreAnswer scoreAnswer = new ScoreAnswer();
+		scoreAnswer.setItemId(itemId);
+		int s = this.mapper.selectCount(scoreAnswer);
+		double r = (double)rank/s;
+		return "前"+r*100+"%，共"+s;
+	}
+
+	private String ranking_check(Integer itemId, String answer) {
+		ScoreAnswer scoreAnswer = new ScoreAnswer();
+		scoreAnswer.setItemId(itemId);
+		int s = this.mapper.selectCount(scoreAnswer);
+		scoreAnswer.setAnswerValue(answer);
+		int checks = this.mapper.selectCount(scoreAnswer);
+		double rank = (double)checks/s;
+		return rank*100+"%选择了此选项，共"+s;
 	}
 
 }

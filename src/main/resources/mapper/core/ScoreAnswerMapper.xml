@@ -16,4 +16,12 @@
     <result column="answer_reason" property="answerReason" jdbcType="VARCHAR" />
     <result column="answer_real" property="answerReal" jdbcType="BIT" />
   </resultMap>
+  
+  <select id="selectRankingInput" resultType="java.lang.Integer">
+  	SELECT count(DISTINCT answer_value)+1 count 
+  	from d_score_answer 
+  	WHERE
+ 	item_id=#{itemId} and answer_value &lt; ${answer} 
+ 	ORDER BY answer_value+0 ASC
+  </select>
 </mapper>

@@ -592,5 +592,12 @@ public class ScorePaperController {
 		return ResponseUtil.success();
 	}
 	
+	@RequestMapping("getAnswerOfRanking")
+	@ResponseBody
+	public Result getAnswerOfRanking(Integer itemId,String answer ){
+		String rank = iScoreAnswerService.getAnswerOfRanking(itemId,answer);
+		return ResponseUtil.success(rank);
+	}
+	
 
 }

@@ -44,6 +44,16 @@ public class ScoreItem extends Sortable {
     @Column(name = "related_field")
     private String relatedField;
     
+    @Column(name = "score_type")
+    private String scoreType;
+    @Column(name = "max_value")
+    private Integer maxValue;
+    @Column(name = "refer_item")
+    private String referItem;
+    @Column(name = "show_level")
+    private Integer showLevel;
+    
+    
     /**
      * 题目权重
      */
@@ -63,7 +73,10 @@ public class ScoreItem extends Sortable {
     public void setOptionLogic(String optionLogic) {
         this.optionLogic = optionLogic;
     }
-
+    /**
+     * 题目回答类型：0 填空 1 单选 2 多选 3填空[多] 4填空[数字]  5单选[可填空] 6多选[可填空]
+     * @return
+     */
     public Integer getType() {
         return type;
     }
@@ -183,5 +196,43 @@ public class ScoreItem extends Sortable {
 	public void setRelatedField(String relatedField) {
 		this.relatedField = relatedField;
 	}
+	/**
+	 * case "1"://统计项
+		case "2"://线性打分
+		case "3"://专家打分
+	 * @return
+	 */
+	public String getScoreType() {
+		return scoreType;
+	}
+
+	public void setScoreType(String scoreType) {
+		this.scoreType = scoreType;
+	}
+
+	public Integer getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(Integer maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public String getReferItem() {
+		return referItem;
+	}
+
+	public void setReferItem(String referItem) {
+		this.referItem = referItem;
+	}
+
+	public Integer getShowLevel() {
+		return showLevel;
+	}
+
+	public void setShowLevel(Integer showLevel) {
+		this.showLevel = showLevel;
+	}
+	
 
 }

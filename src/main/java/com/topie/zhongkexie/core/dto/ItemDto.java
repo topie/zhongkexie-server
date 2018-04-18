@@ -5,41 +5,78 @@ import java.util.List;
 
 public class ItemDto {
 
-    private Integer id;
+	private Integer id;
 
-    private String title;
+	private String title;
 
-    private String type = "item";
+	private String type = "item";
 
-    private Integer itemType;
+	private Integer itemType;
 
-    private BigDecimal weight;
-    
-    private BigDecimal score;
+	private BigDecimal weight;
 
-    private List<OptionDto> items;
+	private BigDecimal score;
+	private String scoreType;
+	private Integer maxValue;
+	private String referItem;
+	private Integer showLevel;
 
-    public Integer getItemType() {
-        return itemType;
-    }
+	private List<OptionDto> items;
 
-    public void setItemType(Integer itemType) {
-        this.itemType = itemType;
-    }
+	public Integer getItemType() {
+		return itemType;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public void setItemType(Integer itemType) {
+		this.itemType = itemType;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public List<OptionDto> getItems() {
-        return items;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public BigDecimal getWeight() {
+	
+	public String getScoreType() {
+		return scoreType;
+	}
+
+	public void setScoreType(String scoreType) {
+		this.scoreType = scoreType;
+	}
+
+	public Integer getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(Integer maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public String getReferItem() {
+		return referItem;
+	}
+
+	public void setReferItem(String referItem) {
+		this.referItem = referItem;
+	}
+
+	public Integer getShowLevel() {
+		return showLevel;
+	}
+
+	public void setShowLevel(Integer showLevel) {
+		this.showLevel = showLevel;
+	}
+
+	public List<OptionDto> getItems() {
+		return items;
+	}
+
+	public BigDecimal getWeight() {
 		return weight;
 	}
 
@@ -48,30 +85,30 @@ public class ItemDto {
 	}
 
 	public void setItems(List<OptionDto> items) {
-        this.items = items;
-    }
+		this.items = items;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public BigDecimal getScore() {
-        return score;
-    }
+	public BigDecimal getScore() {
+		return score;
+	}
 
-    public void setScore(BigDecimal score) {
-        this.score = score;
-    }
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
 }
