@@ -1,14 +1,21 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.Size;
+
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_user")
 public class User extends Sortable {
@@ -108,8 +115,23 @@ public class User extends Sortable {
      */
     @Column(name = "last_password_reset")
     private Date lastPasswordReset;
-
+    
+    @Column(name = "user_type")
+    private Integer userType;
+    
     /**
+     *  7学会 4专家 1协会
+     * @return
+     */
+    public Integer getUserType() {
+		return userType;
+	}
+
+	public void setUserType(Integer userType) {
+		this.userType = userType;
+	}
+
+	/**
      * 用户roles_id 集合
      */
     @Transient

@@ -1,10 +1,10 @@
 package com.topie.zhongkexie.security.security;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-
 import java.util.Collection;
 import java.util.Date;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * 工程：os-app 创建人 : ChenGJ 创建时间： 2015/9/4 说明：
@@ -16,6 +16,7 @@ public class SecurityUser extends User {
     private String email;
     private String contactPhone;
     private Date lastPasswordReset;
+    private Integer userType;
     public SecurityUser(com.topie.zhongkexie.database.core.model.User user,
                               Collection<GrantedAuthority> userGrantedAuthorities) {
         super(user.getLoginName(), user.getPassword(), user.getEnabled(),
@@ -28,6 +29,7 @@ public class SecurityUser extends User {
             setEmail(user.getEmail());
             setContactPhone(user.getContactPhone());
             setLastPasswordReset(user.getLastPasswordReset());
+            setUserType(user.getUserType());
         }
     }
 
@@ -78,4 +80,13 @@ public class SecurityUser extends User {
     public void setLastPasswordReset(Date lastPasswordReset) {
         this.lastPasswordReset = lastPasswordReset;
     }
+
+	public Integer getUserType() {
+		return userType;
+	}
+
+	public void setUserType(Integer userType) {
+		this.userType = userType;
+	}
+    
 }

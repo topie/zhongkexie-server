@@ -20,6 +20,7 @@
         <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR"/>
         <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="user_type" property="userType" jdbcType="INTEGER"/>
         <result column="last_password_reset" property="lastPasswordReset" jdbcType="TIMESTAMP"/>
     </resultMap>
     <resultMap id="UserVoMap" type="com.topie.zhongkexie.security.dto.UserDTO">
@@ -41,6 +42,7 @@
         <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR"/>
         <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="user_type" property="userType" jdbcType="INTEGER"/>
         <result column="last_password_reset" property="lastPasswordReset" jdbcType="TIMESTAMP"/>
 
     </resultMap>
@@ -62,7 +64,7 @@
         -->
         id, login_name, password, display_name, enabled, account_non_locked, account_non_expired,
         credentials_non_expired, last_login_ip, last_login_time, email, contact_phone, insert_time,
-        update_time,last_password_reset
+        update_time,last_password_reset,user_type
     </sql>
     <update id="updateAccountNonLocked">
         update d_user set account_non_locked = #{accountNonLocked} where id=#{userId}
@@ -109,6 +111,9 @@
             </if>
             <if test="contactPhone != null and contactPhone != ''">
                 and contact_phone like concat('%',concat(#{contactPhone}, '%'))
+            </if>
+            <if test="userType != null ">
+                and user_type = #{userType}
             </if>
         </where>
         <if test="sort_ != null and sort_ != ''">

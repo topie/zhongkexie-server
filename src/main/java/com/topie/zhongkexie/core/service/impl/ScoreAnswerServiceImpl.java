@@ -138,8 +138,9 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		ScoreAnswer scoreAnswer = new ScoreAnswer();
 		scoreAnswer.setItemId(itemId);
 		int s = this.mapper.selectCount(scoreAnswer);
-		double r = (double)rank/s;
-		return "前"+r*100+"%，共"+s;
+		double r = (double)rank/s*100;
+		
+		return "超过了"+r+"%的用户，共"+s;
 	}
 
 	private String ranking_check(Integer itemId, String answer) {
@@ -149,7 +150,7 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		scoreAnswer.setAnswerValue(answer);
 		int checks = this.mapper.selectCount(scoreAnswer);
 		double rank = (double)checks/s;
-		return rank*100+"%选择了此选项，共"+s;
+		return rank*100+"%的用户选择了此选项，共"+s;
 	}
 
 }

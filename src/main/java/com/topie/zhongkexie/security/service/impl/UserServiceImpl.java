@@ -1,5 +1,13 @@
 package com.topie.zhongkexie.security.service.impl;
 
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
@@ -9,13 +17,6 @@ import com.topie.zhongkexie.security.dto.FunctionDTO;
 import com.topie.zhongkexie.security.security.UserCache;
 import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * 工程：os-app 创建人 : ChenGJ 创建时间： 2015/9/2 说明：
@@ -46,6 +47,8 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
     public int updateUser(User user) {
         if (StringUtils.isNotEmpty(user.getPassword())) {
             user.setPassword(SecurityUtil.encodeString(user.getPassword()));
+        }else{
+        	user.setPassword(null);
         }
         int result = getMapper().updateByPrimaryKeySelective(user);
         if (CollectionUtils.isNotEmpty(user.getRoles())) {
