@@ -38,7 +38,7 @@ public class ScoreIndexCollectionServiceImpl extends BaseService<ScoreIndexColle
 	}
 
 	@Override
-	public Set getSelectedNodesId(Integer paperId, Integer id) {
+	public Set<String> getSelectedNodesId(Integer paperId, Integer id) {
 		Example ex = new Example(ScoreIndexCollection.class);
 		Criteria c = ex.createCriteria();
 		c.andEqualTo("paperId", paperId);
@@ -46,7 +46,7 @@ public class ScoreIndexCollectionServiceImpl extends BaseService<ScoreIndexColle
 			c.andNotEqualTo("id", id);
 		}
 		List<ScoreIndexCollection> list = getMapper().selectByExample(ex);
-		Set set = new HashSet();
+		Set<String> set = new HashSet<String>();
 		for(ScoreIndexCollection s:list){
 			String indexs = s.getIndexCollection();
 			if(StringUtil.isNotEmpty(indexs))

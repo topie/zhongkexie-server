@@ -12,5 +12,6 @@
     <result column="item_collection" property="itemCollection" jdbcType="VARCHAR" />
     <result column="index_collection" property="indexCollection" jdbcType="VARCHAR" />
     <result column="content_json" property="contentJson" jdbcType="VARCHAR" />
+    <result column="related_field" property="relatedField" jdbcType="VARCHAR" />
   </resultMap>
 </mapper>

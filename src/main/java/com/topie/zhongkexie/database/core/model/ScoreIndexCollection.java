@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_score_index_collection")
 public class ScoreIndexCollection {
@@ -14,6 +18,11 @@ public class ScoreIndexCollection {
     private Integer paperId;
 
     private String description;
+    /**
+     * 领域
+     */
+    @Column(name = "related_field")
+    private String relatedField;
 
     @Column(name = "item_collection")
     private String itemCollection;
@@ -66,7 +75,15 @@ public class ScoreIndexCollection {
         this.paperId = paperId;
     }
 
-    /**
+    public String getRelatedField() {
+		return relatedField;
+	}
+
+	public void setRelatedField(String relatedField) {
+		this.relatedField = relatedField;
+	}
+
+	/**
      * @return description
      */
     public String getDescription() {

@@ -12,8 +12,8 @@ public interface IScoreIndexCollectionService extends IService<ScoreIndexCollect
 	PageInfo<ScoreIndexCollection> selectByFilterAndPage(
 			ScoreIndexCollection scoreIndexCollection, int pageNum, int pageSize);
 
-	List selectByFilter(ScoreIndexCollection scoreIndexCollection);
+	List<ScoreIndexCollection> selectByFilter(ScoreIndexCollection scoreIndexCollection);
 
-	Set getSelectedNodesId(Integer paperId, Integer id);
+	Set<String> getSelectedNodesId(Integer paperId, Integer id);
 
 }

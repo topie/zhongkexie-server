@@ -44,16 +44,16 @@
                         password="${jdbc_password}">
         </jdbcConnection>
 
-        <javaModelGenerator targetPackage="com.topie.zhongkexie.database.core.model"
+        <javaModelGenerator targetPackage="com.topie.zhongkexie.database.expert.model"
                             targetProject="${targetBasedir}/src/main/java"/>
 
-        <sqlMapGenerator targetPackage="mapper/core"
+        <sqlMapGenerator targetPackage="mapper/expert"
                          targetProject="${targetBasedir}/src/main/resources"/>
 
-        <javaClientGenerator targetPackage="com.topie.zhongkexie.database.core.dao"
+        <javaClientGenerator targetPackage="com.topie.zhongkexie.database.expert.dao"
                              targetProject="${targetBasedir}/src/main/java" type="XMLMAPPER"/>
 
-        <table tableName="d_score_index_collection" domainObjectName="ScoreIndexCollection">
+        <table tableName="e_index_coll_expert" domainObjectName="IndexCollExpert">
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
     </context>
