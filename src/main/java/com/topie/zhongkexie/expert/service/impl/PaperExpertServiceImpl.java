@@ -3,6 +3,7 @@ package com.topie.zhongkexie.expert.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tk.mybatis.mapper.entity.Example;
@@ -29,6 +30,8 @@ public class PaperExpertServiceImpl extends BaseService<PaperExpert> implements
 	private IDeptService iDeptService;
 	@Autowired
 	private IIndexCollExpertService iIndexCollExpertService;
+	@Value("${xuehui.isType}")
+	private String xuehuiISType;//是否按学会分类
 
 	@Override
 	public PageInfo<PaperExpert> selectByFilterAndPage(PaperExpert paperExpert,
@@ -56,10 +59,34 @@ public class PaperExpertServiceImpl extends BaseService<PaperExpert> implements
 
 	@Override
 	public int init(Integer paperId) {
-		List<DictItem> list = iDictService.selectItemsByDictCode("ZYFL");
-		for(DictItem item:list){
+		if(xuehuiISType.equals("1")){
+			List<DictItem> list = iDictService.selectItemsByDictCode("ZYFL");
+			for(DictItem item:list){
+				Dept dept = new Dept();
+				dept.setType(item.getItemCode());
+				List<Dept> depts = iDeptService.selectByFilter(dept);
+				String ids = "";
+				String names = "";
+				for(Dept d:depts){
+					ids+=","+d.getId();
+					names+=","+d.getName();
+				}
+				if(ids.length()>0){
+					ids = ids.substring(1);
+					names = names.substring(1);
+				}
+				PaperExpert pe = new PaperExpert();
+				pe.setDeptIds(ids);
+				pe.setDeptNames(names);
+				pe.setPaperId(paperId);
+				pe.setName(item.getItemName()+"学会组");
+				pe.setType(item.getItemCode());
+				this.saveNotNull(pe);
+				iIndexCollExpertService.init(paperId, pe.getId(), item.getItemCode());
+			}
+			return list.size();
+		}else{
 			Dept dept = new Dept();
-			dept.setType(item.getItemCode());
 			List<Dept> depts = iDeptService.selectByFilter(dept);
 			String ids = "";
 			String names = "";
@@ -75,12 +102,11 @@ public class PaperExpertServiceImpl extends BaseService<PaperExpert> implements
 			pe.setDeptIds(ids);
 			pe.setDeptNames(names);
 			pe.setPaperId(paperId);
-			pe.setName(item.getItemName()+"学会组");
-			pe.setType(item.getItemCode());
+			pe.setName("全国学会组");
 			this.saveNotNull(pe);
-			iIndexCollExpertService.init(paperId, pe.getId(), item.getItemCode());
+			iIndexCollExpertService.init(paperId, pe.getId(), null);
 		}
-		return list.size();
+		return 1;
 	}
 
 }

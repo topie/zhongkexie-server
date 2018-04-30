@@ -15,4 +15,6 @@ public interface IExpertInfoService extends IService<ExpertInfo> {
 
 	int saveNotNull(ExpertInfo entity, String password);
 
+	ExpertInfo selectByUserId(Integer userId);
+
 }

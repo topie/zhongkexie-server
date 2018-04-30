@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tk.mybatis.mapper.entity.Example;
@@ -45,6 +46,8 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	private IScoreItemService iScoreItemService;
 	@Autowired
 	private IScoreItemOptionService iScoreItemOptionService;
+	@Value("${xuehui.userType}")
+	private Integer showLevel;
 	@Override
 	public PageInfo<ScorePaperImportConf> selectByFilterAndPage(ScorePaperImportConf searchModel, int pageNum,
 			int pageSize) {
@@ -111,10 +114,16 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    			if(index==null){//没有指标 则不添加
 	    				
 	    			}else{//添加指标
+	    				index = index.trim();
 	    				Integer score_col = jo.getString("score")==null?null:jo.getInteger("score");//获取指标 分值列数
+	    				Integer weight_col = jo.getString("weight")==null?null:jo.getInteger("weight");//获取指标 weight列数
 	    				String score = "0";
+	    				String weight = "0";
 	    				if(score_col!=null){
-	    					score = ls.get(score_col)==null?null:(String)ls.get(score_col);//获取指标 分值
+	    					score = ls.get(score_col)==null||ls.get(score_col).equals("")?"0":(String)ls.get(score_col);//获取指标 分值
+	    				}
+	    				if(weight_col!=null){
+	    					weight = ls.get(weight_col)==null||ls.get(weight_col).equals("")?"0":(String)ls.get(weight_col);//获取指标 权重
 	    				}
 	    				//插入操作
 	    				if(j==0){//若果是第一列  则pid=0 为顶级指标
@@ -124,32 +133,44 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    					}
 	    					entity.setName(index);
 	    					try {
-	    						entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+	    						entity.setScore(new BigDecimal(score));
 							} catch (Exception e) {
+								entity.setScore(new BigDecimal("0"));
 								throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+score_col)+"列,解析数字时发生错误->【"+score+"】");
+							}
+	    					try {
+	    						entity.setWeight(new BigDecimal(weight));
+							} catch (Exception e) {
+								entity.setWeight(new BigDecimal("0"));
+								throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+weight_col)+"列,解析数字时发生错误->【"+weight+"】");
 							}
 	    					entity.setPaperId(paperId);
 	    					entity.setParentId(0);
-	    					entity.setWeight(new BigDecimal("0"));
-	    					entity.setSort(0);
+	    					entity.setSort(i);
 	    					this.iScoreIndexService.saveNotNull(entity);
 	    					map.put(j, entity.getId());//记录当前列数 最后一次更新的 指标ID 供下级取Pid
 	    				}else{
 	    					int pid = map.get(j-1);
 	    					ScoreIndex entity = new ScoreIndex();
 	    					entity.setName(index);
-	    					entity.setWeight(new BigDecimal("0"));
+	    					try {
+	    						entity.setScore(new BigDecimal(score));
+							} catch (Exception e) {
+								entity.setScore(new BigDecimal("0"));
+								throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+score_col)+"列,解析数字时发生错误->【"+score+"】");
+							}
 	    					if(StringUtils.isEmpty(index)){
 	    						throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+index_col)+"列,指标名称为空");
 	    					}
 	    					try {
-	    						entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+	    						entity.setWeight(new BigDecimal(weight));
 							} catch (Exception e) {
+								entity.setWeight(new BigDecimal("0"));
 								throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+score_col)+"列,解析数字时发生错误->【"+score+"】");
 							}
 	    					entity.setPaperId(paperId);
 	    					entity.setParentId(pid);
-	    					entity.setSort(0);
+	    					entity.setSort(i);
 	    					this.iScoreIndexService.saveNotNull(entity);
 	    					map.put(j, entity.getId());//记录当前列数 最后一次更新的 指标ID 供下级取Pid
 	    				}
@@ -164,20 +185,27 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		}
 	    		int pid = map.get(jsonIndex.size()-1);
 	    		String title =ls.get(jsonItem.getIntValue("title"))==null?null:(String)ls.get(jsonItem.getIntValue("title"));
-	    		String score =jsonItem.getString("score")==null?"0":ls.get(jsonItem.getIntValue("score"))==null?null:(String)ls.get(jsonItem.getIntValue("score"));
+	    		String score =jsonItem.getString("score")==null?"0":ls.get(jsonItem.getIntValue("score"))==null?"0":(String)ls.get(jsonItem.getIntValue("score"));
+	    		String weight =jsonItem.getString("weight")==null?"0":ls.get(jsonItem.getIntValue("weight"))==null?"0":(String)ls.get(jsonItem.getIntValue("weight"));
 	    		String desc =jsonItem.getString("desc")==null?"":ls.get(jsonItem.getIntValue("desc"))==null?null:(String)ls.get(jsonItem.getIntValue("desc"));
 	    		String org =jsonItem.getString("org")==null?"":ls.get(jsonItem.getIntValue("org"))==null?null:(String)ls.get(jsonItem.getIntValue("org"));
+	    		String type =jsonItem.getString("type")==null?null:ls.get(jsonItem.getIntValue("type"))==null?null:(String)ls.get(jsonItem.getIntValue("type"));
 	    		if(StringUtils.isEmpty(org)){
 	    			org = orgName;
 	    		}else{
 	    			orgName = org;
+	    		}
+	    		if(title!=null){
+	    			title = title.trim();
+	    			if(title.endsWith(";")||title.endsWith(".")||title.endsWith("；")||title.endsWith("。")){
+	    				title = title.substring(0, title.length()-1);
+	    			}
 	    		}
 	    		//如果有mapping 
 	    		org = deptMapping.getString(org)==null?org:deptMapping.getString(org);
 	    		ScoreItem entity = new ScoreItem();
 	    		entity.setIndexId(pid);
 	    		entity.setTitle(title);
-				entity.setWeight(new BigDecimal("0"));
 	    		if(StringUtils.isEmpty(title)){
 	    			throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("title"))+"列,题目名称为空");
 	    		}
@@ -185,21 +213,63 @@ public class ScorePaperImportConfServiceImpl extends BaseService<ScorePaperImpor
 	    		if(title.contains("是否")){
 	    			entity.setType(1);//单选
 	    		}
+	    		if(title.contains("列举")||title.contains("举例")){
+	    			entity.setType(3);//多项填空
+	    		}
+	    		if(type!=null){
+	    			if(type.contains("是否")||type.contains("单选")){
+	    				entity.setType(1);//单选
+	    			}
+	    			if(type.contains("列举")||type.contains("举例")||type.contains("多项填空")){
+	    				entity.setType(3);//多项填空
+	    			}
+	    			if(type.contains("多选")){
+	    				entity.setType(2);//多选
+	    			}
+	    			if(type.contains("数字")){
+	    				entity.setType(4);//数字
+	    			}
+	    			if(type.contains("专家评分")||type.contains("专家打分")||type.contains("专家评价打分")){
+	    				entity.setScoreType("3");
+	    			}
+	    			if(type.contains("线性")){
+	    				entity.setScoreType("2");
+	    			}
+	    		}
+	    		if(desc!=null){
+	    			if(desc.contains("专家评分")||desc.contains("专家打分")||type.contains("专家评价打分")){
+	    				entity.setScoreType("3");
+	    			}
+	    			if(desc.contains("线性")){
+	    				entity.setScoreType("2");
+	    			}
+	    			if(desc.contains("统计")){
+	    				entity.setScoreType("1");
+	    			}
+	    		}
 	    		entity.setOptionLogic(desc);
 	    		try {
-					entity.setScore(BigDecimal.valueOf(Long.valueOf(score)));
+					entity.setScore(new BigDecimal(score));
 				} catch (Exception e) {
+					entity.setScore(new BigDecimal("0"));
 					throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("score"))+"列,解析数字时发生错误->【"+score+"】");
 				}
-	    		entity.setSort(0);
+	    		try {
+					entity.setWeight(new BigDecimal(weight));
+				} catch (Exception e) {
+					entity.setWeight(new BigDecimal("0"));
+					throw new DefaultBusinessException("第"+i+"行，第"+(char)('A'+jsonItem.getIntValue("score"))+"列,解析数字时发生错误->【"+score+"】");
+				}
+	    		entity.setSort(i);
+	    		entity.setShowLevel(showLevel);
 	    		entity.setResponsibleDepartment(org);
 	    		this.iScoreItemService.saveNotNull(entity);
-	    		if(title.contains("是否")){
+	    		if(title.contains("是否")||(type!=null&&type.contains("是否"))){
 	    			int itemId = entity.getId();
 	    			ScoreItemOption option = new ScoreItemOption();
 	    			option.setItemId(itemId);
 	    			option.setOptionTitle("是");
-	    			option.setOptionRate(BigDecimal.valueOf(Long.valueOf(score)));
+	    			option.setOptionRate(new BigDecimal(score));
 	    			iScoreItemOptionService.saveNotNull(option);
 	    			ScoreItemOption option1 = new ScoreItemOption();
 	    			option1.setItemId(itemId);

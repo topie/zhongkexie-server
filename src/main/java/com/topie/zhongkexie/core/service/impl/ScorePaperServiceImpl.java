@@ -32,6 +32,7 @@ import com.topie.zhongkexie.core.dto.PaperIndexDto;
 import com.topie.zhongkexie.core.exception.RuntimeBusinessException;
 import com.topie.zhongkexie.core.service.IDeptService;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
+import com.topie.zhongkexie.core.service.IScoreIndexCollectionService;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
@@ -40,11 +41,16 @@ import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
 import com.topie.zhongkexie.database.core.model.Dept;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
+import com.topie.zhongkexie.database.core.model.ScoreIndexCollection;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.User;
+import com.topie.zhongkexie.database.expert.model.ExpertInfo;
+import com.topie.zhongkexie.expert.service.IExpertInfoService;
+import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
+import com.topie.zhongkexie.security.utils.SecurityUtil;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -54,6 +60,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 
     @Autowired
     private IScoreIndexService iScoreIndexService;
+    @Autowired
+    private IScoreIndexCollectionService iScoreIndexCollectionService;
 
     @Autowired
     private IScoreItemService iScoreItemService;
@@ -71,6 +79,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
     private IScoreAnswerService iScoreAnswerService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private IExpertInfoService experInfoService;
 
     @Override
     public PageInfo<ScorePaper> selectByFilterAndPage(ScorePaper scorePaper, int pageNum, int pageSize) {
@@ -144,27 +154,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
             List<ItemDto> ids = new ArrayList<>();
             List<ScoreItem> scoreItems = iScoreItemService.selectByFilter(scoreItem);
             for (ScoreItem item : scoreItems) {
-                ItemDto itemDto = new ItemDto();
-                itemDto.setId(item.getId());
-                itemDto.setTitle(item.getTitle());
-                itemDto.setScore(item.getScore());
-                itemDto.setItemType(item.getType());
-                itemDto.setReferItem(item.getReferItem());
-                itemDto.setShowLevel(item.getShowLevel());
-                itemDto.setScoreType(item.getScoreType());
-                itemDto.setMaxValue(item.getMaxValue());
-                List<OptionDto> itemOptions = new ArrayList<>();
-                ScoreItemOption scoreItemOption = new ScoreItemOption();
-    	        scoreItemOption.setSort_("option_sort_asc");
-    	        scoreItemOption.setItemId(item.getId());
-    	        List<ScoreItemOption> scoreItemOptions = iScoreItemOptionService.selectByFilter(scoreItemOption);
-                for (ScoreItemOption itemOption : scoreItemOptions) {
-                    OptionDto optionDto = new OptionDto();
-                    optionDto.setId(itemOption.getId());
-                    optionDto.setTitle(itemOption.getOptionTitle());
-                    itemOptions.add(optionDto);
-                }
-                itemDto.setItems(itemOptions);
+                ItemDto itemDto = map2ItemDto(item);
                 ids.add(itemDto);
             }
             paperIndexDto.setItems(ids);
@@ -232,27 +222,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 	            List<ItemDto> ids = new ArrayList<>();
 	            List<ScoreItem> scoreItems = iScoreItemService.selectByFilter(scoreItem);
 	            for (ScoreItem item : scoreItems) {
-	                ItemDto itemDto = new ItemDto();
-	                itemDto.setId(item.getId());
-	                itemDto.setTitle(item.getTitle());
-	                itemDto.setScore(item.getScore());
-	                itemDto.setItemType(item.getType());
-	                itemDto.setReferItem(item.getReferItem());
-	                itemDto.setShowLevel(item.getShowLevel());
-	                itemDto.setScoreType(item.getScoreType());
-	                itemDto.setMaxValue(item.getMaxValue());
-	                List<OptionDto> itemOptions = new ArrayList<>();
-	                ScoreItemOption scoreItemOption = new ScoreItemOption();
-	    	        scoreItemOption.setSort_("option_sort_asc");
-	    	        scoreItemOption.setItemId(item.getId());
-	    	        List<ScoreItemOption> scoreItemOptions = iScoreItemOptionService.selectByFilter(scoreItemOption);
-	                for (ScoreItemOption itemOption : scoreItemOptions) {
-                        OptionDto optionDto = new OptionDto();
-                        optionDto.setId(itemOption.getId());
-                        optionDto.setTitle(itemOption.getOptionTitle());
-                        itemOptions.add(optionDto);
-	                }
-	                itemDto.setItems(itemOptions);
+	                ItemDto itemDto = map2ItemDto(item);
 	                ids.add(itemDto);
 	            }
 	            paperIndexDto.setItems(ids);
@@ -262,6 +232,34 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 	        jo.put("title", title);
 	        jo.put("data", paperIndexDtos);
 	        return jo;
+	}
+
+
+	private ItemDto map2ItemDto(ScoreItem item) {
+		ItemDto itemDto = new ItemDto();
+        itemDto.setId(item.getId());
+        itemDto.setTitle(item.getTitle());
+        itemDto.setScore(item.getScore());
+        itemDto.setItemType(item.getType());
+        itemDto.setCustomItems(item.getItems());
+        itemDto.setShowLevel(item.getShowLevel());
+        itemDto.setScoreType(item.getScoreType());
+        itemDto.setHideBtn(item.getHideBtn());
+        itemDto.setPlaceholder(item.getPlaceholder());
+        itemDto.setRow(item.getRow());
+        List<OptionDto> itemOptions = new ArrayList<>();
+        ScoreItemOption scoreItemOption = new ScoreItemOption();
+        scoreItemOption.setSort_("option_sort_asc");
+        scoreItemOption.setItemId(item.getId());
+        List<ScoreItemOption> scoreItemOptions = iScoreItemOptionService.selectByFilter(scoreItemOption);
+        for (ScoreItemOption itemOption : scoreItemOptions) {
+            OptionDto optionDto = new OptionDto();
+            optionDto.setId(itemOption.getId());
+            optionDto.setTitle(itemOption.getOptionTitle());
+            itemOptions.add(optionDto);
+        }
+        itemDto.setItems(itemOptions);
+        return itemDto;
 	}
 
 
@@ -553,6 +551,33 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 		col+=2;
 		
 		return col;
+	}
+
+
+	@Override
+	public String getCurrentUserPaper(Integer paperId) {
+		SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+		//中科协用火狐
+		if(user.getUserType()==1){
+			ScorePaper p = this.mapper.selectByPrimaryKey(paperId);
+			if(p!=null) return p.getContentJson();
+		}
+		//专家
+		if(user.getUserType()==4){
+			Integer userId = user.getId();
+			ExpertInfo expertInfo  = experInfoService.selectByUserId(userId);
+			String rf = expertInfo.getRelatedField();
+			String f = expertInfo.getFieldType();
+			
+			ScoreIndexCollection scoreIndexCollection = new ScoreIndexCollection();
+			scoreIndexCollection.setPaperId(paperId);
+			scoreIndexCollection.setRelatedField(rf);
+			List<ScoreIndexCollection> list = iScoreIndexCollectionService.selectByFilter(scoreIndexCollection);
+			if(list.size()>0) return list.get(0).getContentJson();
+			
+		}
+		
+		return null;
 	}
 
 	

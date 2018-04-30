@@ -46,5 +46,11 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	 * @param orgIds
 	 */
 	HSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds);
+	/**
+	 * 专家获取当前用户的可查看试卷信息
+	 * @param paperId
+	 * @return
+	 */
+	String getCurrentUserPaper(Integer paperId);
 
 }

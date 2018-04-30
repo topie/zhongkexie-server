@@ -90,7 +90,7 @@ public class ExcelReader {
                     // + " 列 is Number type ; DateFormt:"  
                     // + cell.getCellStyle().getDataFormatString());  
                     if ("@".equals(cell.getCellStyle().getDataFormatString())) {  
-                        value = df.format(cell.getNumericCellValue());  
+                        value = nf.format(cell.getNumericCellValue());  
   
                     } else if ("General".equals(cell.getCellStyle()  
                             .getDataFormatString())) {  
@@ -180,7 +180,7 @@ public class ExcelReader {
                     // System.out.println(i + "行" + j  
                     // + " 列 is Number type ; DateFormt:"  
                     // + cell.getCellStyle().getDataFormatString());  
-                        value = df.format(cell.getNumberValue());  
+                        value = nf.format(cell.getNumberValue());  
 //                    System.out.print("  " + value + "  ");  
                     break;  
                 case XSSFCell.CELL_TYPE_BOOLEAN:  

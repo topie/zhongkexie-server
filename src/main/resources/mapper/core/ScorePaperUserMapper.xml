@@ -46,4 +46,26 @@
 		</if>
 	</where>
   </select>
+  
+  <select id="selectExpertUserCommitPaper" resultMap="PagerUserDtoResultMap">
+  	SELECT
+	spu.`status` user_status,
+	spu.score,
+	spu.subjective_score,
+	u.id userId,
+	sp.*, u.display_name user_name
+	FROM
+		d_score_paper_user spu
+	LEFT JOIN d_score_paper sp ON spu.paper_id = sp.id
+	LEFT JOIN e_expert_dept_user du ON du.dept_user_id = spu.user_id
+	LEFT JOIN d_user u ON spu.user_id = u.id
+	<where>
+		<if test="paperId!=null">
+			and spu.paper_id=#{paperId}
+		</if>
+		<if test="userId!=null">
+			and du.expert_user_id=#{userId}
+		</if>
+	</where>
+  </select>
 </mapper>

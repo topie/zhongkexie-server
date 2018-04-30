@@ -179,6 +179,25 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 		}
 		
 	}
+	@Override
+	public PageInfo<PagerUserDto> selectZJUserCommit(PagerUserDto pagerUserDto,
+			int pageNum, int pageSize) {
+		SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+		Integer type = user.getUserType();
+		if(type==1){//中科协用户
+			PageHelper.startPage(pageNum, pageSize);
+			List<PagerUserDto> list = this.scorePagerUserMapper.selectUserCommitPaper(pagerUserDto);
+			return new PageInfo<PagerUserDto>(list);
+		}if(type==4){//专家用户
+			pagerUserDto.setUserId(user.getId());
+			PageHelper.startPage(pageNum, pageSize);
+			List<PagerUserDto> list = this.scorePagerUserMapper.selectExpertUserCommitPaper(pagerUserDto);
+			return new PageInfo<PagerUserDto>(list);
+			
+		}
+		
+		 return new PageInfo<PagerUserDto>();
+	}
 
 	
 }

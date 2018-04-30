@@ -51,5 +51,14 @@ public interface IScorePagerUserService extends IService<ScorePaperUser>{
 	 */
 	ScorePaperUser getCurrentUserScorePaperUser(Integer paperId);
 	void updatePaperScore(Integer paperId);
+	/**
+	 * 获取当前专家可以查看的学会
+	 * @param pagerUserDto
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	PageInfo<PagerUserDto> selectZJUserCommit(PagerUserDto pagerUserDto,
+			int pageNum, int pageSize);
 
 }

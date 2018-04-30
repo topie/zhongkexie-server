@@ -14,14 +14,15 @@ public class ItemDto {
 	private Integer itemType;
 
 	private BigDecimal weight;
-
 	private BigDecimal score;
 	private String scoreType;
-	private Integer maxValue;
-	private String referItem;
 	private Integer showLevel;
+	private Integer row;
+	private String placeholder;
+	private Boolean hideBtn;
 
 	private List<OptionDto> items;
+	private String customItems;
 
 	public Integer getItemType() {
 		return itemType;
@@ -39,7 +40,22 @@ public class ItemDto {
 		this.type = type;
 	}
 
-	
+	public Boolean getHideBtn() {
+		return hideBtn;
+	}
+
+	public void setHideBtn(Boolean hideBtn) {
+		this.hideBtn = hideBtn;
+	}
+
+	public String getCustomItems() {
+		return customItems;
+	}
+
+	public void setCustomItems(String customItems) {
+		this.customItems = customItems;
+	}
+
 	public String getScoreType() {
 		return scoreType;
 	}
@@ -48,20 +64,20 @@ public class ItemDto {
 		this.scoreType = scoreType;
 	}
 
-	public Integer getMaxValue() {
-		return maxValue;
+	public Integer getRow() {
+		return row;
 	}
 
-	public void setMaxValue(Integer maxValue) {
-		this.maxValue = maxValue;
+	public void setRow(Integer row) {
+		this.row = row;
 	}
 
-	public String getReferItem() {
-		return referItem;
+	public String getPlaceholder() {
+		return placeholder;
 	}
 
-	public void setReferItem(String referItem) {
-		this.referItem = referItem;
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
 	}
 
 	public Integer getShowLevel() {

@@ -54,6 +54,9 @@ public class ExpertInfoServiceImpl extends BaseService<ExpertInfo> implements
 		if (!StringUtils.isEmpty(expertInfo.getRelatedField())) {
 			c.andEqualTo("relatedField", expertInfo.getRelatedField());
 		}
+		if (expertInfo.getUserId()!=null) {
+			c.andEqualTo("userId", expertInfo.getUserId());
+		}
 		if (!StringUtils.isEmpty(expertInfo.getFieldType())) {
 			c.andEqualTo("fieldType", expertInfo.getFieldType());
 		}
@@ -95,5 +98,14 @@ public class ExpertInfoServiceImpl extends BaseService<ExpertInfo> implements
 		}
         return mapper.updateByPrimaryKeySelective(entity);
 		
+	}
+
+	@Override
+	public ExpertInfo selectByUserId(Integer userId) {
+		ExpertInfo expertInfo = new ExpertInfo();
+		expertInfo.setUserId(userId);
+		List<ExpertInfo> list = this.selectByFilter(expertInfo);
+		if(list.size()>0)return list.get(0);
+		return null;
 	}
 }

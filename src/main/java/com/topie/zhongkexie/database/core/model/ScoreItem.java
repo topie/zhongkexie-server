@@ -13,173 +13,194 @@ import com.topie.zhongkexie.common.handler.Sortable;
 @Table(name = "d_score_item")
 public class ScoreItem extends Sortable {
 
-    private static final long serialVersionUID = 3203650793511377505L;
+	private static final long serialVersionUID = 3203650793511377505L;
 
-    /**
-     * ID
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	/**
+	 * ID
+	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    /**
-     * 指标ID
-     */
-    @Column(name = "index_id")
-    private Integer indexId;
+	/**
+	 * 指标ID
+	 */
+	@Column(name = "index_id")
+	private Integer indexId;
 
-    /**
-     * 题目
-     */
-    private String title;
+	/**
+	 * 题目
+	 */
+	private String title;
 
-    private Integer type;
+	private Integer type;
 
-    @Column(name = "option_logic")
-    private String optionLogic;
+	@Column(name = "option_logic_desc")
+	private String optionLogicDesc;
 
-    @Column(name = "responsible_department")
-    private String responsibleDepartment;
-    
-    @Column(name = "related_field")
-    private String relatedField;
-    
-    @Column(name = "score_type")
-    private String scoreType;
-    @Column(name = "max_value")
-    private Integer maxValue;
-    @Column(name = "refer_item")
-    private String referItem;
-    @Column(name = "show_level")
-    private Integer showLevel;
-    
-    
-    /**
-     * 题目权重
-     */
-    private BigDecimal weight;
+	@Column(name = "option_logic")
+	private String optionLogic;
 
-    /**
-     * 题目分值
-     */
-    private BigDecimal score;
+	@Column(name = "responsible_department")
+	private String responsibleDepartment;
 
-    private Integer sort;
+	@Column(name = "related_field")
+	private String relatedField;
 
-    public String getOptionLogic() {
-        return optionLogic;
-    }
+	@Column(name = "score_type")
+	private String scoreType;
+	@Column(name = "row")
+	private Integer row;
+	@Column(name = "placeholder")
+	private String placeholder;
+	@Column(name = "items")
+	private String items;
+	@Column(name = "show_level")
+	private Integer showLevel;
+	@Column(name = "hide_btn")
+	private Boolean hideBtn;
 
-    public void setOptionLogic(String optionLogic) {
-        this.optionLogic = optionLogic;
-    }
-    /**
-     * 题目回答类型：0 填空 1 单选 2 多选 3填空[多] 4填空[数字]  5单选[可填空] 6多选[可填空]
-     * @return
-     */
-    public Integer getType() {
-        return type;
-    }
+	/**
+	 * 题目权重
+	 */
+	private BigDecimal weight;
 
-    public void setType(Integer type) {
-        this.type = type;
-    }
+	/**
+	 * 题目分值
+	 */
+	private BigDecimal score;
 
-    public Integer getSort() {
-        return sort;
-    }
+	private Integer sort;
 
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
+	public String getOptionLogic() {
+		return optionLogic;
+	}
 
-    /**
-     * 获取ID
-     *
-     * @return id - ID
-     */
-    public Integer getId() {
-        return id;
-    }
+	public void setOptionLogic(String optionLogic) {
+		this.optionLogic = optionLogic;
+	}
 
-    /**
-     * 设置ID
-     *
-     * @param id ID
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	/**
+	 * 题目回答类型：0 填空 1 单选 2 多选 3填空[多] 4填空[数字] 5单选[可填空] 6多选[可填空]7填空[自定义]
+	 * 
+	 * @return
+	 */
+	public Integer getType() {
+		return type;
+	}
 
-    /**
-     * 获取指标ID
-     *
-     * @return index_id - 指标ID
-     */
-    public Integer getIndexId() {
-        return indexId;
-    }
+	public void setType(Integer type) {
+		this.type = type;
+	}
 
-    /**
-     * 设置指标ID
-     *
-     * @param indexId 指标ID
-     */
-    public void setIndexId(Integer indexId) {
-        this.indexId = indexId;
-    }
+	public Boolean getHideBtn() {
+		return hideBtn;
+	}
 
-    /**
-     * 获取题目
-     *
-     * @return title - 题目
-     */
-    public String getTitle() {
-        return title;
-    }
+	public void setHideBtn(Boolean hideBtn) {
+		this.hideBtn = hideBtn;
+	}
 
-    /**
-     * 设置题目
-     *
-     * @param title 题目
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    
-    /**
-     * 获取题目权重
-     * @return
-     */
-    public BigDecimal getWeight() {
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
+
+	/**
+	 * 获取ID
+	 *
+	 * @return id - ID
+	 */
+	public Integer getId() {
+		return id;
+	}
+
+	/**
+	 * 设置ID
+	 *
+	 * @param id
+	 *            ID
+	 */
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * 获取指标ID
+	 *
+	 * @return index_id - 指标ID
+	 */
+	public Integer getIndexId() {
+		return indexId;
+	}
+
+	/**
+	 * 设置指标ID
+	 *
+	 * @param indexId
+	 *            指标ID
+	 */
+	public void setIndexId(Integer indexId) {
+		this.indexId = indexId;
+	}
+
+	/**
+	 * 获取题目
+	 *
+	 * @return title - 题目
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * 设置题目
+	 *
+	 * @param title
+	 *            题目
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * 获取题目权重
+	 * 
+	 * @return
+	 */
+	public BigDecimal getWeight() {
 		return weight;
 	}
-    
-    /**
-     * 题目权重
-     * 
-     */
+
+	/**
+	 * 题目权重
+	 * 
+	 */
 	public void setWeight(BigDecimal weight) {
 		this.weight = weight;
 	}
 
 	/**
-     * 获取题目分值
-     *
-     * @return score - 题目分值
-     */
-    public BigDecimal getScore() {
-        return score;
-    }
+	 * 获取题目分值
+	 *
+	 * @return score - 题目分值
+	 */
+	public BigDecimal getScore() {
+		return score;
+	}
 
-    /**
-     * 设置题目分值
-     *
-     * @param score 题目分值
-     */
-    public void setScore(BigDecimal score) {
-        this.score = score;
-    }
+	/**
+	 * 设置题目分值
+	 *
+	 * @param score
+	 *            题目分值
+	 */
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
 
 	public String getResponsibleDepartment() {
 		return responsibleDepartment;
@@ -196,10 +217,10 @@ public class ScoreItem extends Sortable {
 	public void setRelatedField(String relatedField) {
 		this.relatedField = relatedField;
 	}
+
 	/**
-	 * case "1"://统计项
-		case "2"://线性打分
-		case "3"://专家打分
+	 * case "1"://统计项 case "2"://线性打分 case "3"://专家打分
+	 * 
 	 * @return
 	 */
 	public String getScoreType() {
@@ -210,20 +231,36 @@ public class ScoreItem extends Sortable {
 		this.scoreType = scoreType;
 	}
 
-	public Integer getMaxValue() {
-		return maxValue;
+	public Integer getRow() {
+		return row;
 	}
 
-	public void setMaxValue(Integer maxValue) {
-		this.maxValue = maxValue;
+	public void setRow(Integer row) {
+		this.row = row;
 	}
 
-	public String getReferItem() {
-		return referItem;
+	public String getPlaceholder() {
+		return placeholder;
 	}
 
-	public void setReferItem(String referItem) {
-		this.referItem = referItem;
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
+	}
+
+	public String getOptionLogicDesc() {
+		return optionLogicDesc;
+	}
+
+	public void setOptionLogicDesc(String optionLogicDesc) {
+		this.optionLogicDesc = optionLogicDesc;
+	}
+
+	public String getItems() {
+		return items;
+	}
+
+	public void setItems(String items) {
+		this.items = items;
 	}
 
 	public Integer getShowLevel() {
@@ -233,6 +270,5 @@ public class ScoreItem extends Sortable {
 	public void setShowLevel(Integer showLevel) {
 		this.showLevel = showLevel;
 	}
-	
 
 }

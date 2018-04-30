@@ -28,6 +28,7 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.topie.zhongkexie.common.utils.JavaExecScript;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
@@ -130,6 +131,26 @@ public class ScorePaperController {
 	}
 
 	/**
+	 * 专家 查看各个学会提交信息
+	 * 
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping(value = "/zjcheckList", method = RequestMethod.GET)
+	@ResponseBody
+	public Result zjcheckList(
+			PagerUserDto pagerUserDto,
+			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+		PageInfo<PagerUserDto> pageInfo = iScorePagerUserService
+				.selectZJUserCommit(pagerUserDto, pageNum, pageSize);
+		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+
+	}
+
+	/**
 	 * 学会评价表审核列表
 	 * 
 	 * @param scorePaper
@@ -148,17 +169,18 @@ public class ScorePaperController {
 				.selectByFilterAndPage(scorePaper, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
 	}
-	
+
 	/**
 	 * 获取退回意见
+	 * 
 	 * @param paperId
 	 * @return
 	 */
 	@RequestMapping(value = "/getFeedback", method = RequestMethod.GET)
 	@ResponseBody
-	public Result getFeedback(
-			Integer paperId) {
-		ScorePaperUser user = this.iScorePagerUserService.getCurrentUserScorePaperUser(paperId);
+	public Result getFeedback(Integer paperId) {
+		ScorePaperUser user = this.iScorePagerUserService
+				.getCurrentUserScorePaperUser(paperId);
 		return ResponseUtil.success(user);
 	}
 
@@ -244,12 +266,14 @@ public class ScorePaperController {
 		try {
 			output = response.getOutputStream();
 			response.reset();
-			//fileName=new String((fileName+"导出数据.xls").getBytes(), "ISO_8859_1");
-			fileName=URLEncoder.encode(fileName+"导出数据.xls","UTF-8");
+			// fileName=new String((fileName+"导出数据.xls").getBytes(),
+			// "ISO_8859_1");
+			fileName = URLEncoder.encode(fileName + "导出数据.xls", "UTF-8");
 			response.setHeader("Content-disposition", "attachment; filename="
 					+ fileName);
-//			response.setHeader("Content-disposition", "attachment;filename*=UTF-8 "
-//					+ URLEncoder.encode(fileName,"UTF-8"));
+			// response.setHeader("Content-disposition",
+			// "attachment;filename*=UTF-8 "
+			// + URLEncoder.encode(fileName,"UTF-8"));
 			response.setContentType("application/vnd.ms-excel;charset=utf-8");
 			response.setCharacterEncoding("utf-8");
 			wb.write(output);
@@ -287,7 +311,8 @@ public class ScorePaperController {
 	@RequestMapping(value = "/reportContentSubmit", method = RequestMethod.GET)
 	@ResponseBody
 	public Result reportContentSubmit(int id) {
-		iScorePagerUserService.check(id, PagerUserDto.PAPERSTATUS_SUBMMIT,null);
+		iScorePagerUserService
+				.check(id, PagerUserDto.PAPERSTATUS_SUBMMIT, null);
 		return ResponseUtil.success("操作完成！");
 	}
 
@@ -301,11 +326,11 @@ public class ScorePaperController {
 	@RequestMapping(value = "/reportContentCheck", method = RequestMethod.GET)
 	@ResponseBody
 	public Result reportContentCheck(int id, short result,
-			@RequestParam(value="feedback",required=false)String feedback) {
-		iScorePagerUserService.check(id, result,feedback);
+			@RequestParam(value = "feedback", required = false) String feedback) {
+		iScorePagerUserService.check(id, result, feedback);
 		return ResponseUtil.success("操作完成！");
 	}
-	
+
 	/**
 	 * 中科协特殊渠道退回到填报员
 	 * 
@@ -316,8 +341,8 @@ public class ScorePaperController {
 	@RequestMapping(value = "/reportBack", method = RequestMethod.GET)
 	@ResponseBody
 	public Result reportContentCheck(int id, int userId,
-			@RequestParam(value="feedback",required=false)String feedback) {
-		iScorePagerUserService.check(id,new Short("0") ,userId,feedback);
+			@RequestParam(value = "feedback", required = false) String feedback) {
+		iScorePagerUserService.check(id, new Short("0"), userId, feedback);
 		return ResponseUtil.success("操作完成！");
 	}
 
@@ -381,15 +406,42 @@ public class ScorePaperController {
 					// 单选
 				} else if (scoreItem.getType() == 2) {
 					// 多选
+					// TODO 计算分数
 					String logic = scoreItem.getOptionLogic();
 				}
-				Integer indexId = iScoreItemService.selectByKey(a.getItemId()).getIndexId();
+				Integer indexId = iScoreItemService.selectByKey(a.getItemId())
+						.getIndexId();
 				sa.setIndexId(indexId);
+				// 计算分数
+				if (scoreItem.getScoreType().equals("2")) {// 线性打分
+					try {
+						sa.setAnswerScore(getScore(scoreItem,sa));
+					} catch (Exception e) {
+						sa.setAnswerScore(new BigDecimal("0"));
+						System.err.println("线性打分项评分时出现异常：");
+						e.printStackTrace();
+					}
+				} else {// 统计项 或者专家打分项
+					sa.setAnswerScore(new BigDecimal("0"));
+				}
 				iScoreAnswerService.saveNotNull(sa);
-				// TODO 计算分数
 			}
 		}
 		return ResponseUtil.success();
+	}
+
+	private BigDecimal getScore(ScoreItem scoreItem,ScoreAnswer sa) {
+		BigDecimal score = null;
+		String functionBody = scoreItem.getOptionLogic();
+		ScoreAnswer referItemValue = new ScoreAnswer();
+		ScoreItemOption scoreItemOption = new ScoreItemOption();
+		scoreItemOption.setItemId(scoreItem.getId());
+		List<ScoreItemOption> opts = this.iScoreItemOptionService
+				.selectByFilter(scoreItemOption);
+		score = JavaExecScript.jsFunction(sa, opts, referItemValue,
+				functionBody);
+		return score;
+
 	}
 
 	/**
@@ -437,7 +489,7 @@ public class ScorePaperController {
 	public Result getPaperOptions() {
 		Example example = new Example(ScorePaper.class);
 		example.setOrderByClause("create_time desc");
-		//TODO 查询编辑状态的
+		// TODO 查询编辑状态的
 		List<ScorePaper> list = iScorePaperService.selectByExample(example);
 		List<Map> maps = new ArrayList<Map>();
 		for (ScorePaper s : list) {
@@ -449,7 +501,7 @@ public class ScorePaperController {
 		}
 		return ResponseUtil.success(maps);
 	}
-	
+
 	/**
 	 * 获取所有评价表 下拉框
 	 * 
@@ -460,7 +512,7 @@ public class ScorePaperController {
 	public Object getPaperSelect(String status) {
 		Example example = new Example(ScorePaper.class);
 		example.setOrderByClause("create_time desc");
-		//TODO 查询编辑状态的
+		// TODO 查询编辑状态的
 		List<ScorePaper> list = iScorePaperService.selectByExample(example);
 		List<Map> maps = new ArrayList<Map>();
 		for (ScorePaper s : list) {
@@ -473,7 +525,7 @@ public class ScorePaperController {
 		}
 		return maps;
 	}
-	
+
 	/**
 	 * 获取所有答题不真实的item
 	 * 
@@ -481,7 +533,7 @@ public class ScorePaperController {
 	 */
 	@RequestMapping(value = "/getPaperAnswerReal", method = RequestMethod.GET)
 	@ResponseBody
-	public Result getPaperAnswerReal(Integer paperId,Integer userId) {
+	public Result getPaperAnswerReal(Integer paperId, Integer userId) {
 		Example example = new Example(ScoreAnswer.class);
 		Criteria c = example.createCriteria();
 		c.andEqualTo("paperId", paperId);
@@ -490,6 +542,7 @@ public class ScorePaperController {
 		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
 		return ResponseUtil.success(list);
 	}
+
 	/**
 	 * 更新答题的真实情况
 	 * 
@@ -497,17 +550,18 @@ public class ScorePaperController {
 	 */
 	@RequestMapping(value = "/updateAnswerReal", method = RequestMethod.POST)
 	@ResponseBody
-	public Result updateAnswerReal(Integer paperId,Integer userId,Integer itemId,Boolean answerReal) {
+	public Result updateAnswerReal(Integer paperId, Integer userId,
+			Integer itemId, Boolean answerReal) {
 		Example example = new Example(ScoreAnswer.class);
 		Criteria c = example.createCriteria();
 		c.andEqualTo("paperId", paperId);
 		c.andEqualTo("userId", userId);
 		c.andEqualTo("itemId", itemId);
 		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
-		if(list.size()>0){
+		if (list.size() > 0) {
 			ScoreAnswer one = list.get(0);
 			one.setAnswerReal(answerReal);
-			if(!answerReal){
+			if (!answerReal) {
 				one.setAnswerScore(new BigDecimal(0));
 			}
 			iScoreAnswerService.updateAll(one);
@@ -515,7 +569,7 @@ public class ScorePaperController {
 		}
 		return ResponseUtil.error();
 	}
-	
+
 	/**
 	 * 更新答题的分数
 	 * 
@@ -523,17 +577,18 @@ public class ScorePaperController {
 	 */
 	@RequestMapping(value = "/updateAnswerScore", method = RequestMethod.POST)
 	@ResponseBody
-	public Result updateAnswerScore(Integer paperId,Integer userId,Integer itemId,BigDecimal answerScore) {
+	public Result updateAnswerScore(Integer paperId, Integer userId,
+			Integer itemId, BigDecimal answerScore) {
 		Example example = new Example(ScoreAnswer.class);
 		Criteria c = example.createCriteria();
 		c.andEqualTo("paperId", paperId);
 		c.andEqualTo("userId", userId);
 		c.andEqualTo("itemId", itemId);
 		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
-		if(list.size()>0){
+		if (list.size() > 0) {
 			ScoreAnswer one = list.get(0);
 			one.setAnswerScore(answerScore);
-			if(!one.getAnswerReal()){
+			if (!one.getAnswerReal()) {
 				one.setAnswerScore(new BigDecimal(0));
 				iScoreAnswerService.updateAll(one);
 				return ResponseUtil.error("信息虚假，不能修改分数");
@@ -543,7 +598,7 @@ public class ScorePaperController {
 		}
 		return ResponseUtil.error();
 	}
-	
+
 	/**
 	 * 计算得分
 	 * 
@@ -551,19 +606,22 @@ public class ScorePaperController {
 	 */
 	@RequestMapping(value = "/getUserScore", method = RequestMethod.GET)
 	@ResponseBody
-	public Result getUserScore(Integer paperId,Integer userId) {
-		BigDecimal score = this.iScoreAnswerService.getUserScore(paperId,userId);
+	public Result getUserScore(Integer paperId, Integer userId) {
+		BigDecimal score = this.iScoreAnswerService.getUserScore(paperId,
+				userId);
 		Example example = new Example(ScorePaperUser.class);
-		example.createCriteria().andEqualTo("paperId",paperId).andEqualTo("userId",userId);
-		List<ScorePaperUser> list = this.iScorePagerUserService.selectByExample(example);
-		if(list.size()>0){
+		example.createCriteria().andEqualTo("paperId", paperId)
+				.andEqualTo("userId", userId);
+		List<ScorePaperUser> list = this.iScorePagerUserService
+				.selectByExample(example);
+		if (list.size() > 0) {
 			ScorePaperUser user = list.get(0);
 			user.setScore(score);
 			iScorePagerUserService.updateNotNull(user);
 		}
 		return ResponseUtil.success(score);
 	}
-	
+
 	/**
 	 * 计算所有得分
 	 * 
@@ -575,29 +633,49 @@ public class ScorePaperController {
 		this.iScorePagerUserService.updatePaperScore(paperId);
 		return ResponseUtil.success();
 	}
+
 	/**
 	 * 更新附加分数 主观分
 	 */
 	@RequestMapping(value = "/updateSubjectiveScore", method = RequestMethod.GET)
 	@ResponseBody
-	public Result updateSubjectiveScore(Integer paperId,Integer userId,BigDecimal subjectiveScore) {
+	public Result updateSubjectiveScore(Integer paperId, Integer userId,
+			BigDecimal subjectiveScore) {
 		Example example = new Example(ScorePaperUser.class);
-		example.createCriteria().andEqualTo("paperId",paperId).andEqualTo("userId",userId);
-		List<ScorePaperUser> list = this.iScorePagerUserService.selectByExample(example);
-		if(list.size()>0){
+		example.createCriteria().andEqualTo("paperId", paperId)
+				.andEqualTo("userId", userId);
+		List<ScorePaperUser> list = this.iScorePagerUserService
+				.selectByExample(example);
+		if (list.size() > 0) {
 			ScorePaperUser user = list.get(0);
 			user.setSubjectiveScore(subjectiveScore);
 			iScorePagerUserService.updateNotNull(user);
 		}
 		return ResponseUtil.success();
 	}
-	
+
 	@RequestMapping("getAnswerOfRanking")
 	@ResponseBody
-	public Result getAnswerOfRanking(Integer itemId,String answer ){
-		String rank = iScoreAnswerService.getAnswerOfRanking(itemId,answer);
+	public Result getAnswerOfRanking(Integer itemId, String answer) {
+		String rank = iScoreAnswerService.getAnswerOfRanking(itemId, answer);
 		return ResponseUtil.success(rank);
 	}
-	
+
+	/**
+	 * 专家获取试卷
+	 * 
+	 * @param itemId
+	 * @param answer
+	 * @return
+	 */
+	@RequestMapping("getPaper")
+	@ResponseBody
+	public Object getPaper(Integer paperId) {
+		String contentJson = this.iScorePaperService
+				.getCurrentUserPaper(paperId);
+		if (contentJson == null)
+			return ResponseUtil.error("没有权限获取数据");
+		return ResponseUtil.success(contentJson);
+	}
 
 }
