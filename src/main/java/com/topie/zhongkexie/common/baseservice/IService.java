@@ -24,9 +24,9 @@
 
 package com.topie.zhongkexie.common.baseservice;
 
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 /**
  * 通用接口
@@ -41,6 +41,8 @@ public interface IService<T> {
     int saveNotNull(T entity);
 
     int delete(Object key);
+    
+    int deleteByExample(Object ex);
 
     int updateAll(T entity);
 

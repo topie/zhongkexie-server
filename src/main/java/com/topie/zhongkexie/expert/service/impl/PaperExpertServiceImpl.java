@@ -17,7 +17,10 @@ import com.topie.zhongkexie.core.service.IDeptService;
 import com.topie.zhongkexie.core.service.IDictService;
 import com.topie.zhongkexie.database.core.model.Dept;
 import com.topie.zhongkexie.database.core.model.DictItem;
+import com.topie.zhongkexie.database.expert.model.ExpertDeptUser;
+import com.topie.zhongkexie.database.expert.model.IndexCollExpert;
 import com.topie.zhongkexie.database.expert.model.PaperExpert;
+import com.topie.zhongkexie.expert.service.IExpertDeptUserService;
 import com.topie.zhongkexie.expert.service.IIndexCollExpertService;
 import com.topie.zhongkexie.expert.service.IPaperExpertService;
 
@@ -30,6 +33,9 @@ public class PaperExpertServiceImpl extends BaseService<PaperExpert> implements
 	private IDeptService iDeptService;
 	@Autowired
 	private IIndexCollExpertService iIndexCollExpertService;
+	@Autowired
+	private IExpertDeptUserService iExpertDeptUserService;
+	
 	@Value("${xuehui.isType}")
 	private String xuehuiISType;//是否按学会分类
 
@@ -58,8 +64,9 @@ public class PaperExpertServiceImpl extends BaseService<PaperExpert> implements
 	}
 
 	@Override
-	public int init(Integer paperId) {
-		if(xuehuiISType.equals("1")){
+	public int init(Integer paperId,String type) {
+		deleteAllConfig(paperId);
+		if(type!=null){
 			List<DictItem> list = iDictService.selectItemsByDictCode("ZYFL");
 			for(DictItem item:list){
 				Dept dept = new Dept();
@@ -107,6 +114,21 @@ public class PaperExpertServiceImpl extends BaseService<PaperExpert> implements
 			iIndexCollExpertService.init(paperId, pe.getId(), null);
 		}
 		return 1;
+	}
+
+	private void deleteAllConfig(Integer paperId) {
+		Example ex = new Example(PaperExpert.class);
+		ex.createCriteria().andEqualTo("paperId", paperId);
+		getMapper().deleteByExample(ex);
+		
+		Example ex1 = new Example(IndexCollExpert.class);
+		ex1.createCriteria().andEqualTo("paperId", paperId);
+		iIndexCollExpertService.deleteByExample(ex1);
+
+		Example ex2 = new Example(ExpertDeptUser.class);
+		ex2.createCriteria().andEqualTo("paperId", paperId);
+		iExpertDeptUserService.deleteByExample(ex2);
+		
 	}
 
 }

@@ -41,7 +41,8 @@ public class PaperExpertController {
 	    @ResponseBody
 	    public Result init(PaperExpert paperExpert) {
 	    	Integer paperId = paperExpert.getPaperId();
-	    	int result = this.iPaperExpertService.init(paperId);
+	    	String type = paperExpert.getType();
+	    	int result = this.iPaperExpertService.init(paperId,type);
 	    	return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
 	    }
 

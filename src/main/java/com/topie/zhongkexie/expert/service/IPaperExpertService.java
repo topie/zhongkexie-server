@@ -13,6 +13,6 @@ public interface IPaperExpertService extends IService<PaperExpert> {
 
 	List<PaperExpert> selectByFilter(PaperExpert paperExpert);
 
-	int init(Integer paperId);
+	int init(Integer paperId, String type);
 
 }

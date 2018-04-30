@@ -25,13 +25,13 @@
 package com.topie.zhongkexie.common.baseservice.impl;
 
 
-import com.topie.zhongkexie.common.baseservice.IService;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
 import tk.mybatis.mapper.common.Mapper;
+
+import com.topie.zhongkexie.common.baseservice.IService;
 
 /**
  * Created by liuzh on 2014/12/11.
@@ -60,6 +60,9 @@ public abstract class BaseService<T> implements IService<T> {
 
     public int delete(Object key) {
         return mapper.deleteByPrimaryKey(key);
+    }
+    public int deleteByExample(Object ex) {
+        return mapper.deleteByExample(ex);
     }
 
     public int updateAll(T entity) {
