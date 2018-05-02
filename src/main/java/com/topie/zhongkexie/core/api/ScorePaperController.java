@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.entity.Example.Criteria;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.utils.JavaExecScript;
@@ -415,7 +416,9 @@ public class ScorePaperController {
 				// 计算分数
 				if (scoreItem.getScoreType().equals("2")) {// 线性打分
 					try {
-						sa.setAnswerScore(getScore(scoreItem,sa));
+						BigDecimal s = getScore(scoreItem,sa);
+						if(s!=null)
+							sa.setAnswerScore(s);
 					} catch (Exception e) {
 						sa.setAnswerScore(new BigDecimal("0"));
 						System.err.println("线性打分项评分时出现异常：");
@@ -433,6 +436,9 @@ public class ScorePaperController {
 	private BigDecimal getScore(ScoreItem scoreItem,ScoreAnswer sa) {
 		BigDecimal score = null;
 		String functionBody = scoreItem.getOptionLogic();
+		if(StringUtils.isEmpty(functionBody)){
+			return null;
+		}
 		ScoreAnswer referItemValue = new ScoreAnswer();
 		ScoreItemOption scoreItemOption = new ScoreItemOption();
 		scoreItemOption.setItemId(scoreItem.getId());
