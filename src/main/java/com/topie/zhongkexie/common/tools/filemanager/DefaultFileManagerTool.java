@@ -1,13 +1,24 @@
 package com.topie.zhongkexie.common.tools.filemanager;
 
-import com.topie.zhongkexie.common.exception.DefaultBusinessException;
-import com.topie.zhongkexie.common.utils.FileManagerUtil;
-import org.springframework.stereotype.Component;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.springframework.stereotype.Component;
+
+import com.topie.zhongkexie.common.exception.DefaultBusinessException;
+import com.topie.zhongkexie.common.utils.FileManagerUtil;
 
 /**
  * Created by chenguojun on 2017/1/14.
@@ -96,10 +107,15 @@ public class DefaultFileManagerTool implements IFileManager {
     @Override
     public void download(HttpServletResponse response, String filePath, String fileName) {
         response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
+        response.setContentType("application/force-download");
         try {
-            response.setHeader("Content-Disposition",
-                    "attachment;fileName=" + new String(fileName.getBytes("gbk"), "iso-8859-1"));
+		    
+		    //设置响应头，对文件进行url编码
+        	fileName = URLEncoder.encode(fileName, "UTF-8");
+		    response.setHeader("Content-Disposition", "attachment;filename="+fileName);   
+		    
+//            response.setHeader("Content-Disposition",
+//                    "attachment;fileName=" +  new String(fileName.getBytes("utf-8"), "iso-8859-1"));
             File file = new File(filePath);
             InputStream inputStream = new FileInputStream(file);
             OutputStream os = response.getOutputStream();

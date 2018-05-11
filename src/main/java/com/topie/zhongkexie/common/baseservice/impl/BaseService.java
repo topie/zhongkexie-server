@@ -81,4 +81,12 @@ public abstract class BaseService<T> implements IService<T> {
     public List<T> selectAll() {
         return mapper.selectAll();
     }
+    @Override
+    public int updateByExample(T entity, Object example) {
+    	return mapper.updateByExample(entity,example);
+    }
+    @Override
+    public int updateByExampleSelective(T entity, Object example) {
+    	return mapper.updateByExampleSelective(entity,example);
+    }
 }

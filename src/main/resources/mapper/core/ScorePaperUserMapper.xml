@@ -25,7 +25,7 @@
     <result column="subjective_score" property="subjectiveScore" jdbcType="DECIMAL" />
     <result column="user_id" property="userId" jdbcType="INTEGER"/>
     <result column="user_status" property="checkStatus" jdbcType="VARCHAR"/>
-    <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" />
+<!--     <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" /> -->
   </resultMap>
   <select id="selectByPagerId" resultMap="BaseResultMap">
         select

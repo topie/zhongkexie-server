@@ -43,7 +43,9 @@ public class MessageServiceImpl extends BaseService<Message> implements IMessage
 		Criteria c = ex.createCriteria();
 		if(StringUtils.isNotEmpty(message.getTitle())) c.andLike("title", "%"+message.getTitle()+"%");
 		if(StringUtils.isNotEmpty(message.getCreateUser())) c.andLike("createUser", "%"+message.getCreateUser()+"%");
-		if(null!=message.getSpId())c.andEqualTo("spId",message.getSpId());
+		if(message.getSpId()!=null)c.andEqualTo("spId",message.getSpId());
+		if(StringUtils.isNotEmpty(message.getType()))c.andEqualTo("type",message.getType());
+		if(StringUtils.isNotEmpty(message.getStatus()))c.andEqualTo("status",message.getStatus());
 		ex.setOrderByClause("create_time desc");
 		List<Message> list = this.messageMapper.selectByExample(ex); 
 		PageInfo<Message> page = new PageInfo<Message>(list);
@@ -67,10 +69,14 @@ public class MessageServiceImpl extends BaseService<Message> implements IMessage
 		return super.saveNotNull(message);
 	}
 
+	
 	private void setDetail(Message message) {
 		message.setCreateUserId(SecurityUtil.getCurrentUserId());
     	message.setCreateUser(SecurityUtil.getCurrentUserName());
     	message.setCreateTime(DateUtil.DateToString(new Date(), DateStyle.YYYY_MM_DD_HH_MM_SS));
+    	if(StringUtils.isNotEmpty(message.getTitle())){
+    		return ;
+    	}
     	String title="";
     	String content="";
     	try{
@@ -83,8 +89,8 @@ public class MessageServiceImpl extends BaseService<Message> implements IMessage
     	title = title.replace("${paperName}",sp.getTitle());
     	message.setTitle(title);
     	content = content.replace("${paperName}", sp.getTitle())
-    			.replace("${startTime}", DateUtil.DateToString(sp.getBegin(),DateStyle.YYYY_MM_DD))
-    			.replace("${endTime}", DateUtil.DateToString(sp.getEnd(),DateStyle.YYYY_MM_DD));
+    			.replace("${startTime}", DateUtil.DateToString(sp.getBegin(),"yyyy年MM月dd日"))
+    			.replace("${endTime}", DateUtil.DateToString(sp.getEnd(),"yyyy年MM月dd日"));
     	message.setContent(content);
 		
 	}

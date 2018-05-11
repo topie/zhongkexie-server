@@ -1,9 +1,11 @@
 package com.topie.zhongkexie.system.api.common;
 
-import com.topie.zhongkexie.common.utils.ResponseUtil;
-import com.topie.zhongkexie.common.utils.Result;
-import com.topie.zhongkexie.database.core.model.Attachment;
-import com.topie.zhongkexie.system.service.IAttachmentService;
+import java.io.IOException;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.HashMap;
+import com.topie.zhongkexie.common.tools.filemanager.DefaultFileManagerTool;
+import com.topie.zhongkexie.common.utils.ResponseUtil;
+import com.topie.zhongkexie.common.utils.Result;
+import com.topie.zhongkexie.database.core.model.Attachment;
+import com.topie.zhongkexie.system.service.IAttachmentService;
 
 /**
  * Created by chenguojun on 8/31/16.
@@ -30,6 +34,8 @@ public class CommonController {
 
     @Autowired
     private IAttachmentService iAttachmentService;
+    @Autowired
+    private DefaultFileManagerTool defaultFileManagerTool;
 
     @RequestMapping(value = "/uploadFile", method = { RequestMethod.POST })
     @ResponseBody
@@ -118,6 +124,21 @@ public class CommonController {
             }
         }
         return ResponseUtil.error("附件id不存在。");
+    }
+    
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    @ResponseBody
+    public void download(HttpServletResponse response, HttpServletRequest httpServletRequest,
+    		@RequestParam("id") Integer attachmentId) throws Exception {
+    	
+    	if (attachmentId != null) {
+            Attachment attachment = iAttachmentService.selectByKey(attachmentId);
+            if (attachment != null) {
+                String filePath = attachment.getAttachmentPath();
+                defaultFileManagerTool.download(response, filePath, attachment.getAttachmentName());
+            }
+        }
+    	
     }
 
 }

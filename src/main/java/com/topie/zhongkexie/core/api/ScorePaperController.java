@@ -150,6 +150,23 @@ public class ScorePaperController {
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
 
 	}
+	/**
+	 * 专家 获取各个学会提交信息
+	 * 
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping(value = "/zjcheckListName", method = RequestMethod.GET)
+	@ResponseBody
+	public Result zjcheckListName(
+			PagerUserDto pagerUserDto) {
+		PageInfo<PagerUserDto> pageInfo = iScorePagerUserService
+				.selectZJUserCommit(pagerUserDto, 0, 1000);
+		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+
+	}
 
 	/**
 	 * 学会评价表审核列表
@@ -602,7 +619,7 @@ public class ScorePaperController {
 			iScoreAnswerService.updateAll(one);
 			return ResponseUtil.success();
 		}
-		return ResponseUtil.error();
+		return ResponseUtil.error("用户未答题不能评分");
 	}
 
 	/**
@@ -668,7 +685,7 @@ public class ScorePaperController {
 	}
 
 	/**
-	 * 专家获取试卷
+	 * 专家获取试卷内容
 	 * 
 	 * @param itemId
 	 * @param answer

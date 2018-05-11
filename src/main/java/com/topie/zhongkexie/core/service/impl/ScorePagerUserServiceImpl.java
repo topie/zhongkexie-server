@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
@@ -20,6 +22,8 @@ import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.ScorePaperUser;
+import com.topie.zhongkexie.database.expert.model.ExpertDeptUser;
+import com.topie.zhongkexie.expert.service.IExpertDeptUserService;
 import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
@@ -36,6 +40,8 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 	UserService userService;
 	@Autowired
 	IScoreAnswerService iScoreAnswerService;
+	@Autowired
+	private IExpertDeptUserService iExpertDeptUserService;
 
 	@Override
 	public void check(int id, short result,String feedback) {
@@ -51,7 +57,6 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
     	}else if(CUname.endsWith("002")&& PagerUserDto.PAPERSTATUS_SUBMMIT.equals(result)){//填报员 提交审核
     		System.out.println(CUname+"=》提交审核");
     	}else if(CUname.equals("admin")){
-    		
     	}
     	else {
     		throw new DefaultBusinessException("学会管理员才能审核!");
@@ -62,6 +67,13 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 		if(su!=null)
 		{
 			scorePagerUser.setStatus(result);
+			if(PagerUserDto.PAPERSTATUS_EGIS.equals(result)){
+				ExpertDeptUser entity = new ExpertDeptUser();
+				entity.setStatus("1");
+				Example example = new Example(ExpertDeptUser.class);
+				example.createCriteria().andEqualTo("paperId", id).andEqualTo("deptUserId",userId);
+				iExpertDeptUserService.updateByExampleSelective(entity, example);
+			}
 			scorePagerUser.setFeedback(feedback);
 			getMapper().updateByPrimaryKey(scorePagerUser);
 		}
@@ -86,6 +98,13 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 			scorePagerUser.setStatus(result);
 			scorePagerUser.setFeedback(feedback);
 			getMapper().updateByPrimaryKey(scorePagerUser);
+			if(PagerUserDto.PAPERSTATUS_NEW.equals(result)){
+				ExpertDeptUser entity = new ExpertDeptUser();
+				entity.setStatus("0");
+				Example example = new Example(ExpertDeptUser.class);
+				example.createCriteria().andEqualTo("paperId", id).andEqualTo("deptUserId",userId);
+				iExpertDeptUserService.updateByExampleSelective(entity, example);
+			}
 		}
 		else
 		{

@@ -93,7 +93,7 @@ public class ScorePaperUser {
 
     /**
      * ��ȡ״̬
-     *
+     *0 未提交 1 未审核 2通过 3 退回
      * @return status - ״̬
      */
     public Short getStatus() {
@@ -102,7 +102,7 @@ public class ScorePaperUser {
 
     /**
      * ����״̬
-     *
+     * 0 未提交 1 未审核 2通过 3 退回
      * @param status ״̬
      */
     public void setStatus(Short status) {

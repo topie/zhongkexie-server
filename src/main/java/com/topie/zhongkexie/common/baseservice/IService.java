@@ -34,22 +34,26 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IService<T> {
 
-    T selectByKey(Object key);
+	T selectByKey(Object key);
 
-    int save(T entity);
+	int save(T entity);
 
-    int saveNotNull(T entity);
+	int saveNotNull(T entity);
 
-    int delete(Object key);
-    
-    int deleteByExample(Object ex);
+	int delete(Object key);
 
-    int updateAll(T entity);
+	int deleteByExample(Object ex);
 
-    int updateNotNull(T entity);
+	int updateAll(T entity);
 
-    List<T> selectByExample(Object example);
+	int updateNotNull(T entity);
 
-    List<T> selectAll();
+	List<T> selectByExample(Object example);
+
+	List<T> selectAll();
+
+	int updateByExample(T entity, Object example);
+
+	int updateByExampleSelective(T entity, Object example);
 
 }

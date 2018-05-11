@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_message")
 public class Message {
@@ -39,6 +43,13 @@ public class Message {
     private String title;
 
     private String content;
+
+    private String type;
+    
+    private String status;
+    
+    @Column(name = "download_file_id")
+    private String downloadFileId;
 
     /**
      * 获取ID
@@ -157,4 +168,30 @@ public class Message {
     public void setContent(String content) {
         this.content = content;
     }
+
+	public String getDownloadFileId() {
+		return downloadFileId;
+	}
+
+	public void setDownloadFileId(String downloadFileId) {
+		this.downloadFileId = downloadFileId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+    
 }

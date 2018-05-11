@@ -1,6 +1,7 @@
 package com.topie.zhongkexie.database.expert.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
 
 @Table(name = "e_expert_dept_user")
 public class ExpertDeptUser {
@@ -33,6 +34,9 @@ public class ExpertDeptUser {
 
     @Column(name = "index_coll_expert_id")
     private Integer indexCollExpertId;
+    
+    @Column(name = "status")
+    private String status;
 
     /**
      * @return paper_id
@@ -133,4 +137,18 @@ public class ExpertDeptUser {
     public void setIndexCollExpertId(Integer indexCollExpertId) {
         this.indexCollExpertId = indexCollExpertId;
     }
+    /**
+	 * 0 未提交 1待评价 2 已评价
+	 */
+	public String getStatus() {
+		return status;
+	}
+	/**
+	 * 0 未提交 1待评价 2 已评价
+	 * @param status
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+    
 }

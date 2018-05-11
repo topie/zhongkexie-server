@@ -38,13 +38,20 @@ public class MessageController {
         return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
     }
 
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @ResponseBody
+    public Result update(Message message) {
+        int result = iMessageService.updateNotNull(message);
+        return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
+    }
+    
     @RequestMapping(value = "/load/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Result load(@PathVariable(value = "id") Integer id) {
         Message message = iMessageService.selectByKey(id);
         return ResponseUtil.success(message);
     }
-
+    
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     @ResponseBody
     public Result delete(@RequestParam(value = "id") Integer id) {
