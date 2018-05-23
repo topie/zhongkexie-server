@@ -86,18 +86,38 @@ public class IndexCollExpertServiceImpl extends BaseService<IndexCollExpert> imp
 	}
 	
 	@Override
-	public int updateNotNull(IndexCollExpert entity) {
+	public int updateNotNull(IndexCollExpert entity,boolean avg) {
 		int g = super.updateNotNull(entity);
 		if(StringUtil.isNotEmpty(entity.getExpertIds())){
 			iExpertDeptUserService.deleteByIndexCollExpertId(entity.getId());
-			String exIds = entity.getExpertIds();
-			Example example = new Example(ExpertInfo.class);
-			example.createCriteria().andIn("id", Arrays.asList(exIds.split(",")));
-			List<ExpertInfo> experts = iExpertInfoService.selectByExample(example);
-			String deptIds = iPaperExpertService.selectByKey(entity.getPaperExpertId()).getDeptIds();
-			Example example1 = new Example(ExpertInfo.class);
-			example1.createCriteria().andIn("id", Arrays.asList(deptIds.split(",")));
-			List<Dept> depts = iDeptService.selectByExample(example1);
+			insertEx(entity,avg);
+		}
+		return g;
+	}
+	 
+	@Override
+	public int saveNotNull(IndexCollExpert entity,boolean avg) {
+		int j = mapper.insertSelective(entity);
+		if(StringUtil.isNotEmpty(entity.getExpertIds())){
+			insertEx(entity,avg);
+		}
+		return j;
+	}
+	/**
+	 * 
+	 * @param entity
+	 * @param avg 是否平均分配
+	 */
+	private void insertEx(IndexCollExpert entity,boolean avg) {
+		String exIds = entity.getExpertIds();
+		Example example = new Example(ExpertInfo.class);
+		example.createCriteria().andIn("id", Arrays.asList(exIds.split(",")));
+		List<ExpertInfo> experts = iExpertInfoService.selectByExample(example);
+		String deptIds = iPaperExpertService.selectByKey(entity.getPaperExpertId()).getDeptIds();
+		Example example1 = new Example(Dept.class);
+		example1.createCriteria().andIn("id", Arrays.asList(deptIds.split(",")));
+		List<Dept> depts = iDeptService.selectByExample(example1);
+		if(avg){//平均分配
 			for(int i=0;i<depts.size();i++){
 				int index = i%experts.size();
 				ExpertInfo info = experts.get(index);
@@ -116,39 +136,29 @@ public class IndexCollExpertServiceImpl extends BaseService<IndexCollExpert> imp
 				du.setIndexCollExpertId(entity.getId());
 				iExpertDeptUserService.saveNotNull(du);
 			}
-			
-		}
-		return g;
-	}
-	@Override
-	public int saveNotNull(IndexCollExpert entity) {
-		int j = mapper.insertSelective(entity);
-		if(StringUtil.isNotEmpty(entity.getExpertIds())){
-			String exIds = entity.getExpertIds();
-			Example example = new Example(ExpertInfo.class);
-			example.createCriteria().andIn("id", Arrays.asList(exIds.split(",")));
-			List<ExpertInfo> experts = iExpertInfoService.selectByExample(example);
-			String deptIds = iPaperExpertService.selectByKey(entity.getPaperExpertId()).getDeptIds();
-			Example example1 = new Example(ExpertInfo.class);
-			example1.createCriteria().andIn("id", Arrays.asList(deptIds.split(",")));
-			List<Dept> depts = iDeptService.selectByExample(example1);
-			for(int i=0;i<depts.size();i++){
-				int index = i%experts.size();
-				ExpertInfo info = experts.get(index);
-				Dept d = depts.get(i);
-				User u = userService.findUserByLoginName(d.getCode()+"002");
-				ExpertDeptUser du = new ExpertDeptUser();
-				du.setDeptUserId(u.getId());
-				du.setExpertId(info.getId());
-				du.setExpertUserId(info.getUserId());
-				du.setPaperId(entity.getPaperId());
-				du.setIndexCollId(entity.getIndexCollectionId());
-				du.setIndexCollExpertId(entity.getId());
-				iExpertDeptUserService.saveNotNull(du);
+		}else{//
+			for(int k=0;k<experts.size();k++){
+				ExpertInfo info = experts.get(k);
+				for(int i=0;i<depts.size();i++){
+					Dept d = depts.get(i);
+					User u = userService.findUserByLoginName(d.getCode().trim()+"002");
+					if(u==null){
+							System.err.println("缺少用户:"+d.getCode()+"-"+d.getName());
+						continue;
+					}
+					ExpertDeptUser du = new ExpertDeptUser();
+					du.setDeptUserId(u.getId());
+					du.setExpertId(info.getId());
+					du.setExpertUserId(info.getUserId());
+					du.setPaperId(entity.getPaperId());
+					du.setIndexCollId(entity.getIndexCollectionId());
+					du.setIndexCollExpertId(entity.getId());
+					iExpertDeptUserService.saveNotNull(du);
+				}
 			}
-			
 		}
-		return j;
+		
 	}
+
 
 }

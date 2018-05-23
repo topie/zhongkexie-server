@@ -30,10 +30,10 @@ public class JavaExecScript {
 	    ScriptEngineManager sem = new ScriptEngineManager();
 	    ScriptEngine se = sem.getEngineByName("javascript");
 	    try {
-	      String script = "function say(that){ "+functionBody+"}";
+	      String script = "function say(value){ "+functionBody+"}";
 	      se.eval(script);
 	      Invocable inv2 = (Invocable) se;
-	      String res = (String) inv2.invokeFunction("say", data);
+	      String res = (String) inv2.invokeFunction("say", data); 
 	      return res;
 	    } catch (Exception e) {
 	      e.printStackTrace();

@@ -158,9 +158,13 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 	public PageInfo<PagerUserDto> selectAllUserCommit(PagerUserDto pagerUserDto,
 			int pageNum, int pageSize) {
 		PageHelper.startPage(pageNum, pageSize);
-		List<PagerUserDto> list = this.scorePagerUserMapper.selectUserCommitPaper(pagerUserDto);
-		
+		List<PagerUserDto> list = selectAllUserCommit(pagerUserDto);
 		return new PageInfo<PagerUserDto>(list);
+	}
+	@Override
+	public List<PagerUserDto> selectAllUserCommit(PagerUserDto pagerUserDto) {
+		List<PagerUserDto> list = this.scorePagerUserMapper.selectUserCommitPaper(pagerUserDto);
+		return list;
 	}
 
 	@Override

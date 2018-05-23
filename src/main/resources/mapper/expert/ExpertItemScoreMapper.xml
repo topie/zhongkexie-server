@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.expert.dao.ExpertItemScoreMapper" >
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.expert.model.ExpertItemScore" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    <result column="expert_id" property="expertId" jdbcType="INTEGER" />
+    <result column="expert_user_id" property="expertUserId" jdbcType="INTEGER" />
+    <result column="org_user_id" property="orgUserId" jdbcType="INTEGER" />
+    <result column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="item_score" property="itemScore" jdbcType="DECIMAL" />
+  </resultMap>
+</mapper>

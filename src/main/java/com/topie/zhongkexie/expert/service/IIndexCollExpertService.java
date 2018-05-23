@@ -8,11 +8,15 @@ import com.topie.zhongkexie.database.expert.model.IndexCollExpert;
 
 public interface IIndexCollExpertService extends IService<IndexCollExpert> {
 
-	PageInfo<IndexCollExpert> selectByFilterAndPage(IndexCollExpert indexCollExpert,
-			int pageNum, int pageSize);
+	PageInfo<IndexCollExpert> selectByFilterAndPage(
+			IndexCollExpert indexCollExpert, int pageNum, int pageSize);
 
 	List<IndexCollExpert> selectByFilter(IndexCollExpert indexCollExpert);
 
-	int init(Integer paperId,Integer paperExpertId,String fieldType);
+	int init(Integer paperId, Integer paperExpertId, String fieldType);
+
+	public int saveNotNull(IndexCollExpert entity, boolean avg);
+
+	public int updateNotNull(IndexCollExpert entity, boolean avg);
 
 }

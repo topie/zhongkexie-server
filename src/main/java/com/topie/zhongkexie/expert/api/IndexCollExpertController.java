@@ -34,14 +34,14 @@ public class IndexCollExpertController {
 	    @RequestMapping(value = "/insert", method = RequestMethod.POST)
 	    @ResponseBody
 	    public Result insert(IndexCollExpert indexCollExpert) {
-	        int result = iIndexCollExpertService.saveNotNull(indexCollExpert);
+	        int result = iIndexCollExpertService.saveNotNull(indexCollExpert,false);
 	        return result > 0 ? ResponseUtil.success() : ResponseUtil.error();
 	    }
 
 	    @RequestMapping(value = "/update", method = RequestMethod.POST)
 	    @ResponseBody
 	    public Result update(IndexCollExpert indexCollExpert) {
-	        iIndexCollExpertService.updateNotNull(indexCollExpert);
+	        iIndexCollExpertService.updateNotNull(indexCollExpert,false);
 	        return ResponseUtil.success();
 	    }
 

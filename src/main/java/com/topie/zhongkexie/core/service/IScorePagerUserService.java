@@ -1,5 +1,7 @@
 package com.topie.zhongkexie.core.service;
 
+import java.util.List;
+
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
@@ -44,6 +46,7 @@ public interface IScorePagerUserService extends IService<ScorePaperUser>{
 	 */
 	PageInfo<PagerUserDto> selectAllUserCommit(PagerUserDto pagerUserDto,
 			int pageNum, int pageSize);
+	List<PagerUserDto> selectAllUserCommit(PagerUserDto pagerUserDto);
 	/**
 	 * 获取当前用户的提交状态
 	 * @param paperId

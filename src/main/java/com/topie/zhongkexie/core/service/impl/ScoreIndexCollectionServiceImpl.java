@@ -26,6 +26,7 @@ public class ScoreIndexCollectionServiceImpl extends BaseService<ScoreIndexColle
 		Criteria c = ex.createCriteria();
 		if(StringUtils.isNotEmpty(dict.getName()))c.andLike("name", "%"+dict.getName()+"%");
 		if(dict.getPaperId()!=null)c.andEqualTo("paperId", dict.getPaperId());
+		if(dict.getRelatedField()!=null)c.andEqualTo("relatedField",dict.getRelatedField());
 		return getMapper().selectByExample(ex);
 	}
 

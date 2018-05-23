@@ -29,6 +29,7 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.topie.zhongkexie.common.utils.ExcelExportUtils;
 import com.topie.zhongkexie.common.utils.JavaExecScript;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
@@ -46,6 +47,8 @@ import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.ScorePaperUser;
+import com.topie.zhongkexie.database.expert.model.ExpertItemScore;
+import com.topie.zhongkexie.expert.service.IExpertItemScoreService;
 import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
@@ -71,6 +74,8 @@ public class ScorePaperController {
 
 	@Autowired
 	private IScorePagerUserService iScorePagerUserService;
+	@Autowired
+	private IExpertItemScoreService iExpertItemScoreService;
 	@Autowired
 	private UserService userService;
 
@@ -269,12 +274,48 @@ public class ScorePaperController {
 		HSSFWorkbook wb = iScorePaperService.exportPaper(paperId, indexIds,
 				orgIds);
 		try {
-			String p = this.iScorePaperService.selectByKey(paperId).getTitle();
+			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"详细得分情况";
 			outWrite(request, response, wb, p);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	@RequestMapping(value = "/exportPaperValue", method = RequestMethod.GET)
+	public void exportPaperValue(Integer paperId, String indexIds, String orgIds,
+			HttpServletRequest request, HttpServletResponse response) {
+		HSSFWorkbook wb = iScorePaperService.exportPaper(paperId, indexIds,
+				orgIds);
+		try {
+			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"详细答题情况";
+			outWrite(request, response, wb, p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	@RequestMapping(value = "/exportPaperScore", method = RequestMethod.GET)
+	public void exportPaperScore(PagerUserDto pagerUserDto,
+			HttpServletRequest request, HttpServletResponse response) {
+		List<PagerUserDto> list = iScorePagerUserService
+				.selectAllUserCommit(pagerUserDto);
+		 String[] fields = "userName,score".split(",");
+	        String[] names = "学会,分数".split(",");
+	        try {
+	        	String name = "分数导出";
+	        	name = list.get(0).getTitle()+name;
+	        	HSSFWorkbook wb = ExcelExportUtils.getInstance().inExcelMoreSheet(list, fields, names);
+	        	outWrite(request, response, wb, name);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 	private static void outWrite(HttpServletRequest request,
@@ -595,7 +636,7 @@ public class ScorePaperController {
 
 	/**
 	 * 更新答题的分数
-	 * 
+	 * V2 多个专家给一个题打分 取平均分
 	 * @return
 	 */
 	@RequestMapping(value = "/updateAnswerScore", method = RequestMethod.POST)
@@ -607,19 +648,60 @@ public class ScorePaperController {
 		c.andEqualTo("paperId", paperId);
 		c.andEqualTo("userId", userId);
 		c.andEqualTo("itemId", itemId);
+		Integer cuserId = SecurityUtil.getCurrentUserId();
 		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
-		if (list.size() > 0) {
-			ScoreAnswer one = list.get(0);
-			one.setAnswerScore(answerScore);
-			if (!one.getAnswerReal()) {
-				one.setAnswerScore(new BigDecimal(0));
-				iScoreAnswerService.updateAll(one);
-				return ResponseUtil.error("信息虚假，不能修改分数");
-			}
-			iScoreAnswerService.updateAll(one);
-			return ResponseUtil.success();
+		if (list.size() == 0) {
+			return ResponseUtil.error("用户未答题不能评分");
 		}
-		return ResponseUtil.error("用户未答题不能评分");
+		ScoreAnswer one = list.get(0);
+		if (!one.getAnswerReal()) {
+			one.setAnswerScore(new BigDecimal(0));
+			iScoreAnswerService.updateAll(one);
+			return ResponseUtil.error("信息虚假，不能修改分数");
+		}
+		ExpertItemScore  entity = new ExpertItemScore();
+		entity.setExpertId(null);
+		entity.setItemId(itemId);
+		entity.setExpertUserId(cuserId);
+		entity.setOrgUserId(userId);
+		entity.setPaperId(paperId);
+		List<ExpertItemScore> ls = iExpertItemScoreService.selectByFilter(entity);
+		if(ls.size()==0){
+			entity.setItemScore(answerScore);
+			iExpertItemScoreService.save(entity);
+		}else{
+			entity = ls.get(0);
+			entity.setItemScore(answerScore);
+			iExpertItemScoreService.updateAll(entity);
+		}
+		entity.setExpertUserId(null);
+		entity.setItemScore(null);
+		List<ExpertItemScore> lis = iExpertItemScoreService.selectByFilter(entity);
+		BigDecimal score = new BigDecimal(0);
+		for(ExpertItemScore is:lis){
+			score = score.add(is.getItemScore());
+		}
+		score = score.divide( new BigDecimal(lis.size()));
+		one.setAnswerScore(score);
+		iScoreAnswerService.updateAll(one);
+		return ResponseUtil.success();
+	}
+	/**
+	 * 获取当前专家打的分数
+	 * @param paperId
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping("getExperScore")
+	@ResponseBody
+	public Object getExperScore(Integer paperId,Integer userId){
+		ExpertItemScore  entity = new ExpertItemScore();
+		entity.setPaperId(paperId);
+		entity.setOrgUserId(userId);
+		entity.setExpertUserId(SecurityUtil.getCurrentUserId());
+		List<ExpertItemScore> list = iExpertItemScoreService.selectByFilter(entity);
+		
+		return ResponseUtil.success(list);
 	}
 
 	/**

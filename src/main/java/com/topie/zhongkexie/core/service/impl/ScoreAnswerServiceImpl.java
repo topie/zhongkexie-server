@@ -139,7 +139,7 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		scoreAnswer.setItemId(itemId);
 		int s = this.mapper.selectCount(scoreAnswer);
 		double r = (double)rank/s*100;
-		
+		r =new BigDecimal(r).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue(); 
 		return "超过了"+r+"%的用户，共"+s;
 	}
 
@@ -149,8 +149,9 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		int s = this.mapper.selectCount(scoreAnswer);
 		scoreAnswer.setAnswerValue(answer);
 		int checks = this.mapper.selectCount(scoreAnswer);
-		double rank = (double)checks/s;
-		return rank*100+"%的用户选择了此选项，共"+s;
+		double rank = (double)checks/s*100;
+		rank =new BigDecimal(rank).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue(); 
+		return rank+"%的用户选择了此选项，共"+s;
 	}
 
 }
