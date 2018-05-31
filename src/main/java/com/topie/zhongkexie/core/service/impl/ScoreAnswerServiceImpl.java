@@ -13,12 +13,15 @@ import tk.mybatis.mapper.entity.Example;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
+import com.topie.zhongkexie.common.utils.JavaExecScript;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
+import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.dao.ScoreAnswerMapper;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
+import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 
 /**
@@ -33,6 +36,8 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	IScoreItemService iScoreItemService;
 	@Autowired
 	ScoreAnswerMapper scoreAnswerMapper;
+	@Autowired
+	private IScoreItemOptionService iScoreItemOptionService;
 	
 	@Override
 	public PageInfo<ScoreAnswer> selectByFilterAndPage(ScoreAnswer scoreAnswer,
@@ -140,7 +145,8 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		int s = this.mapper.selectCount(scoreAnswer);
 		double r = (double)rank/s*100;
 		r =new BigDecimal(r).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue(); 
-		return "超过了"+r+"%的用户，共"+s;
+		//return "超过了"+r+"%的用户，共"+s;
+		return "共"+s+"个学会填报，超过了"+r+"%的学会";
 	}
 
 	private String ranking_check(Integer itemId, String answer) {
@@ -151,7 +157,64 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		int checks = this.mapper.selectCount(scoreAnswer);
 		double rank = (double)checks/s*100;
 		rank =new BigDecimal(rank).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue(); 
-		return rank+"%的用户选择了此选项，共"+s;
+		//return rank+"%的用户选择了此选项，共"+s;
+		return "共"+s+"个学会填报，其中"+rank+"%的学会选择此选项";
+	}
+
+	@Override
+	public void divScore(ScoreItem scoreItem, ScoreAnswer sa) {
+		if (scoreItem.getType() == 0) {
+			// 填空
+			String logic = scoreItem.getOptionLogic();
+		} else if (scoreItem.getType() == 1) {
+			// 单选
+			Integer optionId = Integer.parseInt(sa.getAnswerValue());
+			ScoreItemOption option = iScoreItemOptionService
+					.selectByKey(optionId);
+			sa.setAnswerScore(scoreItem.getScore().multiply(
+					option.getOptionRate()));
+		} else if (scoreItem.getType() == 2) {
+			// 多选
+			
+		}
+		Integer indexId = scoreItem.getIndexId();
+		sa.setIndexId(indexId);
+		// 计算分数
+		if (scoreItem.getScoreType().equals("2")) {// 线性打分
+			try {
+				BigDecimal s = getScore(scoreItem,sa);
+				if(s!=null)
+					sa.setAnswerScore(s);
+			} catch (Exception e) {
+				sa.setAnswerScore(new BigDecimal("0"));
+				System.err.println("线性打分项评分时出现异常：");
+				e.printStackTrace();
+			}
+		} else if(scoreItem.getScoreType().equals("3")){//专家打分项
+			if(sa.getAnswerScore()==null){
+				sa.setAnswerScore(new BigDecimal("0"));
+			}
+		}else{// 统计项 
+			sa.setAnswerScore(new BigDecimal("0"));
+		}
+		
+	}
+	
+	private BigDecimal getScore(ScoreItem scoreItem,ScoreAnswer sa) {
+		BigDecimal score = null;
+		String functionBody = scoreItem.getOptionLogic();
+		if(StringUtils.isEmpty(functionBody)){
+			return null;
+		}
+		ScoreAnswer referItemValue = new ScoreAnswer();
+		ScoreItemOption scoreItemOption = new ScoreItemOption();
+		scoreItemOption.setItemId(scoreItem.getId());
+		List<ScoreItemOption> opts = this.iScoreItemOptionService
+				.selectByFilter(scoreItemOption);
+		score = JavaExecScript.jsFunction(sa, opts, referItemValue,
+				functionBody);
+		return score;
+
 	}
 
 }

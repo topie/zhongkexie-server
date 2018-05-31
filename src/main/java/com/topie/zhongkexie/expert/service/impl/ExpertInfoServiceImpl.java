@@ -88,14 +88,15 @@ public class ExpertInfoServiceImpl extends BaseService<ExpertInfo> implements
 	}
 	@Override
 	public int updateNotNull(ExpertInfo entity){
-		Integer userId = entity.getUserId();
+		/*Integer userId = entity.getUserId();
 		if(userId!=null){
 			User user = userService.selectByKey(userId);
 			if(user!=null){
 				user.setEmail(entity.getEmail());
 				user.setContactPhone(entity.getTelPhone());
+				userService.updateNotNull(user);
 			}
-		}
+		}*/
         return mapper.updateByPrimaryKeySelective(entity);
 		
 	}

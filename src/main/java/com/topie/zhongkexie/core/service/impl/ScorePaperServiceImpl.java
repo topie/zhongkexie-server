@@ -1,5 +1,6 @@
 package com.topie.zhongkexie.core.service.impl;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -329,7 +330,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 
 
 	@Override
-	public HSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds) {
+	public HSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds,String type) {
 		ScorePaper p = this.getMapper().selectByPrimaryKey(paperId);
 		if(p==null) throw new RuntimeBusinessException("paperId不能为空");
 		String title = p.getTitle();
@@ -359,7 +360,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 		int row = 0;//行
 		for(ScoreIndex index:indexParentList){
 			int col = 0;//列
-			row  = exportIndex(sheet,index,indexTitle,depts,paperId,row,col,indexChildList);
+			row  = exportIndex(sheet,index,indexTitle,depts,paperId,row,col,indexChildList,type);
 		}
 		List<Integer> collist =getNeedMergeCell(sheet);
 		mergeCell(sheet,collist,style);
@@ -470,12 +471,12 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 
 
 	private int exportIndex(HSSFSheet sheet, ScoreIndex index,
-			String[] indexTitle,List<Dept> depts,int paperId, int row, int col,List<ScoreIndex> indexChildList) {
+			String[] indexTitle,List<Dept> depts,int paperId, int row, int col,List<ScoreIndex> indexChildList, String type) {
 		col = writeIndex(sheet,index,row,col,indexTitle);
 		boolean f = true;
 		for(ScoreIndex one:indexChildList){
 			if(index.getId().intValue()==one.getParentId().intValue()){
-				row = exportIndex(sheet,one,indexTitle,depts,paperId,row,col,indexChildList);
+				row = exportIndex(sheet,one,indexTitle,depts,paperId,row,col,indexChildList,type);
 				f = false;
 			}
 		}
@@ -484,7 +485,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 			scoreItem.setIndexId(index.getId());
 			List<ScoreItem> items = iScoreItemService.selectByFilter(scoreItem);
 			for(ScoreItem item:items){
-				writeItem(sheet,item,row,col,depts);
+				writeItem2(sheet,item,row,col,depts,type);
 				row++;
 			}
 		}
@@ -500,7 +501,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 	 * @param depts
 	 */
 	private void writeItem2(HSSFSheet sheet, ScoreItem item, int row , int col,
-			List<Dept> depts) {
+			List<Dept> depts,String type) {
 		HSSFRow headRow = null;
 		if(row==0){//生成标题
 			headRow = sheet.getRow(row)==null?sheet.createRow(row):sheet.getRow(row);
@@ -514,36 +515,72 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 			dataRow.createCell(col).setCellValue(item.getTitle());
 			dataRow.createCell(col+1).setCellValue(item.getScore()+"");
 			dataRow.createCell(col+2).setCellValue(getType(item.getScoreType()));
-			if(headRow==null && StringUtils.isEmpty(functionBody)){
+			if(headRow==null && StringUtils.isEmpty(functionBody)&&(type!=null && type.equals("value"))){
 				return;
 			}
 			int i = 3;
 			for(Dept dept:depts){
 				if(headRow!=null){
-					headRow.createCell(col+i).setCellValue(dept.getName());
+					if(type==null){
+						headRow.createCell(col+i).setCellValue(dept.getName()+"（填报数值）");
+						headRow.createCell(col+i+1).setCellValue("得分");
+					}else{
+						if(type.equals("value")){
+							headRow.createCell(col+i).setCellValue(dept.getName());
+						}
+						else if(type.equals("score")){
+							headRow.createCell(col+i).setCellValue(dept.getName());
+						}else{
+							
+							headRow.createCell(col+i).setCellValue(dept.getName());
+						}
+					}
 				}
 				String userLoginName = dept.getCode()+"002";
 				User user = userService.findUserByLoginName(userLoginName);
 				String value = "";
+				String score = "";
 				if(user!=null){
 					ScoreAnswer scoreAnswer = new ScoreAnswer();
 					scoreAnswer.setItemId(item.getId());
 					scoreAnswer.setUserId(user.getId());
 					List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
 					for(ScoreAnswer s:answers){
-						value= s.getAnswerValue();//答案
-						value = JavaExecScript.jsFunction(value, functionBody);
-						if(value!=null)
-							value = value.replace("NaN", "0");
-						//score+= s.getAnswerScore();//分数
+						if(type==null){
+							value= s.getAnswerValue();//答案
+							value = JavaExecScript.jsFunction(value, functionBody);
+							if(value!=null)
+								value = value.replace("NaN", "0");
+							score+= s.getAnswerScore();//分数
+						}else{
+							if(type.equals("value")){
+								value= s.getAnswerValue();//答案
+								value = JavaExecScript.jsFunction(value, functionBody);
+								if(value!=null)
+									value = value.replace("NaN", "0");
+							}
+							if(type.equals("score")){
+								score+= s.getAnswerScore();//分数
+							}
+						}
 					}
 				}
-				dataRow.createCell(col+i++).setCellValue(value);
+				if(type==null){
+					dataRow.createCell(col+i++).setCellValue(value);
+					dataRow.createCell(col+i++).setCellValue(score);
+				}else{
+					if(type.equals("value")){
+						dataRow.createCell(col+i++).setCellValue(value);
+					}
+					if(type.equals("score")){
+						dataRow.createCell(col+i++).setCellValue(score);
+					}
+				}
 		}
 		
 	}
 	
-	private void writeItem(HSSFSheet sheet, ScoreItem item, int row , int col,
+	/*private void writeItem(HSSFSheet sheet, ScoreItem item, int row , int col,
 			List<Dept> depts) {
 		if(row==0){//生成标题
 			HSSFRow headRow = sheet.getRow(row)==null?sheet.createRow(row):sheet.getRow(row);
@@ -599,7 +636,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 			}
 		}
 		
-	}
+	}*/
 
 
 	private String getType(String scoreType) {
@@ -662,6 +699,136 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 		
 		return null;
 	}
+
+
+	@Override
+	public void updateWightScore(Integer paperId) {
+		ScorePaper p = this.mapper.selectByPrimaryKey(paperId);
+		BigDecimal paperScore = p.getScore();
+		ScoreIndex scoreIndex = new ScoreIndex();
+		scoreIndex.setPaperId(paperId);
+		List<ScoreIndex> listIndex = iScoreIndexService.selectByFilter(scoreIndex);
+		updateChildList(listIndex,0,paperScore,"");
+		//更新完成之后跟新评价表 json字符串缓存
+		p.setContentJson(getContentJson(paperId, p.getTitle()));
+		mapper.updateByPrimaryKey(p);
+		//更新指标集合json 字符串缓存
+		ScoreIndexCollection scoreIndexCollection = new ScoreIndexCollection();
+		scoreIndexCollection.setPaperId(paperId);
+		List<ScoreIndexCollection> ics = iScoreIndexCollectionService.selectByFilter(scoreIndexCollection);
+		for(ScoreIndexCollection ic:ics){
+			ic.setContentJson(this.getContentJson(ic.getPaperId(), ic.getIndexCollection(), null).toJSONString());
+			iScoreIndexCollectionService.updateAll(ic);
+		}
+	}
+
+
+	@Override
+	public void updateWightUserScore(Integer paperId) {
+		ScoreIndex scoreIndex = new ScoreIndex();
+		scoreIndex.setPaperId(paperId);
+		List<ScoreIndex> listIndex = iScoreIndexService.selectByFilter(scoreIndex);
+		updateChildListUserScore(listIndex,0);
+		
+	}
+	
+	//获取父id下的子集合  
+    private List<ScoreIndex> updateChildListUserScore(List<ScoreIndex> list,int pId) {  
+		List<ScoreIndex> reList = new ArrayList();
+        for (ScoreIndex testEntity : list) {  
+            if (testEntity.getParentId()==pId) {//查询下级
+                reList.add(testEntity);  
+            }  
+        }
+        if(reList.size()==0){//最底层item
+        	ScoreItem scoreItem = new ScoreItem();
+        	scoreItem.setIndexId(pId);
+        	List<ScoreItem> ls = iScoreItemService.selectByFilter(scoreItem);
+	        for(ScoreItem item : ls){
+	        	ScoreAnswer scoreAnswer = new ScoreAnswer();
+	        	scoreAnswer.setItemId(item.getId());
+	        	List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
+	        	for(ScoreAnswer an:answers){
+	        		iScoreAnswerService.divScore(item, an);//计算分数
+	        		BigDecimal newScore = an.getAnswerScore();
+	        		an.setItemScore(item.getScore());
+	        		an.setAnswerScore(newScore);
+        			iScoreAnswerService.updateAll(an);
+	        	}
+	        }
+           
+        	return null;
+        }
+        for(ScoreIndex testEntity : reList){
+        	updateChildListUserScore(list, testEntity.getId());
+        }
+        return reList;  
+    }  
+    //获取父id下的子集合  
+    private List<ScoreIndex> updateChildList(List<ScoreIndex> list,int pId, BigDecimal totleScore, String level) {  
+		List<ScoreIndex> reList = new ArrayList();
+        for (ScoreIndex testEntity : list) {  
+            if (testEntity.getParentId()==pId) {//查询下级
+                reList.add(testEntity);  
+            }  
+        }
+        BigDecimal totleWeight = new BigDecimal(0);
+        BigDecimal div = new BigDecimal(100);
+        if(reList.size()==0){//最底层item
+        	ScoreItem scoreItem = new ScoreItem();
+        	scoreItem.setIndexId(pId);
+        	List<ScoreItem> ls = iScoreItemService.selectByFilter(scoreItem);
+        	if(totleScore.compareTo(totleWeight)==0){//如果是0
+    	        for(ScoreItem testEntity : ls){
+    	        	if(testEntity.getScore().compareTo(totleWeight)!=0){//总分是零 子都为0
+    	        		testEntity.setScore(totleWeight);
+    	        		iScoreItemService.updateNotNull(testEntity);
+    	        	}
+    	        	
+    	        }
+            }else{
+            	for(ScoreItem testEntity : ls){
+            		totleWeight = totleWeight.add(testEntity.getWeight());
+            		BigDecimal s = totleScore.multiply(testEntity.getWeight()).divide(div);
+            		if(testEntity.getScore().compareTo(s)!=0){//计算分数如果不同 就更新
+    	        		testEntity.setScore(s);
+    	        		iScoreItemService.updateNotNull(testEntity);
+    	        	}
+    	        }
+            	if(totleWeight.compareTo(div)!=0){
+            		throw new RuntimeBusinessException(level+"：下级指标权重之和为  （"+totleWeight+"）未达到100，请检查！");
+            	}
+            }
+        	return null;
+        }
+        
+        if(totleScore.compareTo(totleWeight)==0){//如果是0
+	        for(ScoreIndex testEntity : reList){
+	        	if(testEntity.getScore().compareTo(totleWeight)!=0){//总分是零 子都为0
+	        		testEntity.setScore(totleWeight);
+	        		iScoreIndexService.updateNotNull(testEntity);
+	        	}
+	        	updateChildList(list, testEntity.getId(), totleWeight, level+"->"+testEntity.getName());
+	        	
+	        }
+        }else{
+        	for(ScoreIndex testEntity : reList){
+        		totleWeight = totleWeight.add(testEntity.getWeight());
+        		BigDecimal s = totleScore.multiply(testEntity.getWeight()).divide(div);
+        		if(testEntity.getScore().compareTo(s)!=0){//计算分数如果不同 就更新
+	        		testEntity.setScore(s);
+	        		iScoreIndexService.updateNotNull(testEntity);
+	        	}
+        		updateChildList(list, testEntity.getId(), s, level+"->"+testEntity.getName());
+	        }
+        	if(totleWeight.compareTo(div)!=0){
+        		throw new RuntimeBusinessException(level+"：下级指标权重之和为  （"+totleWeight+"）未达到100，请检查！");
+        	}
+        }
+        return reList;  
+    }  
+      
+  
 
 	
 }

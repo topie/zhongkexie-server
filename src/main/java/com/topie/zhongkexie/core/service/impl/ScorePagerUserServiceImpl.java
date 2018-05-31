@@ -98,7 +98,7 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 			scorePagerUser.setStatus(result);
 			scorePagerUser.setFeedback(feedback);
 			getMapper().updateByPrimaryKey(scorePagerUser);
-			if(PagerUserDto.PAPERSTATUS_NEW.equals(result)){
+			if(PagerUserDto.PAPERSTATUS_NEW.equals(result)){//退回
 				ExpertDeptUser entity = new ExpertDeptUser();
 				entity.setStatus("0");
 				Example example = new Example(ExpertDeptUser.class);
