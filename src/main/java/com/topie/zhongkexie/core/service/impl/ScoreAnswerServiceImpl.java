@@ -23,6 +23,7 @@ import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.expert.service.IExpertItemScoreService;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -38,6 +39,8 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	ScoreAnswerMapper scoreAnswerMapper;
 	@Autowired
 	private IScoreItemOptionService iScoreItemOptionService;
+	@Autowired
+	private IExpertItemScoreService iExpertItemScoreService;
 	
 	@Override
 	public PageInfo<ScoreAnswer> selectByFilterAndPage(ScoreAnswer scoreAnswer,
@@ -191,11 +194,12 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 				e.printStackTrace();
 			}
 		} else if(scoreItem.getScoreType().equals("3")){//专家打分项
-			if(sa.getAnswerScore()==null){
-				sa.setAnswerScore(new BigDecimal("0"));
-			}
-		}else{// 统计项 
+			sa.setAnswerScore(iExpertItemScoreService.divScore(sa));
+			
+		}else if(scoreItem.getScoreType().equals("1")){// 统计项 
 			sa.setAnswerScore(new BigDecimal("0"));
+		}else{//其他
+			
 		}
 		
 	}
@@ -203,7 +207,7 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	private BigDecimal getScore(ScoreItem scoreItem,ScoreAnswer sa) {
 		BigDecimal score = null;
 		String functionBody = scoreItem.getOptionLogic();
-		if(StringUtils.isEmpty(functionBody)){
+		if(StringUtils.isEmpty(functionBody.trim())){
 			return null;
 		}
 		ScoreAnswer referItemValue = new ScoreAnswer();

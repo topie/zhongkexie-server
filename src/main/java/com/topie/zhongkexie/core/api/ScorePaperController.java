@@ -573,6 +573,7 @@ public class ScorePaperController {
 	}
 
 	/**
+	 * 专家评分
 	 * 更新答题的分数
 	 * V2 多个专家给一个题打分 取平均分
 	 * @return
@@ -589,7 +590,25 @@ public class ScorePaperController {
 		Integer cuserId = SecurityUtil.getCurrentUserId();
 		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
 		if (list.size() == 0) {
-			return ResponseUtil.error("用户未答题不能评分");
+			ScoreAnswer one = new ScoreAnswer();
+			one.setPaperId(paperId);
+			one.setUserId(userId);
+			one.setItemId(itemId);
+			one.setAnswerReal(true);
+			one.setAnswerValue("");
+			one.setAnswerScore(new BigDecimal(0));
+			one.setAnswerReason("");
+			try{
+				ScoreItem n= iScoreItemService.selectByKey(itemId);
+				one.setItemScore(n.getScore());
+				one.setIndexId(n.getIndexId());
+			}catch(Exception e){
+				one.setItemScore(new BigDecimal(0));
+				
+			}
+			iScoreAnswerService.saveNotNull(one);
+			list.add(one);
+			//return ResponseUtil.error("用户未答题不能评分");
 		}
 		ScoreAnswer one = list.get(0);
 		if (!one.getAnswerReal()) {
@@ -612,14 +631,7 @@ public class ScorePaperController {
 			entity.setItemScore(answerScore);
 			iExpertItemScoreService.updateAll(entity);
 		}
-		entity.setExpertUserId(null);
-		entity.setItemScore(null);
-		List<ExpertItemScore> lis = iExpertItemScoreService.selectByFilter(entity);
-		BigDecimal score = new BigDecimal(0);
-		for(ExpertItemScore is:lis){
-			score = score.add(is.getItemScore());
-		}
-		score = score.divide( new BigDecimal(lis.size()));
+		BigDecimal score = iExpertItemScoreService.divScore(one);
 		one.setAnswerScore(score);
 		iScoreAnswerService.updateAll(one);
 		return ResponseUtil.success();

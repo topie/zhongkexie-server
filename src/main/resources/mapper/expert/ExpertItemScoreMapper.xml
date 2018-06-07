@@ -12,4 +12,10 @@
     <result column="item_id" property="itemId" jdbcType="INTEGER" />
     <result column="item_score" property="itemScore" jdbcType="DECIMAL" />
   </resultMap>
+  <select id="selectScoreInfo" resultType="java.util.HashMap">
+  	SELECT u.display_name,s.item_id,s.item_score,u.login_name,s.item_score
+	FROM e_pxpert_item_score s  
+	LEFT JOIN d_user u ON s.expert_user_id=u.id 
+	WHERE s.org_user_id=#{userId} and s.item_id=${itemId}
+  </select>
 </mapper>

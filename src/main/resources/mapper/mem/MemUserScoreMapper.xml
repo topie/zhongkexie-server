@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.mem.dao.MemUserScoreMapper">
+	<resultMap id="BaseResultMap"
+		type="com.topie.zhongkexie.database.mem.model.MemUserScore">
+		<!-- WARNING - @mbggenerated -->
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="score" property="score" jdbcType="DECIMAL" />
+		<result column="item_id" property="itemId" jdbcType="INTEGER" />
+		<result column="paper_id" property="paperId" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="PagerUserDtoResultMap" type="com.topie.zhongkexie.core.dto.PagerUserDto">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="begin" property="begin" jdbcType="TIMESTAMP" />
+		<result column="end" property="end" jdbcType="TIMESTAMP" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="SMALLINT" />
+		<result column="approve_status" property="approveStatus"
+			jdbcType="SMALLINT" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="score" property="score" jdbcType="DECIMAL" />
+		<result column="subjective_score" property="subjectiveScore"
+			jdbcType="DECIMAL" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="user_status" property="checkStatus" jdbcType="VARCHAR" />
+		<!-- <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" 
+			/> -->
+	</resultMap>
+	<select id="selectByExampleEx" resultMap="PagerUserDtoResultMap">
+		SELECT
+		spu.`status` user_status,
+		u.id userId,
+		u.display_name user_name,
+		sp.id,sp.title,ms.score,ms.id approve_status
+		FROM
+		d_score_paper_user spu
+		LEFT JOIN d_score_paper sp ON spu.paper_id = sp.id
+		LEFT JOIN d_user u ON spu.user_id = u.id
+		LEFT JOIN d_mem_user_score ms ON u.id=ms.user_id AND sp.id=ms.paper_id
+		<where>
+			<if test="paperId!=null">
+				and spu.paper_id=#{paperId}
+			</if>
+			<if test="userId!=null">
+				and spu.user_id=#{userId}
+			</if>
+			<if test="userName!=null and userName!=''">
+				and u.display_name like concat(concat('%',#{userName}),'%')
+			</if>
+		</where>
+	</select>
+</mapper>

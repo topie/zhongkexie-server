@@ -25,6 +25,7 @@ import tk.mybatis.mapper.entity.Example.Criteria;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.topie.zhongkexie.appraise.service.IScoreAppraiseUserService;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.common.utils.JavaExecScript;
 import com.topie.zhongkexie.core.dto.ItemDto;
@@ -50,6 +51,7 @@ import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.User;
 import com.topie.zhongkexie.database.expert.model.ExpertInfo;
 import com.topie.zhongkexie.expert.service.IExpertInfoService;
+import com.topie.zhongkexie.mem.service.IMemUserScoreService;
 import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
@@ -83,6 +85,11 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
     private UserService userService;
     @Autowired
     private IExpertInfoService experInfoService;
+
+    @Autowired
+    private IScoreAppraiseUserService iScoreAppraiseUserService;
+    @Autowired
+    private IMemUserScoreService iMemUserScoreService;
 
     @Override
     public PageInfo<ScorePaper> selectByFilterAndPage(ScorePaper scorePaper, int pageNum, int pageSize) {
@@ -510,12 +517,12 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 			headRow.createCell(col+2).setCellValue("类型");
 			//row++;
 		}
-			String functionBody = item.getRelatedField();
+			String functionBody = item.getRelatedField();//获取导出配置
 			HSSFRow dataRow = sheet.getRow(row+1)==null?sheet.createRow(row+1):sheet.getRow(row+1);
 			dataRow.createCell(col).setCellValue(item.getTitle());
 			dataRow.createCell(col+1).setCellValue(item.getScore()+"");
 			dataRow.createCell(col+2).setCellValue(getType(item.getScoreType()));
-			if(headRow==null && StringUtils.isEmpty(functionBody)&&(type!=null && type.equals("value"))){
+			if(headRow==null && StringUtils.isEmpty(functionBody.trim())&&(type!=null && type.equals("value"))){
 				return;
 			}
 			int i = 3;
@@ -729,6 +736,11 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 		scoreIndex.setPaperId(paperId);
 		List<ScoreIndex> listIndex = iScoreIndexService.selectByFilter(scoreIndex);
 		updateChildListUserScore(listIndex,0);
+		//计算重大任务分数
+		iScoreAppraiseUserService.divScore(paperId);
+		//满意度评价分数
+		iMemUserScoreService.divScore(paperId);
+		
 		
 	}
 	
@@ -750,9 +762,9 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
 	        	List<ScoreAnswer> answers = iScoreAnswerService.selectByFilter(scoreAnswer);
 	        	for(ScoreAnswer an:answers){
 	        		iScoreAnswerService.divScore(item, an);//计算分数
-	        		BigDecimal newScore = an.getAnswerScore();
+	        		//BigDecimal newScore = an.getAnswerScore();
 	        		an.setItemScore(item.getScore());
-	        		an.setAnswerScore(newScore);
+	        		//an.setAnswerScore(newScore);
         			iScoreAnswerService.updateAll(an);
 	        	}
 	        }
@@ -789,7 +801,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
             }else{
             	for(ScoreItem testEntity : ls){
             		totleWeight = totleWeight.add(testEntity.getWeight());
-            		BigDecimal s = totleScore.multiply(testEntity.getWeight()).divide(div);
+            		BigDecimal s = totleScore.multiply(testEntity.getWeight()).divide(div,4);
             		if(testEntity.getScore().compareTo(s)!=0){//计算分数如果不同 就更新
     	        		testEntity.setScore(s);
     	        		iScoreItemService.updateNotNull(testEntity);
@@ -814,7 +826,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements IS
         }else{
         	for(ScoreIndex testEntity : reList){
         		totleWeight = totleWeight.add(testEntity.getWeight());
-        		BigDecimal s = totleScore.multiply(testEntity.getWeight()).divide(div);
+        		BigDecimal s = totleScore.multiply(testEntity.getWeight()).divide(div,4);
         		if(testEntity.getScore().compareTo(s)!=0){//计算分数如果不同 就更新
 	        		testEntity.setScore(s);
 	        		iScoreIndexService.updateNotNull(testEntity);

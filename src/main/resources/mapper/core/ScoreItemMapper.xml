@@ -22,4 +22,31 @@
         <result column="placeholder" property="placeholder" jdbcType="VARCHAR" />
         <result column="score_type" property="scoreType" jdbcType="VARCHAR"/>
     </resultMap>
+    
+    	<select id="selectByExampleEx" resultMap="BaseResultMap">
+  	SELECT *
+	FROM d_score_item t 
+	
+	<where>
+	<foreach collection="example.oredCriteria" item="ite" index="ind">
+		<foreach collection="ite.criteria" item="item" index="index">
+			<if test="item.listValue">
+				${item.condition} 
+				<foreach collection="item.value" item="citem" open="(" close=")" separator=",">
+					#{citem}
+				</foreach>
+			</if>
+			<if test="item.singleValue">
+				${item.condition} #{item.value}
+			</if>
+		</foreach>
+	</foreach>
+	<if test="responsibleDepartment!=null">
+		and FIND_IN_SET(#{responsibleDepartment},responsible_department)
+	</if>
+	</where>
+	<if test="example.orderByClause!=null and example.orderByClause!=''">
+		ORDER BY ${example.orderByClause}
+	</if>
+    </select>
 </mapper>

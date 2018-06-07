@@ -119,7 +119,8 @@ public class JavaExecScript {
 	      BigDecimal res = new BigDecimal((Double)inv2.invokeFunction("getSocre", scoreItem,options,referItem,scoreItem.getAnswerValue(),scoreItem.getItemScore()));
 	      return res;
 	    } catch (Exception e) {
-	    	
+	    	System.err.println(scoreItem.getAnswerValue());
+	    	System.err.println(functionBody);
 	    	e.printStackTrace();
 	    }
 	    return new BigDecimal(0);

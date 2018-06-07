@@ -53,7 +53,8 @@
 	spu.score,
 	spu.subjective_score,
 	u.id userId,
-	sp.*, u.display_name user_name
+	u.display_name user_name,
+	sp.id,sp.title,sp.content_json,sp.begin,sp.end,sp.create_time,sp.status,sp.score score2,du.status approve_status
 	FROM
 		d_score_paper_user spu
 	LEFT JOIN d_score_paper sp ON spu.paper_id = sp.id

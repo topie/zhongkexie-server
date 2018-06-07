@@ -57,7 +57,7 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="mapperLocations">
             <array>
-                <value>classpath*:mapper/core/**/*.xml</value>
+                <value>classpath*:mapper/**/*Mapper.xml</value>
             </array>
         </property>
         <property name="typeAliasesPackage" value="com.topie.zhongkexie.database.*.model"/>

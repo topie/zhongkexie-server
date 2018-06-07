@@ -91,7 +91,7 @@ public class ScoreAppraiseUserController {
 				if(list.size()>0){
 					ScoreAppraiseUser an = list.get(0);
 					an.setItemValue((String)a.getItemValue());
-					iScoreAppraiseUserService.updateNotNull(an);
+					iScoreAppraiseUserService.updateNotNull(an,true);
 				}
 			}
 		}

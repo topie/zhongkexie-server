@@ -1,5 +1,8 @@
 package com.topie.zhongkexie.expert.api;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,19 +11,29 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
+import com.topie.zhongkexie.database.expert.model.ExpertDeptUser;
 import com.topie.zhongkexie.database.expert.model.PaperExpert;
+import com.topie.zhongkexie.expert.service.IExpertDeptUserService;
+import com.topie.zhongkexie.expert.service.IExpertItemScoreService;
 import com.topie.zhongkexie.expert.service.IPaperExpertService;
+import com.topie.zhongkexie.security.utils.SecurityUtil;
 
 @Controller
 @RequestMapping("/api/expert/paper")
 public class PaperExpertController {
 	
 	 @Autowired
-	    private IPaperExpertService iPaperExpertService;
+	 private IPaperExpertService iPaperExpertService;
+	 @Autowired
+	 private IExpertDeptUserService iExpertDeptUserService;
+	 @Autowired
+	 private IExpertItemScoreService iExpertItemScoreService;
 
 	    @RequestMapping(value = "/list", method = RequestMethod.GET)
 	    @ResponseBody
@@ -65,5 +78,36 @@ public class PaperExpertController {
 	    public Result delete(@RequestParam(value = "id") Integer id) {
 	        iPaperExpertService.delete(id);
 	        return ResponseUtil.success();
+	    }
+	    /**
+	     * 专家标记为完成评分
+	     * @param id
+	     * @return
+	     */
+	    @RequestMapping(value = "/zjFinish", method = RequestMethod.GET)
+	    @ResponseBody
+	    public Result zjFinish(Integer paperId,Integer userId,String status) {
+	    	Example ex = new Example(ExpertDeptUser.class);
+	    	Integer cUserId = SecurityUtil.getCurrentUserId();
+	    	ex.createCriteria().andEqualTo("deptUserId",userId)
+	    		.andEqualTo("expertUserId",cUserId)
+	    		.andEqualTo("paperId",paperId);
+	    	ExpertDeptUser du = new ExpertDeptUser();
+	    	du.setStatus(status);
+	    	int i = iExpertDeptUserService.updateByExampleSelective(du, ex);
+	        return ResponseUtil.success(i);
+	    }
+	    /**
+	     * 获取一个题的专家打分情况
+	     * @param userId
+	     * @param itemId
+	     * @return
+	     */
+	    @RequestMapping(value = "/getScoreInfo", method = RequestMethod.GET)
+	    @ResponseBody
+	    public Result getScoreInfo(Integer userId,String itemId) {
+	    	List<Map> list = iExpertItemScoreService.selectScoreInfo(userId,itemId);
+	    	
+	        return ResponseUtil.success(list);
 	    }
 }
