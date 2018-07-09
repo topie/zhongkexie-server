@@ -1,9 +1,14 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_score_item_option")
 public class ScoreItemOption extends Sortable {
@@ -154,4 +159,13 @@ public class ScoreItemOption extends Sortable {
     public void setOptionSort(Integer optionSort) {
         this.optionSort = optionSort;
     }
+
+	@Override
+	public String toString() {
+		return "ScoreItemOption [id=" + id + ", itemId=" + itemId
+				+ ", optionTitle=" + optionTitle + ", optionRate=" + optionRate
+				+ ", optionDesc=" + optionDesc + ", optionSort=" + optionSort
+				+ "]";
+	}
+    
 }

@@ -1,6 +1,8 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_inbox")
 public class Inbox {
@@ -196,4 +198,13 @@ public class Inbox {
     public void setIbToUsers(String ibToUsers) {
         this.ibToUsers = ibToUsers;
     }
+
+	@Override
+	public String toString() {
+		return "Inbox [ibId=" + ibId + ", ibCreateTime=" + ibCreateTime
+				+ ", ibCreateUserId=" + ibCreateUserId + ", ibFromUser="
+				+ ibFromUser + ", ibHasAttachment=" + ibHasAttachment
+				+ ", ibSubject=" + ibSubject + ", ibContent=" + ibContent
+				+ ", ibToUsers=" + ibToUsers + "]";
+	}
 }

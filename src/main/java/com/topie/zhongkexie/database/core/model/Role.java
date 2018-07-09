@@ -1,10 +1,16 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_role")
 public class Role extends Sortable {
@@ -165,4 +171,13 @@ public class Role extends Sortable {
     public void setFunctions(List<Integer> functions) {
         this.functions = functions;
     }
+
+	@Override
+	public String toString() {
+		return "Role [id=" + id + ", roleName=" + roleName + ", defaultAction="
+				+ defaultAction + ", state=" + state + ", insertTime="
+				+ insertTime + ", updateTime=" + updateTime + ", functions="
+				+ functions + "]";
+	}
+    
 }

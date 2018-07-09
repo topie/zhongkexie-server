@@ -45,6 +45,7 @@
 			and spu.user_id=#{userId}
 		</if>
 	</where>
+	order by spu.score desc
   </select>
   
   <select id="selectExpertUserCommitPaper" resultMap="PagerUserDtoResultMap">

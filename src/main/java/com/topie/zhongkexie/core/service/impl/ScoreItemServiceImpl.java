@@ -38,8 +38,11 @@ public class ScoreItemServiceImpl extends BaseService<ScoreItem> implements ISco
         if (scoreItem.getIndexId() != null) criteria.andEqualTo("indexId", scoreItem.getIndexId());
         if (scoreItem.getType() != null) criteria.andEqualTo("type", scoreItem.getType());
         if (StringUtils.isNotEmpty(scoreItem.getRelatedField())) criteria.andEqualTo("relatedField", scoreItem.getRelatedField());
-        if (StringUtils.isNotEmpty(scoreItem.getSortWithOutOrderBy()))
+        if (StringUtils.isNotEmpty(scoreItem.getSortWithOutOrderBy())){
             example.setOrderByClause(scoreItem.getSortWithOutOrderBy());
+        }else{
+        	example.setOrderByClause("sort asc");
+        }
         if (StringUtils.isNotEmpty(scoreItem.getResponsibleDepartment())) {
         	return scoreItemMapper.selectByExampleEx(example,scoreItem.getResponsibleDepartment());
         }

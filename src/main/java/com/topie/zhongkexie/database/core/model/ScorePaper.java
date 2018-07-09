@@ -284,4 +284,15 @@ public class ScorePaper extends Sortable {
 		this.score = score;
 	}
 
+	@Override
+	public String toString() {
+		return "ScorePaper [id=" + id + ", title=" + title + ", begin=" + begin
+				+ ", end=" + end + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + ", status=" + status
+				+ ", score=" + score + ", approveStatus=" + approveStatus
+				+ ", falsityCount="
+				+ falsityCount + ", falsityCountItem=" + falsityCountItem + "]";
+	}
+	
+
 }

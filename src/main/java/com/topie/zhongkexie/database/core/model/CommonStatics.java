@@ -1,6 +1,8 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_common_statics")
 public class CommonStatics {
@@ -55,4 +57,11 @@ public class CommonStatics {
     public void setsDescription(String sDescription) {
         this.sDescription = sDescription;
     }
+
+	@Override
+	public String toString() {
+		return "CommonStatics [sKey=" + sKey + ", sValue=" + sValue
+				+ ", sDescription=" + sDescription + "]";
+	}
+    
 }

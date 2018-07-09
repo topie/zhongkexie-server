@@ -245,5 +245,14 @@ public class ScoreAnswer extends Sortable {
 	public void setAnswerReal(Boolean answerReal) {
 		this.answerReal = answerReal;
 	}
+
+	@Override
+	public String toString() {
+		return "ScoreAnswer [id=" + id + ", userId=" + userId + ", paperId="
+				+ paperId + ", indexId=" + indexId + ", itemId=" + itemId
+				+ ", itemScore=" + itemScore + ", answerValue=" + answerValue
+				+ ", answerScore=" + answerScore + ", answerReason="
+				+ answerReason + ", answerReal=" + answerReal + "]";
+	}
     
 }

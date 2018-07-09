@@ -157,5 +157,12 @@ public class ScoreIndex extends Sortable {
 	public void setPaperId(Integer paperId) {
 		this.paperId = paperId;
 	}
+
+	@Override
+	public String toString() {
+		return "ScoreIndex [id=" + id + ", parentId=" + parentId + ", paperId="
+				+ paperId + ", name=" + name + ", weight=" + weight
+				+ ", score=" + score + ", sort=" + sort + "]";
+	}
     
 }

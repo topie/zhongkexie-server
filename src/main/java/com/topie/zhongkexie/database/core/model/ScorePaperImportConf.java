@@ -1,7 +1,12 @@
 package com.topie.zhongkexie.database.core.model;
 
 import java.util.Date;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_score_paper_import_conf")
 public class ScorePaperImportConf {
@@ -259,4 +264,14 @@ public class ScorePaperImportConf {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+	@Override
+	public String toString() {
+		return "ScorePaperImportConf [id=" + id + ", fileId=" + fileId
+				+ ", paperId=" + paperId + ", start=" + start + ", end=" + end
+				+ ", name=" + name + ", deptMapping=" + deptMapping
+				+ ", fieldMapping=" + fieldMapping + ", jsonIndex=" + jsonIndex
+				+ ", jsonItem=" + jsonItem + ", createTime=" + createTime + "]";
+	}
+    
 }

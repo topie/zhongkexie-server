@@ -1,6 +1,8 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_dict_item")
 public class DictItem {
@@ -123,4 +125,13 @@ public class DictItem {
     public void setItemDesc(String itemDesc) {
         this.itemDesc = itemDesc;
     }
+
+	@Override
+	public String toString() {
+		return "DictItem [itemId=" + itemId + ", itemCode=" + itemCode
+				+ ", itemName=" + itemName + ", itemSeq=" + itemSeq
+				+ ", dictId=" + dictId + ", itemPid=" + itemPid + ", itemDesc="
+				+ itemDesc + "]";
+	}
+    
 }

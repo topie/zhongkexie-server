@@ -96,4 +96,11 @@ public class MemUserScore {
     public void setPaperId(Integer paperId) {
         this.paperId = paperId;
     }
+
+	@Override
+	public String toString() {
+		return "MemUserScore [id=" + id + ", userId=" + userId + ", score="
+				+ score + ", itemId=" + itemId + ", paperId=" + paperId + "]";
+	}
+    
 }

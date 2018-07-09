@@ -271,4 +271,18 @@ public class ScoreItem extends Sortable {
 		this.showLevel = showLevel;
 	}
 
+	@Override
+	public String toString() {
+		return "ScoreItem [id=" + id + ", indexId=" + indexId + ", title="
+				+ title + ", type=" + type + ", optionLogicDesc="
+				+ optionLogicDesc + ", optionLogic=" + optionLogic
+				+ ", responsibleDepartment=" + responsibleDepartment
+				+ ", relatedField=" + relatedField + ", scoreType=" + scoreType
+				+ ", row=" + row + ", placeholder=" + placeholder + ", items="
+				+ items + ", showLevel=" + showLevel + ", hideBtn=" + hideBtn
+				+ ", weight=" + weight + ", score=" + score + ", sort=" + sort
+				+ "]";
+	}
+	
+
 }

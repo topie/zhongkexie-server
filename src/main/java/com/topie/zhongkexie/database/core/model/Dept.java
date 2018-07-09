@@ -1,6 +1,9 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_dept")
 public class Dept {
@@ -251,4 +254,13 @@ public class Dept {
     public void setSeq(Integer seq) {
         this.seq = seq;
     }
+
+	@Override
+	public String toString() {
+		return "Dept [id=" + id + ", code=" + code + ", name=" + name
+				+ ", duty=" + duty + ", field=" + field + ", pid=" + pid
+				+ ", address=" + address + ", tel=" + tel + ", linkman="
+				+ linkman + ", type=" + type + ", seq=" + seq + "]";
+	}
+    
 }

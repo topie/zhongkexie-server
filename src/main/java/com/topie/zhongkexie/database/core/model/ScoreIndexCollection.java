@@ -138,4 +138,14 @@ public class ScoreIndexCollection {
     public void setContentJson(String contentJson) {
         this.contentJson = contentJson;
     }
+
+	@Override
+	public String toString() {
+		return "ScoreIndexCollection [id=" + id + ", name=" + name
+				+ ", paperId=" + paperId + ", description=" + description
+				+ ", relatedField=" + relatedField + ", itemCollection="
+				+ itemCollection + ", indexCollection=" + indexCollection
+				+ "]";
+	}
+    
 }

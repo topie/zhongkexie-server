@@ -308,4 +308,15 @@ public class ExpertInfo {
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
+
+	@Override
+	public String toString() {
+		return "ExpertInfo [id=" + id + ", realName=" + realName
+				+ ", loginName=" + loginName + ", address=" + address
+				+ ", workUnits=" + workUnits + ", birthday=" + birthday
+				+ ", telPhone=" + telPhone + ", phone=" + phone + ", email="
+				+ email + ", title=" + title + ", relatedField=" + relatedField
+				+ ", fieldType=" + fieldType + ", userId=" + userId
+				+ ", createDate=" + createDate + "]";
+	}
 }

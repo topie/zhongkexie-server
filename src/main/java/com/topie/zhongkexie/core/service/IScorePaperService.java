@@ -7,6 +7,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
+import com.topie.zhongkexie.database.core.model.Attachment;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 
 /**
@@ -57,5 +58,12 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	void updateWightScore(Integer paperId);
 
 	void updateWightUserScore(Integer paperId);
+	/**
+	 * 导入外部数据答案
+	 * @param attachment
+	 * @param userId 
+	 * @param paperId 
+	 */
+	void importAnswer(Attachment attachment, Integer paperId, Integer userId);
 
 }

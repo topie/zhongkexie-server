@@ -1,6 +1,8 @@
 package com.topie.zhongkexie.database.department.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_department")
 public class Department {
@@ -176,4 +178,12 @@ public class Department {
     public void setSeqNum(Integer seqNum) {
         this.seqNum = seqNum;
     }
+
+	@Override
+	public String toString() {
+		return "Department [id=" + id + ", linkMan=" + linkMan + ", deptName="
+				+ deptName + ", deptType=" + deptType + ", email=" + email
+				+ ", tellPhone=" + tellPhone + ", userId=" + userId
+				+ ", loginName=" + loginName + ", seqNum=" + seqNum + "]";
+	}
 }

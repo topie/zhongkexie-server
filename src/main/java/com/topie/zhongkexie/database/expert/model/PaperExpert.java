@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.expert.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "e_papert_expert")
 public class PaperExpert {
@@ -138,4 +142,13 @@ public class PaperExpert {
     public void setType(String type) {
         this.type = type;
     }
+
+	@Override
+	public String toString() {
+		return "PaperExpert [id=" + id + ", paperId=" + paperId + ", name="
+				+ name + ", deptNames=" + deptNames + ", expertNames="
+				+ expertNames + ", deptIds=" + deptIds + ", expertIds="
+				+ expertIds + ", type=" + type + "]";
+	}
+    
 }

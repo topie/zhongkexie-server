@@ -150,4 +150,11 @@ public class ExpertItemScore {
     public void setItemScore(BigDecimal itemScore) {
         this.itemScore = itemScore;
     }
+
+	@Override
+	public String toString() {
+		return "ExpertItemScore [paperId=" + paperId + ", expertId=" + expertId
+				+ ", expertUserId=" + expertUserId + ", orgUserId=" + orgUserId
+				+ ", itemId=" + itemId + ", itemScore=" + itemScore + "]";
+	}
 }

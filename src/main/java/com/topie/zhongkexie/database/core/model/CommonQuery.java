@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_common_query")
 public class CommonQuery {
@@ -212,4 +216,15 @@ public class CommonQuery {
     public void setHtmlContent(String htmlContent) {
         this.htmlContent = htmlContent;
     }
+
+	@Override
+	public String toString() {
+		return "CommonQuery [id=" + id + ", queryName=" + queryName
+				+ ", tableAlias=" + tableAlias + ", selectQuery=" + selectQuery
+				+ ", exportQuery=" + exportQuery + ", whereQuery=" + whereQuery
+				+ ", groupQuery=" + groupQuery + ", orderQuery=" + orderQuery
+				+ ", scriptContent=" + scriptContent + ", htmlContent="
+				+ htmlContent + "]";
+	}
+    
 }

@@ -107,6 +107,14 @@ public class ScoreAppraiseUser {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+	@Override
+	public String toString() {
+		return "ScoreAppraiseUser [id=" + id + ", userId=" + userId
+				+ ", itemId=" + itemId + ", paperId=" + paperId
+				+ ", itemValue=" + itemValue + ", itemStatus=" + itemStatus
+				+ "]";
+	}
     
     
 }

@@ -1,13 +1,20 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-import com.topie.zhongkexie.common.utils.date.DateUtil;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.topie.zhongkexie.common.handler.Sortable;
+import com.topie.zhongkexie.common.utils.date.DateUtil;
 
 @Table(name = "d_export_task")
 public class ExportTask extends Sortable {
@@ -192,4 +199,14 @@ public class ExportTask extends Sortable {
         }
         return "-";
     }
+
+	@Override
+	public String toString() {
+		return "ExportTask [id=" + id + ", exportUser=" + exportUser
+				+ ", exportTime=" + exportTime + ", completeTime="
+				+ completeTime + ", taskName=" + taskName + ", attachmentUri="
+				+ attachmentUri + ", status=" + status + ", period=" + period
+				+ "]";
+	}
+    
 }

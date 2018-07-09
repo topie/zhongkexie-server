@@ -17,6 +17,7 @@ public class SecurityUser extends User {
     private String contactPhone;
     private Date lastPasswordReset;
     private Integer userType;
+    private String ip;
     public SecurityUser(com.topie.zhongkexie.database.core.model.User user,
                               Collection<GrantedAuthority> userGrantedAuthorities) {
         super(user.getLoginName(), user.getPassword(), user.getEnabled(),
@@ -30,6 +31,7 @@ public class SecurityUser extends User {
             setContactPhone(user.getContactPhone());
             setLastPasswordReset(user.getLastPasswordReset());
             setUserType(user.getUserType());
+            setIp(user.getLastLoginIp());
         }
     }
 
@@ -41,7 +43,15 @@ public class SecurityUser extends User {
         this.id = id;
     }
 
-    public String getLoginName() {
+    public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getLoginName() {
         return loginName;
     }
 

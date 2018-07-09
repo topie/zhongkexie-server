@@ -33,8 +33,11 @@ public class ScoreIndexServiceImpl extends BaseService<ScoreIndex> implements IS
         if (StringUtils.isNotEmpty(scoreIndex.getName())) criteria.andLike("name", "%" + scoreIndex.getName() + "%");
         if (scoreIndex.getParentId() != null) criteria.andEqualTo("parentId", scoreIndex.getParentId());
         if (scoreIndex.getPaperId() != null) criteria.andEqualTo("paperId", scoreIndex.getPaperId());
-        if (StringUtils.isNotEmpty(scoreIndex.getSortWithOutOrderBy()))
+        if (StringUtils.isNotEmpty(scoreIndex.getSortWithOutOrderBy())){
             example.setOrderByClause(scoreIndex.getSortWithOutOrderBy());
+	    }else{
+	    	example.setOrderByClause("sort asc");
+	    }
         return getMapper().selectByExample(example);
     }
 

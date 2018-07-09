@@ -122,4 +122,12 @@ public class ScorePaperUser {
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
+
+	@Override
+	public String toString() {
+		return "ScorePaperUser [paperId=" + paperId + ", userId=" + userId
+				+ ", status=" + status + ", feedback=" + feedback + ", score="
+				+ score + ", subjectiveScore=" + subjectiveScore + "]";
+	}
+    
 }

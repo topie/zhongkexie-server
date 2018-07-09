@@ -1,11 +1,16 @@
 package com.topie.zhongkexie.database.core.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "d_attachment")
 public class Attachment {
 
-    /**
+
+	/**
      * 附件id
      */
     @Id
@@ -198,4 +203,14 @@ public class Attachment {
     public void setUploadLoginName(String uploadLoginName) {
         this.uploadLoginName = uploadLoginName;
     }
+
+    @Override
+	public String toString() {
+		return "Attachment [attachmentId=" + attachmentId + ", attachmentName="
+				+ attachmentName + ", attachmentType=" + attachmentType
+				+ ", attachmentSuffix=" + attachmentSuffix
+				+ ", attachmentPath=" + attachmentPath + ", attachmentUrl="
+				+ attachmentUrl + ", attachmentSize=" + attachmentSize
+				+ ", uploadLoginName=" + uploadLoginName + "]";
+	}
 }

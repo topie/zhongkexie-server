@@ -1,9 +1,14 @@
 package com.topie.zhongkexie.database.core.model;
 
-import com.topie.zhongkexie.common.handler.Sortable;
-
-import javax.persistence.*;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.topie.zhongkexie.common.handler.Sortable;
 
 @Table(name = "d_function")
 public class Function extends Sortable {
@@ -240,4 +245,14 @@ public class Function extends Sortable {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
+
+	@Override
+	public String toString() {
+		return "Function [id=" + id + ", parentId=" + parentId
+				+ ", functionName=" + functionName + ", display=" + display
+				+ ", state=" + state + ", icon=" + icon + ", action=" + action
+				+ ", functionDesc=" + functionDesc + ", insertTime="
+				+ insertTime + ", updateTime=" + updateTime + "]";
+	}
+    
 }

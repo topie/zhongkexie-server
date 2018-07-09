@@ -55,4 +55,11 @@ public class MemPaperItem {
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
     }
+
+	@Override
+	public String toString() {
+		return "MemPaperItem [id=" + id + ", paperId=" + paperId + ", itemId="
+				+ itemId + "]";
+	}
+    
 }

@@ -150,5 +150,14 @@ public class ExpertDeptUser {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	@Override
+	public String toString() {
+		return "ExpertDeptUser [paperId=" + paperId + ", expertId=" + expertId
+				+ ", expertUserId=" + expertUserId + ", deptUserId="
+				+ deptUserId + ", indexCollId=" + indexCollId
+				+ ", indexCollExpertId=" + indexCollExpertId + ", status="
+				+ status + "]";
+	}
     
 }

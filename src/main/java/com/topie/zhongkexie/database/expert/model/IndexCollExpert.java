@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.expert.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Table(name = "e_index_coll_expert")
 public class IndexCollExpert {
@@ -156,4 +160,13 @@ public class IndexCollExpert {
     public void setFieldType(String fieldType) {
         this.fieldType = fieldType;
     }
+
+	@Override
+	public String toString() {
+		return "IndexCollExpert [id=" + id + ", paperId=" + paperId
+				+ ", paperExpertId=" + paperExpertId + ", indexCollectionId="
+				+ indexCollectionId + ", name=" + name + ", expertNames="
+				+ expertNames + ", expertIds=" + expertIds + ", relatedField="
+				+ relatedField + ", fieldType=" + fieldType + "]";
+	}
 }

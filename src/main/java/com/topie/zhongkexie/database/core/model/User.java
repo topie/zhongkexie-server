@@ -400,4 +400,19 @@ public class User extends Sortable {
     public void setRoles(List<Integer> roles) {
         this.roles = roles;
     }
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", loginName=" + loginName + ", password="
+				+ password + ", displayName=" + displayName + ", enabled="
+				+ enabled + ", accountNonLocked=" + accountNonLocked
+				+ ", accountNonExpired=" + accountNonExpired
+				+ ", credentialsNonExpired=" + credentialsNonExpired
+				+ ", lastLoginIp=" + lastLoginIp + ", lastLoginTime="
+				+ lastLoginTime + ", email=" + email + ", contactPhone="
+				+ contactPhone + ", insertTime=" + insertTime + ", updateTime="
+				+ updateTime + ", lastPasswordReset=" + lastPasswordReset
+				+ ", userType=" + userType + ", roles=" + roles + "]";
+	}
+    
 }
