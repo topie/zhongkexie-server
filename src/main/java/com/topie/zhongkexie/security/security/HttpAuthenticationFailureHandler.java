@@ -59,7 +59,7 @@ public class HttpAuthenticationFailureHandler
    		 return;
    	 }
         log.setCuser(user.getUsername()+"["+user.getId()+"]");//设置管理员id  
-        log.setCdate(DateUtil.DateToString(new Date(),"YYYY-MM-dd HH:mm:ss"));//操作时间  
+        log.setCdate(DateUtil.DateToString(new Date(),"yyyy-MM-dd HH:mm:ss"));//操作时间  
         log.setContent(content);//操作内容 
         log.setTitle(title);//操作  
         log.setCtype(LogService.DENGLU);

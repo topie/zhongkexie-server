@@ -1,7 +1,10 @@
 package com.topie.zhongkexie.system.api.common;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.topie.zhongkexie.common.tools.filemanager.DefaultFileManagerTool;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
+import com.topie.zhongkexie.common.utils.ZipUtil;
+import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.database.core.model.Attachment;
+import com.topie.zhongkexie.security.utils.SecurityUtil;
 import com.topie.zhongkexie.system.service.IAttachmentService;
 
 /**
@@ -36,6 +42,8 @@ public class CommonController {
     private IAttachmentService iAttachmentService;
     @Autowired
     private DefaultFileManagerTool defaultFileManagerTool;
+    @Autowired
+    private IScoreItemService scoreItemService;
 
     @RequestMapping(value = "/uploadFile", method = { RequestMethod.POST })
     @ResponseBody
@@ -53,7 +61,7 @@ public class CommonController {
             // 定义允许上传的文件扩展名
             HashMap<String, String> extMap = new HashMap<String, String>();
             extMap.put(dirName,
-                    "apk,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,gz,bz2,gif,jpg,jpeg,png,bmp,swf,flv,mp3,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb");
+                    "apk,doc,docx,xls,xlsx,ppt,pptx,pdf,txt,zip,rar,gz,bz2,gif,jpg,jpeg,png,bmp,swf,flv,mp3,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb");
 
             Attachment attachment = iAttachmentService
                     .uploadFileAttachement(request, file, dirName, maxSize, extMap, FILE);
@@ -104,7 +112,7 @@ public class CommonController {
                 // 定义允许上传的文件扩展名
                 HashMap<String, String> extMap = new HashMap<String, String>();
                 extMap.put(dirName,
-                        "doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,gz,bz2,gif,jpg,jpeg,png,bmp,swf,flv,mp3,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb");
+                        "doc,docx,xls,xlsx,ppt,pptx,pdf,txt,zip,rar,gz,bz2,gif,jpg,jpeg,png,bmp,swf,flv,mp3,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb");
 
                 Attachment attachment = iAttachmentService
                         .uploadFileAttachement(request, multipartFile, dirName, maxSize, extMap, FILE);
@@ -129,16 +137,69 @@ public class CommonController {
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     @ResponseBody
     public void download(HttpServletResponse response, HttpServletRequest httpServletRequest,
-    		@RequestParam("id") Integer attachmentId) throws Exception {
+    		@RequestParam("id") Integer attachmentId,@RequestParam(value="itemId",required=false) Integer itemId) throws Exception {
     	
     	if (attachmentId != null) {
             Attachment attachment = iAttachmentService.selectByKey(attachmentId);
             if (attachment != null) {
+            	String path = "";
                 String filePath = attachment.getAttachmentPath();
-                defaultFileManagerTool.download(response, filePath, attachment.getAttachmentName());
+                if(itemId!=null){
+                	path = scoreItemService.selectPath(itemId)+"_";
+                }
+                defaultFileManagerTool.download(response, filePath, path+attachment.getAttachmentName());
             }
         }
     	
     }
+    
+    @RequestMapping(value = "/downloadzip", method = RequestMethod.GET)
+    @ResponseBody
+    public void download(HttpServletResponse response, HttpServletRequest httpServletRequest,
+    		@RequestParam("id") String attachmentId,@RequestParam(value="itemId",required=false) Integer itemId) throws Exception {
+    	
+    	if (attachmentId != null) {
+    		String[] atts = attachmentId.split("_");
+    		List<File> files = new ArrayList<File>();
+    		for(int i=0;i<atts.length;i++){
+	    		Integer attId = Integer.valueOf(atts[i]);
+	            Attachment attachment = iAttachmentService.selectByKey(attId);
+	            if (attachment != null) {
+	            	try{
+	            	File file = new File(attachment.getAttachmentPath());
+	            	files.add(file);
+	            	}catch(Exception e){}
+	            }
+    		}
+    		if(files.size()>0){
+    			String path = getPath( httpServletRequest);
+    			File zipfile = new File(path+"file_"+System.currentTimeMillis());
+    			ZipUtil.zipFiles(files, zipfile);
+    			String itemPath = "";
+                if(itemId!=null){
+                	itemPath = scoreItemService.selectPath(itemId)+"_";
+                }
+    			defaultFileManagerTool.download(response, zipfile, itemPath+"上传资料.zip");
+    		}
+        }
+    	
+    }
+
+	private String getPath(HttpServletRequest request) {
+		String savePath = request.getSession().getServletContext().getRealPath("/") + "ziptemp/" + SecurityUtil
+                .getCurrentUserName() + "/";
+        // 文件保存目录URL
+        File targetFile = new File(savePath);
+        if (!targetFile.exists()) {
+            targetFile.mkdirs();
+        }
+        // 创建文件夹
+        savePath += "ziptemp" + "/";
+        File saveDirFile = new File(savePath);
+        if (!saveDirFile.exists()) {
+            saveDirFile.mkdirs();
+        }
+		return savePath;
+	}
 
 }

@@ -20,6 +20,7 @@ public class ItemDto {
 	private Integer row;
 	private String placeholder;
 	private Boolean hideBtn;
+	private String info;
 
 	private List<OptionDto> items;
 	private String customItems;
@@ -38,6 +39,14 @@ public class ItemDto {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	public Boolean getHideBtn() {

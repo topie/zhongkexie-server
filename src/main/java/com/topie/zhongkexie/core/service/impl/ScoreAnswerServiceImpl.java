@@ -171,11 +171,13 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 			String logic = scoreItem.getOptionLogic();
 		} else if (scoreItem.getType() == 1) {
 			// 单选
+			try{
 			Integer optionId = Integer.parseInt(sa.getAnswerValue());
 			ScoreItemOption option = iScoreItemOptionService
 					.selectByKey(optionId);
 			sa.setAnswerScore(scoreItem.getScore().multiply(
 					option.getOptionRate()));
+			}catch(Exception e){e.printStackTrace();}
 		} else if (scoreItem.getType() == 2) {
 			// 多选
 			

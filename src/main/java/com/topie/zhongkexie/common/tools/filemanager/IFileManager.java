@@ -1,7 +1,9 @@
 package com.topie.zhongkexie.common.tools.filemanager;
 
-import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by chenguojun on 2017/1/14.
@@ -19,5 +21,6 @@ public interface IFileManager {
     void removeFile(String filePath);
 
     void download(HttpServletResponse response, String filePath, String fileName);
+    void download(HttpServletResponse response, File file, String fileName);
 
 }

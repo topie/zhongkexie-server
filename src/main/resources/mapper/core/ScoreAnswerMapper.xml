@@ -12,6 +12,7 @@
     <result column="item_id" property="indexId" jdbcType="INTEGER" />
     <result column="item_score" property="itemScore" jdbcType="DECIMAL" />
     <result column="answer_value" property="answerValue" jdbcType="VARCHAR" />
+    <result column="answer_file" property="answerFile" jdbcType="VARCHAR" />
     <result column="answer_score" property="answerScore" jdbcType="DECIMAL" />
     <result column="answer_reason" property="answerReason" jdbcType="VARCHAR" />
     <result column="answer_real" property="answerReal" jdbcType="BIT" />

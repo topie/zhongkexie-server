@@ -12,7 +12,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
+import com.topie.zhongkexie.database.core.dao.ScoreIndexMapper;
 import com.topie.zhongkexie.database.core.dao.ScoreItemMapper;
+import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 
 /**
@@ -23,6 +25,8 @@ public class ScoreItemServiceImpl extends BaseService<ScoreItem> implements ISco
 
 	@Autowired
 	private ScoreItemMapper scoreItemMapper;
+	@Autowired
+	private ScoreIndexMapper scoreIndexMapper;
     @Override
     public PageInfo<ScoreItem> selectByFilterAndPage(ScoreItem scoreItem, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
@@ -37,6 +41,7 @@ public class ScoreItemServiceImpl extends BaseService<ScoreItem> implements ISco
         if (StringUtils.isNotEmpty(scoreItem.getTitle())) criteria.andLike("title", "%" + scoreItem.getTitle() + "%");
         if (scoreItem.getIndexId() != null) criteria.andEqualTo("indexId", scoreItem.getIndexId());
         if (scoreItem.getType() != null) criteria.andEqualTo("type", scoreItem.getType());
+        if (StringUtils.isNotEmpty(scoreItem.getScoreType())) criteria.andEqualTo("scoreType", scoreItem.getScoreType());
         if (StringUtils.isNotEmpty(scoreItem.getRelatedField())) criteria.andEqualTo("relatedField", scoreItem.getRelatedField());
         if (StringUtils.isNotEmpty(scoreItem.getSortWithOutOrderBy())){
             example.setOrderByClause(scoreItem.getSortWithOutOrderBy());
@@ -48,5 +53,27 @@ public class ScoreItemServiceImpl extends BaseService<ScoreItem> implements ISco
         }
         return getMapper().selectByExample(example);
     }
+
+	@Override
+	public String selectPath(Integer itemId) {
+		ScoreItem item = selectByKey(itemId);
+		if(item==null)return null;
+		String path = getPath(item.getIndexId());
+		path = path.substring(1)+"_"+item.getTitle().substring(0,item.getTitle().length()>10?10:item.getTitle().length())
+				.replaceAll("[\\,，。\\.；\\;、]","");
+		return path;
+	}
+
+	private String getPath(Integer indexId) {
+		String path = "";
+		
+		ScoreIndex index = scoreIndexMapper.selectByPrimaryKey(indexId);
+		if(index==null){
+			return path;
+		}else{
+			path = getPath(index.getParentId())+"_"+index.getName();
+		}
+		return path;
+	}
 
 }

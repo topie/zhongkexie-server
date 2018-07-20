@@ -33,16 +33,20 @@
     </select>
   
   <select id="selectUserCommitPaper" resultMap="PagerUserDtoResultMap">
-  	SELECT spu.`status` user_status,spu.score,spu.subjective_score,u.id userId,sp.*,u.display_name user_name 
+  	SELECT spu.`status` user_status,de.type,de.code ,spu.score,spu.subjective_score,u.id userId,sp.*,u.display_name user_name ,de.`code`,de.type
   	FROM d_score_paper_user spu 
   	LEFT JOIN d_score_paper sp ON spu.paper_id=sp.id 
-	LEFT JOIN d_user u ON spu.user_id = u.id
+	LEFT JOIN d_user u ON spu.user_id = u.id 
+	LEFT JOIN d_dept de ON de.`code` = SUBSTR(u.login_name,1,LENGTH(u.login_name)-3)
 	<where>
 		<if test="paperId!=null">
 			and spu.paper_id=#{paperId}
 		</if>
 		<if test="userId!=null">
 			and spu.user_id=#{userId}
+		</if>
+		<if test="type!=null and type!=''">
+			and de.type=#{type}
 		</if>
 	</where>
 	order by spu.score desc

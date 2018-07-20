@@ -6,6 +6,8 @@ public class AnswerDto {
 
     private Object itemValue;
 
+    private String itemFile;
+
     public Integer getItemId() {
         return itemId;
     }
@@ -21,4 +23,13 @@ public class AnswerDto {
     public void setItemValue(Object itemValue) {
         this.itemValue = itemValue;
     }
+
+	public String getItemFile() {
+		return itemFile;
+	}
+
+	public void setItemFile(String itemFile) {
+		this.itemFile = itemFile;
+	}
+    
 }

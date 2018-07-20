@@ -1,5 +1,18 @@
 package com.topie.zhongkexie.core.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
@@ -12,17 +25,6 @@ import com.topie.zhongkexie.core.service.ICommonQueryService;
 import com.topie.zhongkexie.core.service.ICommonService;
 import com.topie.zhongkexie.database.core.dao.CommonQueryMapper;
 import com.topie.zhongkexie.database.core.model.CommonQuery;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.entity.Example;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -111,7 +113,7 @@ public class CommonQueryServiceImpl extends BaseService<CommonQuery> implements 
                     config.put("timePicker", true);
                     config.put("singleDatePicker", true);
                     Map locale = new HashMap();
-                    locale.put("format", "YYYY-MM-DD HH:mm:ss");
+                    locale.put("format", "yyyy-MM-dd HH:mm:ss");
                     config.put("locale", locale);
                     formItem.setConfig(config);
                 }

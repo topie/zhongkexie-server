@@ -11,6 +11,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.core.service.IDeptService;
@@ -49,6 +50,7 @@ public class AnswerImportController {
 	}
 
 	@RequestMapping("import")
+	@ResponseBody
 	public Object importAnswer(Integer paperId, Integer fileId, Integer orgId) {
 		Attachment attachment = iAttachmentService.selectByKey(fileId);
 		if (attachment == null)
@@ -64,6 +66,20 @@ public class AnswerImportController {
 		if(user==null)return ResponseUtil.error("选择的学会填报用户不存在");
 		Integer userId = user.getId();
 		iScorePaperService.importAnswer(attachment, paperId, userId);
+		return ResponseUtil.success();
+	}
+	
+	@RequestMapping("import2")
+	@ResponseBody
+	public Object importAnswer(Integer paperId, Integer fileId) {
+		Attachment attachment = iAttachmentService.selectByKey(fileId);
+		if (attachment == null)
+			return ResponseUtil.error("附件不存在！");
+		if (paperId == null)
+			return ResponseUtil.error("paperId不能为空");
+//		attachment
+//		.setAttachmentPath("D:\\app_note\\qita\\中国科协\\数据\\答案导入数据\\查询结果(汇总wd)终 - 副本.xls");
+		iScorePaperService.importAnswer(attachment, paperId);
 		return ResponseUtil.success();
 	}
 

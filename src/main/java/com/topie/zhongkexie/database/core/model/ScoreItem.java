@@ -59,6 +59,7 @@ public class ScoreItem extends Sortable {
 	private Integer showLevel;
 	@Column(name = "hide_btn")
 	private Boolean hideBtn;
+	private String info;
 
 	/**
 	 * 题目权重
@@ -74,6 +75,14 @@ public class ScoreItem extends Sortable {
 
 	public String getOptionLogic() {
 		return optionLogic;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	public void setOptionLogic(String optionLogic) {

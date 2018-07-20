@@ -6,7 +6,9 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -30,7 +32,7 @@ import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.appraise.service.IScoreAppraiseUserService;
 import com.topie.zhongkexie.common.baseservice.impl.BaseService;
 import com.topie.zhongkexie.common.exception.DefaultBusinessException;
-import com.topie.zhongkexie.common.utils.ExcelReader;
+import com.topie.zhongkexie.common.utils.ExcelReaderNull;
 import com.topie.zhongkexie.common.utils.JavaExecScript;
 import com.topie.zhongkexie.core.dto.ItemDto;
 import com.topie.zhongkexie.core.dto.OptionDto;
@@ -151,7 +153,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 				.selectByFilter(scoreIndex);
 		ScoreIndex parent = new ScoreIndex();
 		parent.setId(0);
-		childIndices = getLeafIndex(parent,indices);//20180708更新为排序方式
+		childIndices = getLeafIndex(parent, indices);// 20180708更新为排序方式
 		List<PaperIndexDto> paperIndexDtos = new ArrayList<>();
 		for (ScoreIndex childIndex : childIndices) {
 			PaperIndexDto paperIndexDto = new PaperIndexDto();
@@ -179,18 +181,19 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		return jo.toJSONString();
 	}
 
-	private List<ScoreIndex> getLeafIndex( ScoreIndex parent,
+	private List<ScoreIndex> getLeafIndex(ScoreIndex parent,
 			List<ScoreIndex> indices) {
 		List<ScoreIndex> chiled = new ArrayList<ScoreIndex>();
 		List<ScoreIndex> chiled2 = new ArrayList<ScoreIndex>();
 		boolean f = true;
-		for(ScoreIndex index:indices){
-			if(index.getParentId().equals(parent.getId())){
+		for (ScoreIndex index : indices) {
+			if (index.getParentId().equals(parent.getId())) {
 				f = false;
-				chiled2.addAll(getLeafIndex(index,indices));
+				chiled2.addAll(getLeafIndex(index, indices));
 			}
 		}
-		if(f) chiled.add(parent);
+		if (f)
+			chiled.add(parent);
 		chiled.addAll(chiled2);
 		return chiled;
 	}
@@ -229,22 +232,16 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		c.andIn("id", list);
 		ex.setOrderByClause("sort asc");
 		List<ScoreIndex> indices = iScoreIndexService.selectByExample(ex);
-		
 
 		ScoreIndex parent = new ScoreIndex();
 		parent.setId(0);
-		childIndices = getLeafIndex(parent,indices);//20180708更新为排序方式
-		/*for (ScoreIndex index : indices) {
-			Boolean flag = true;
-			for (ScoreIndex index1 : indices) {
-				if (index.getId().intValue() == index1.getParentId().intValue()) {
-					flag = false;
-				}
-			}
-			if (flag) {
-				childIndices.add(index);
-			}
-		}*/
+		childIndices = getLeafIndex(parent, indices);// 20180708更新为排序方式
+		/*
+		 * for (ScoreIndex index : indices) { Boolean flag = true; for
+		 * (ScoreIndex index1 : indices) { if (index.getId().intValue() ==
+		 * index1.getParentId().intValue()) { flag = false; } } if (flag) {
+		 * childIndices.add(index); } }
+		 */
 		List<PaperIndexDto> paperIndexDtos = new ArrayList<>();
 		for (ScoreIndex childIndex : childIndices) {
 			PaperIndexDto paperIndexDto = new PaperIndexDto();
@@ -284,6 +281,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		itemDto.setHideBtn(item.getHideBtn());
 		itemDto.setPlaceholder(item.getPlaceholder());
 		itemDto.setRow(item.getRow());
+		itemDto.setInfo(item.getInfo());
 		List<OptionDto> itemOptions = new ArrayList<>();
 		ScoreItemOption scoreItemOption = new ScoreItemOption();
 		scoreItemOption.setSort_("option_sort_asc");
@@ -507,7 +505,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		HSSFFont fontSearch = wb.createFont();
 		fontSearch.setFontHeightInPoints((short) 12);
 		;// 设置字体大小fontSearch.setFontHeightInPoints((short)
-		// 13);
+			// 13);
 		style.setAlignment(XSSFCellStyle.ALIGN_CENTER); // 居中
 		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);// 垂直
 		style.setFont(fontSearch);// 将该字体样式放入style这个样式中，其他单元格样式也是这么加的，这里只是给一个例子
@@ -986,31 +984,69 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		File file = new File(path);
 		List<List<Object>> list = null;
 		try {
-			list = ExcelReader.readExcel(file);
+			list = ExcelReaderNull.readExcel(file);
+			// print(list);
 			// int orgKeyIndex = 0;
 			int itemKeyIndex = 0;
 			int valueLengthIndex = 0;
 			int valueIndex = 0;
+			int groupIndex = 0;
 			List<Object> titleList = list.get(0);
 			for (int i = 0; i < titleList.size(); i++) {
-				if (titleList.get(i).equals("key")) {
+				if (titleList.get(i).equals("key")
+						|| titleList.get(i).equals("itemId")) {
 					itemKeyIndex = i;
 				}
-				if (titleList.get(i).equals("数据数量")) {
+				if (titleList.get(i).equals("group")) {
+					groupIndex = i;
+				}
+				if (titleList.get(i).equals("数据数量")
+						|| titleList.get(i).equals("count")) {
 					valueLengthIndex = i;
 				}
-				if (titleList.get(i).equals("数据1")) {
+				if (titleList.get(i).equals("数据1")
+						|| titleList.get(i).equals("data1")) {
 					valueIndex = i;
 				}
 			}
+			// System.out.println("itemKeyIndex:"+itemKeyIndex+"   valueLengthIndex:"+valueLengthIndex+"   valueIndex:"+valueIndex);
 			for (int j = 1; j < list.size(); j++) {
 				List<Object> datalist = list.get(j);
-				Integer itemId = (Integer) datalist.get(itemKeyIndex);
-				Integer dataLength = (Integer) datalist.get(valueLengthIndex);
+				if (datalist.size() <= valueIndex)
+					continue;
+				// System.out.println(datalist.get(itemKeyIndex).toString());
+				if (datalist.get(itemKeyIndex) == null
+						|| datalist.get(itemKeyIndex).equals(""))
+					continue;
+				Integer itemId = Integer.valueOf(datalist.get(itemKeyIndex)
+						.toString());
+				// System.out.println(datalist.get(valueLengthIndex).toString());
+				if (datalist.get(valueLengthIndex) == null
+						|| datalist.get(valueLengthIndex).equals(""))
+					continue;
+				Integer dataLength = Integer.valueOf(datalist.get(
+						valueLengthIndex).toString());
 				StringBuilder value = new StringBuilder("");
 				for (int k = 0; k < (dataLength == -1 ? datalist.size()
-						: dataLength); k++) {
-					value.append("," + datalist.get(valueIndex + k));
+						- valueIndex : dataLength); k++) {
+					value.append(","
+							+ datalist.get(valueIndex + k).toString()
+									.replace(",", "，"));
+				}
+				if (dataLength == -1) {// 去掉末尾的空
+					String v = value.toString().replaceAll(",+$", "");
+					try {
+						int groupCount = Integer.valueOf(datalist.get(
+								groupIndex).toString());
+						int ned = v.split(",").length % groupCount;
+						if (ned != 0) {
+							for (int i = ned; i < groupCount; i++) {
+								v = v + ",";
+							}
+						}
+						value = new StringBuilder(v);
+					} catch (Exception e) {
+					}
 				}
 				ScoreAnswer sa = new ScoreAnswer();
 				sa.setUserId(userId);
@@ -1025,7 +1061,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 				}
 				ScoreItem scoreItem = iScoreItemService.selectByKey(itemId);
 				sa.setItemScore(scoreItem.getScore());
-				sa.setAnswerValue(value.toString());
+				sa.setAnswerValue(value.toString().substring(1));
 				iScoreAnswerService.divScore(scoreItem, sa);
 				iScoreAnswerService.saveNotNull(sa);
 			}
@@ -1037,6 +1073,250 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		 * RuntimeBusinessException("附件错误！"); }
 		 */
 
+	}
+
+	private void print(List<List<Object>> list) {
+		for (List<Object> ls : list) {
+			System.out.println();
+			int i = 0;
+			for (Object e : ls) {
+				System.out.print(i++ + "-" + e + "\t");
+			}
+		}
+
+	}
+
+	/*public static void main(String[] args) {
+		Attachment attachment = new Attachment();
+		attachment
+				.setAttachmentPath("D:\\app_note\\qita\\中国科协\\数据\\答案导入数据\\查询结果(汇总wd)终 - 副本.xls");
+		ScorePaperServiceImpl q = new ScorePaperServiceImpl();
+		q.importAnswer(attachment, 2);
+	}*/
+
+	@Override
+	public void importAnswer(Attachment attachment, Integer paperId) {
+		Map<String, Integer> org_user = new HashMap<String, Integer>();
+		String path = attachment.getAttachmentPath();
+		File file = new File(path);
+		List<List<Object>> list = null;
+		BigDecimal ling = new BigDecimal(0);
+		try {
+			List key = new ArrayList<String>();
+			list = ExcelReaderNull.readExcel(file);
+			for (int i = 0; i < list.size(); i++) {
+				if (i == 0) {
+					List<Object> itemIds = list.get(0);
+					List<Object> regs = list.get(1);
+					List<Object> codes = list.get(2);
+					List<Object> titles = list.get(3);
+					for (int j = 0; j < itemIds.size() && j < regs.size()
+							&& j < codes.size(); j++) {
+						if (itemIds.get(j).equals("")) {
+							continue;
+						}
+						key.add(itemIds.get(j));
+						key.add(regs.get(j));
+						key.add(codes.get(j));
+						key.add(j);
+						key.add(titles.get(j));
+						// System.out.println(itemIds.get(j)+"==="+j+"=="+regs.get(j)+"==="+codes.get(j));
+					}
+					i = 3;
+				} else {
+					List<Object> row = list.get(i);
+					int k = i;
+					String perOrg = null;
+					int perOrgIndex = 0;
+					for (int j = 0; j < key.size(); j += 5) {
+						String itemId = key.get(j).toString();
+						String reg = key.get(j + 1).toString();
+						int index = Integer.valueOf(key.get(j + 3).toString());
+						String content = row.get(index).toString()
+								.replace(",", "，");
+						String title = key.get(j + 4).toString();
+						if (itemId.equals("itemId")) {
+							perOrg = content;
+							perOrgIndex = Integer.valueOf(key.get(j + 3)
+									.toString());
+						}
+						// System.out.println(itemId+":"+reg+":"+title+":-==="+index+"==="+content);
+						System.out.println("i:" + i);
+						for (k = i + 1; k < list.size(); k++) {
+							List<Object> crow = list.get(k);
+							if (crow.get(perOrgIndex).equals("")) {
+								String thiscontent = crow.get(index).toString()
+										.replace(",", "，");
+								if (!thiscontent.equals("")) {
+									content += "," + thiscontent;
+								}
+								//System.out.println(content);
+							} else {
+								System.out.println("k:" + (k - 1));
+								break;
+							}
+						}
+						if (!itemId.equals("itemId")) {
+							insertAnswer(perOrg,paperId, itemId, reg, content, title,
+									org_user,ling);
+							// break;
+						}
+
+					}
+					i = k - 1;
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("导入错误");
+			e.printStackTrace();
+		}
+
+	}
+
+	private void insertAnswer(String code, Integer paperId, String itemIdStr,
+			String reg, String content, String title, Map<String, Integer> map,BigDecimal ling) {
+		Integer itemId;
+		System.out.println("机构编码:" + code + "，题目ID:" + itemIdStr + "，填空规则:"
+				+ reg + "，内容:" + content + "，数据标题:" + title);
+		try {
+			itemId = Integer.valueOf(itemIdStr);
+			ScoreAnswer sa = new ScoreAnswer();
+			Integer userId = map.get(code);
+			if (userId == null) {
+				String userLoginName = code.trim() + "002";
+				User user = userService.findUserByLoginName(userLoginName);
+				if(user==null)
+					System.out.println("查找用户失败:"+userLoginName);
+				userId = user.getId();
+				map.put(code, userId);
+			}
+			sa.setUserId(userId);
+			sa.setPaperId(paperId);
+			sa.setItemId(itemId);
+			List<ScoreAnswer> listAw = iScoreAnswerService.selectByFilter(sa);
+			if (listAw.size() > 0) {
+				/*for (ScoreAnswer scoreAnswer : listAw) {
+					iScoreAnswerService.delete(scoreAnswer.getId());
+				}*/
+				sa = listAw.get(0);
+				
+			}
+			String[] regs = reg.split("_");
+			String values = sa.getAnswerValue();
+			if(Integer.valueOf(regs[1])!=0){//限制了长度
+				if(values!=null){
+					String[] vs = getArr(values);
+					for(int i=vs.length;i<Integer.valueOf(regs[1]);i++){
+						values+=",";
+					}
+				}else{
+					values="";
+					for(int i=1;i<Integer.valueOf(regs[1]);i++){
+						values+=",";
+					}
+				}
+				String[] vs = getArr(values);
+				int step = 1;
+				if(regs.length==3){//如果是组填空
+					step = Integer.valueOf(regs[2]);
+					String[] contents = getArr(content);
+					int start = Integer.valueOf(regs[0])-1;
+					for(int i=start;i<vs.length&&(i-start)/step<contents.length;i+=step){
+						vs[i]=contents[(i-start)/(step)];
+					}
+				}else{
+					int start = Integer.valueOf(regs[0])-1;
+					if(vs.length>start){
+						vs[start]=content;
+					}
+				}
+				values = getString(vs);
+			}else{//无限长度
+				if(values!=null){
+					if(regs.length==3){//如果是组填空
+						String[] vs = getArr(values);
+						int start = Integer.valueOf(regs[0])-1;
+						int step = Integer.valueOf(regs[2]);
+						String[] contents = getArr(content);
+						for(int i=start;i<vs.length&&(i-start)/step<contents.length;i+=step){
+							vs[i]=contents[(i-start)/(step)];
+						}
+						values = getString(vs);
+					}else{
+						String[] vs = getArr(values);
+						if(vs.length>Integer.valueOf(regs[0])){
+							vs[Integer.valueOf(regs[0])-1]=content;
+						}
+						values = getString(vs);
+					}
+				}else{
+					values="";
+					for(int i=1;i<Integer.valueOf(regs[0]);i++){
+						values+=",";
+					}
+					if(regs.length==3){//如果是组填空
+						int step = Integer.valueOf(regs[2]);
+						String[] contents = getArr(content);
+						String[] vs = new String[contents.length*step];
+						for(int i=0;i<contents.length*step;i+=step){
+							vs[i]=contents[i/step];
+						}
+						content = getString(vs);
+					}
+					values = values+content;
+				}
+			}
+			ScoreItem scoreItem = iScoreItemService.selectByKey(itemId);
+			sa.setItemScore(scoreItem.getScore());
+			System.out.println(values);
+			sa.setAnswerValue(values);
+			sa.setIndexId(scoreItem.getIndexId());
+			sa.setAnswerScore(ling);
+			//iScoreAnswerService.divScore(scoreItem, sa);
+			if(sa.getId()==null){
+				sa.setAnswerReal(true);
+				sa.setAnswerReason("");
+				iScoreAnswerService.save(sa);
+			}else	
+				iScoreAnswerService.updateNotNull(sa);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+
+	private String[] getArr(String values) {
+		List<String> list = new ArrayList<String>();
+		do{
+			int index = values.indexOf(",");
+			if(index==-1){
+				list.add(values);
+				break;
+			}
+			if(index==0){
+				list.add("");
+				values=values.substring(1);
+			}else{
+				list.add(values.substring(0,index));
+				values=values.substring(index+1);
+			}
+		}while(true);
+		String[] vs = new String[list.size()];
+		int i=0;
+		for(String s:list){
+			vs[i++]=s;
+		}
+		return vs;
+		
+	}
+
+	private String getString(String[] vs) {
+		StringBuilder s = new StringBuilder("");
+		for(String a:vs){
+			s.append(","+a);
+		}
+		if(s.length()==0)return "";
+		return s.toString().substring(1);
 	}
 
 }

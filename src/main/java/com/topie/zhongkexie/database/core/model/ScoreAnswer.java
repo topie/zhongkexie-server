@@ -75,6 +75,13 @@ public class ScoreAnswer extends Sortable {
      */
     @Column(name = "answer_real")
     private Boolean answerReal;
+    
+
+    /**
+     * 附件
+     */
+    @Column(name = "answer_file")
+    private String answerFile;
 
     /**
      * 获取ID
@@ -245,6 +252,15 @@ public class ScoreAnswer extends Sortable {
 	public void setAnswerReal(Boolean answerReal) {
 		this.answerReal = answerReal;
 	}
+	
+
+	public String getAnswerFile() {
+		return answerFile;
+	}
+
+	public void setAnswerFile(String answerFile) {
+		this.answerFile = answerFile;
+	}
 
 	@Override
 	public String toString() {
@@ -252,7 +268,7 @@ public class ScoreAnswer extends Sortable {
 				+ paperId + ", indexId=" + indexId + ", itemId=" + itemId
 				+ ", itemScore=" + itemScore + ", answerValue=" + answerValue
 				+ ", answerScore=" + answerScore + ", answerReason="
-				+ answerReason + ", answerReal=" + answerReal + "]";
+				+ answerReason + ", answerReal=" + answerReal + ", answerFile="+answerFile+"]";
 	}
     
 }

@@ -32,6 +32,10 @@ public class LogServiceImpl extends BaseService<SysLog> implements LogService {
 			c.andLike("title", "%"+sysLog.getTitle()+"%");
 		if(!StringUtils.isEmpty(sysLog.getCtype()))
 			c.andEqualTo("ctype", sysLog.getCtype());
+		if(!StringUtils.isEmpty(sysLog.getCuser()))
+			c.andEqualTo("cuser", sysLog.getCuser());
+		if(!StringUtils.isEmpty(sysLog.getIp()))
+			c.andEqualTo("ip", sysLog.getIp());
 		ex.setOrderByClause("cdate desc");
 		return getMapper().selectByExample(ex);
 	}

@@ -90,6 +90,7 @@ public class ScorePaperController {
 			ScorePaper scorePaper,
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+		scorePaper.setSort_("createTime_desc");
 		PageInfo<ScorePaper> pageInfo = iScorePaperService
 				.selectByFilterAndPage(scorePaper, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -109,6 +110,7 @@ public class ScorePaperController {
 			ScorePaper scorePaper,
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+		scorePaper.setSort_("createTime_desc");
 		PageInfo<ScorePaper> pageInfo = iScorePaperService
 				.selectByFilterAndPageForCheck(scorePaper, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -185,6 +187,7 @@ public class ScorePaperController {
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
 		scorePaper.setStatus(PagerUserDto.PAPERSTATUS_SUBMMIT);
+		scorePaper.setSort_("createTime_desc");
 		PageInfo<ScorePaper> pageInfo = iScorePagerUserService
 				.selectByFilterAndPage(scorePaper, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -405,6 +408,7 @@ public class ScorePaperController {
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
 		scorePaper.setApproveStatus(PagerUserDto.PAPERSTATUS_EGIS);// 审核通过的
+		scorePaper.setSort_("createTime_desc");
 		PageInfo<ScorePaper> pageInfo = iScorePagerUserService
 				.selectByFilterAndPage(scorePaper, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -438,6 +442,7 @@ public class ScorePaperController {
 				sa.setItemScore(scoreItem.getScore());
 				Object itemValue = a.getItemValue();
 				sa.setAnswerValue((String) itemValue);
+				sa.setAnswerFile(a.getItemFile());
 				iScoreAnswerService.divScore(scoreItem,sa);
 				iScoreAnswerService.saveNotNull(sa);
 			}

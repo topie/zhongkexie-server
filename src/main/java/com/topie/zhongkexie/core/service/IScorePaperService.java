@@ -59,11 +59,17 @@ public interface IScorePaperService extends IService<ScorePaper> {
 
 	void updateWightUserScore(Integer paperId);
 	/**
-	 * 导入外部数据答案
+	 * 导入外部数据答案 我们的模板
 	 * @param attachment
 	 * @param userId 
 	 * @param paperId 
 	 */
 	void importAnswer(Attachment attachment, Integer paperId, Integer userId);
+	/**
+	 * 根据外部导出数据导入 他们的模板
+	 * @param attachment
+	 * @param paperId
+	 */
+	void importAnswer(Attachment attachment, Integer paperId);
 
 }

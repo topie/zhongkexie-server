@@ -89,6 +89,14 @@ public class PagerUserDto {
 	 * 主观分 附加分
 	 */
 	private BigDecimal subjectiveScore;
+	/**
+	 * 学会分类
+	 */
+	private String type;
+	/**
+	 * 学会编码
+	 */
+	private String code;
 
 	public BigDecimal getSubjectiveScore() {
 		return subjectiveScore;
@@ -98,7 +106,22 @@ public class PagerUserDto {
 		this.subjectiveScore = subjectiveScore;
 	}
 
-	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public Integer getPaperId() {
 		return paperId;
 	}

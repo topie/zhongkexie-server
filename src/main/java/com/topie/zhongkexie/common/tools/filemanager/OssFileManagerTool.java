@@ -1,22 +1,7 @@
 package com.topie.zhongkexie.common.tools.filemanager;
 
-import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.DeleteObjectsRequest;
-import com.aliyun.oss.model.ListObjectsRequest;
-import com.aliyun.oss.model.OSSObjectSummary;
-import com.aliyun.oss.model.ObjectListing;
-import com.topie.zhongkexie.common.exception.DefaultBusinessException;
-import com.topie.zhongkexie.common.tools.alioss.OssUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +10,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.ListObjectsRequest;
+import com.aliyun.oss.model.OSSObjectSummary;
+import com.aliyun.oss.model.ObjectListing;
+import com.topie.zhongkexie.common.exception.DefaultBusinessException;
+import com.topie.zhongkexie.common.tools.alioss.OssUtil;
 
 /**
  * Created by chenguojun on 2017/1/14.
@@ -175,4 +178,11 @@ public class OssFileManagerTool implements IFileManager {
             throw new DefaultBusinessException("Download fail.");
         }
     }
+
+	@Override
+	public void download(HttpServletResponse response, File file,
+			String fileName) {
+		// TODO 未实现
+		
+	}
 }

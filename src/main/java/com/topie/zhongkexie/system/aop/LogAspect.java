@@ -86,7 +86,7 @@ public class LogAspect {
     		 return;
     	 }
          log.setCuser(user.getUsername()+"["+user.getId()+"]");//设置管理员id  
-         log.setCdate(DateUtil.DateToString(new Date(),"YYYY-MM-dd HH:mm:ss"));
+         log.setCdate(DateUtil.DateToString(new Date(),"yyyy-MM-dd HH:mm:ss"));
          log.setContent(content);//操作内容 
          log.setTitle(title);//操作  
          log.setCtype(LogService.CAOZUO);

@@ -130,4 +130,29 @@ public class DefaultFileManagerTool implements IFileManager {
             throw new DefaultBusinessException("Download fail.");
         }
     }
+    @Override
+    public void download(HttpServletResponse response, File file, String fileName) {
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("application/force-download");
+        try {
+		    
+		    //设置响应头，对文件进行url编码
+        	fileName = URLEncoder.encode(fileName, "UTF-8");
+		    response.setHeader("Content-Disposition", "attachment;filename="+fileName);   
+		    
+//            response.setHeader("Content-Disposition",
+//                    "attachment;fileName=" +  new String(fileName.getBytes("utf-8"), "iso-8859-1"));
+            InputStream inputStream = new FileInputStream(file);
+            OutputStream os = response.getOutputStream();
+            byte[] b = new byte[1024];
+            int length;
+            while ((length = inputStream.read(b)) > 0) {
+                os.write(b, 0, length);
+            }
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new DefaultBusinessException("Download fail.");
+        }
+    }
 }
