@@ -13,6 +13,7 @@ public class SecurityUser extends User {
     private Integer id;
     private String loginName;
     private String displayName;
+    private String linkMan;
     private String email;
     private String contactPhone;
     private Date lastPasswordReset;
@@ -32,6 +33,7 @@ public class SecurityUser extends User {
             setLastPasswordReset(user.getLastPasswordReset());
             setUserType(user.getUserType());
             setIp(user.getLastLoginIp());
+            setLinkMan(user.getLinkMan());
         }
     }
 
@@ -49,6 +51,14 @@ public class SecurityUser extends User {
 
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+
+	public String getLinkMan() {
+		return linkMan;
+	}
+
+	public void setLinkMan(String linkMan) {
+		this.linkMan = linkMan;
 	}
 
 	public String getLoginName() {

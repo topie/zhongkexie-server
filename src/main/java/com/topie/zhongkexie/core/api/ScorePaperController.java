@@ -130,6 +130,7 @@ public class ScorePaperController {
 			PagerUserDto pagerUserDto,
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+		if(pagerUserDto.getPaperId()==null)return ResponseUtil.success(PageConvertUtil.emptyPage());
 		PageInfo<PagerUserDto> pageInfo = iScorePagerUserService
 				.selectAllUserCommit(pagerUserDto, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -423,7 +424,20 @@ public class ScorePaperController {
 	@RequestMapping(value = "/submit", method = RequestMethod.POST)
 	@ResponseBody
 	public Result submit(@RequestBody PaperAnswerDto paperAnswerDto) {
-		Integer userId = SecurityUtil.getCurrentUserId();
+		SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+		String CUname = user.getLoginName();
+		String Mname = CUname;
+		Integer userId = user.getId();
+		// TODO 审核员 查看 填报员填报得信息 Mname =
+		// CUname.substring(0,CUname.lastIndexOf("-001"))+"-002";
+		if (CUname.endsWith("001")) {// 如果学会审核员
+			Mname = CUname.substring(0, CUname.lastIndexOf("001")) + "002";
+			userId = userService.findUserByLoginName(Mname).getId();
+		} else if (CUname.endsWith("002")) {
+			// Mname = CUname ;
+		} else {// 如果不是学会审核员 返回空
+
+		}
 		if (paperAnswerDto.getPaperId() != null
 				&& CollectionUtils.isNotEmpty(paperAnswerDto.getAnswers())) {
 			for (AnswerDto a : paperAnswerDto.getAnswers()) {
@@ -723,7 +737,7 @@ public class ScorePaperController {
 
 	/**
 	 * 专家获取试卷内容
-	 * 
+	 * 专家和科协用户 才能获得
 	 * @param itemId
 	 * @param answer
 	 * @return

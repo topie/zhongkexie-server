@@ -42,6 +42,10 @@
 		<if test="paperId!=null">
 			and spu.paper_id=#{paperId}
 		</if>
+		<if test="userName!=null and userName!=''">
+			and u.display_name like concat('%',concat(#{userName},'%'))
+		</if>
+		
 		<if test="userId!=null">
 			and spu.user_id=#{userId}
 		</if>
@@ -68,6 +72,7 @@
 	<where>
 		<if test="paperId!=null">
 			and spu.paper_id=#{paperId}
+			and du.paper_id = #{paperId}
 		</if>
 		<if test="userId!=null">
 			and du.expert_user_id=#{userId}

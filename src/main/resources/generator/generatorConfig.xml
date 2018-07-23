@@ -53,7 +53,8 @@
         <javaClientGenerator targetPackage="com.topie.zhongkexie.database.core.dao"
                              targetProject="${targetBasedir}/src/main/java" type="XMLMAPPER"/>
 
-        <table tableName="d_log" domainObjectName="SysLog">
+        
+        <table tableName="d_paper_expert_conf" domainObjectName="PaperExpertConf">
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
     </context>

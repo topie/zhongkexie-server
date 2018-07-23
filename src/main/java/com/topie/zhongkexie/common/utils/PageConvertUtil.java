@@ -1,11 +1,11 @@
 package com.topie.zhongkexie.common.utils;
 
-import com.github.pagehelper.PageInfo;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.github.pagehelper.PageInfo;
 
 /**
  * Created by cgj on 2015/10/30.
@@ -58,4 +58,11 @@ public class PageConvertUtil {
         map.put("data", list);
         return map;
     }
+
+	public static Map emptyPage() {
+		Map map = new HashMap();
+        map.put("total", 0);
+        map.put("data", new ArrayList<>());
+        return map;
+	}
 }

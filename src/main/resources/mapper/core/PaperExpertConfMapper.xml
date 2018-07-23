@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.core.dao.PaperExpertConfMapper" >
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.core.model.PaperExpertConf" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <select id="selectByPaperExpertConf" resultMap="BaseResultMap">
+  	SELECT p.title,p.id,p.id paper_id,pp.status,start_time,end_time
+  	from d_score_paper p 
+  	LEFT JOIN d_paper_expert_conf pp 
+  	ON p.id=pp.paper_id 
+  	<where>
+  		<if test="status!=null">
+  			pp.status =${status}
+  		</if>
+  	</where>
+  	order by id desc
+  </select>
+</mapper>

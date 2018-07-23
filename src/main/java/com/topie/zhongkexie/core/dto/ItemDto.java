@@ -21,6 +21,7 @@ public class ItemDto {
 	private String placeholder;
 	private Boolean hideBtn;
 	private String info;
+	private Boolean hideUploadFile;
 
 	private List<OptionDto> items;
 	private String customItems;
@@ -136,4 +137,13 @@ public class ItemDto {
 	public void setScore(BigDecimal score) {
 		this.score = score;
 	}
+
+	public Boolean getHideUploadFile() {
+		return hideUploadFile;
+	}
+
+	public void setHideUploadFile(Boolean hideUploadFile) {
+		this.hideUploadFile = hideUploadFile;
+	}
+	
 }

@@ -50,6 +50,13 @@ public class User extends Sortable {
     @NotEmpty
     @Size(max = 20)
     private String displayName;
+    /**
+     * linkman
+     */
+    @Column(name = "link_man")
+    @NotEmpty
+    @Size(max = 20)
+    private String linkMan;
 
     /**
      * 状态，0=冻结，1=正常
@@ -400,11 +407,20 @@ public class User extends Sortable {
     public void setRoles(List<Integer> roles) {
         this.roles = roles;
     }
+    
+
+	public String getLinkMan() {
+		return linkMan;
+	}
+
+	public void setLinkMan(String linkMan) {
+		this.linkMan = linkMan;
+	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", loginName=" + loginName + ", password="
-				+ password + ", displayName=" + displayName + ", enabled="
+		return "User [id=" + id + ", loginName=" + loginName + ", linkMan="
+				+ linkMan + ", orgName=" + displayName + ", enabled="
 				+ enabled + ", accountNonLocked=" + accountNonLocked
 				+ ", accountNonExpired=" + accountNonExpired
 				+ ", credentialsNonExpired=" + credentialsNonExpired

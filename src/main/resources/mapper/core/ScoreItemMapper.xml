@@ -20,6 +20,7 @@
         <result column="show_level" property="showLevel" jdbcType="INTEGER"/>
         <result column="row" property="row" jdbcType="INTEGER" />
         <result column="info" property="info" jdbcType="VARCHAR" />
+        <result column="hide_upload_file" property="hideUploadFile" jdbcType="BIT" />
         <result column="placeholder" property="placeholder" jdbcType="VARCHAR" />
         <result column="score_type" property="scoreType" jdbcType="VARCHAR"/>
     </resultMap>

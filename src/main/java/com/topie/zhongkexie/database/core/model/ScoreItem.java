@@ -59,6 +59,8 @@ public class ScoreItem extends Sortable {
 	private Integer showLevel;
 	@Column(name = "hide_btn")
 	private Boolean hideBtn;
+	@Column(name = "hide_upload_file")
+	private Boolean hideUploadFile;
 	private String info;
 
 	/**
@@ -279,6 +281,15 @@ public class ScoreItem extends Sortable {
 	public void setShowLevel(Integer showLevel) {
 		this.showLevel = showLevel;
 	}
+	
+
+	public Boolean getHideUploadFile() {
+		return hideUploadFile;
+	}
+
+	public void setHideUploadFile(Boolean hideUploadFile) {
+		this.hideUploadFile = hideUploadFile;
+	}
 
 	@Override
 	public String toString() {
@@ -289,9 +300,12 @@ public class ScoreItem extends Sortable {
 				+ ", relatedField=" + relatedField + ", scoreType=" + scoreType
 				+ ", row=" + row + ", placeholder=" + placeholder + ", items="
 				+ items + ", showLevel=" + showLevel + ", hideBtn=" + hideBtn
+				+ ", hideUploadFile=" + hideUploadFile + ", info=" + info
 				+ ", weight=" + weight + ", score=" + score + ", sort=" + sort
 				+ "]";
 	}
+
+	
 	
 
 }

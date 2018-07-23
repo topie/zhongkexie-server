@@ -208,6 +208,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 	private String getParentIndexString(String path, ScoreIndex childIndex,
 			List<ScoreIndex> indices) {
 		Integer parentId = childIndex.getParentId();
+		if(parentId==null)return path;
 		for (ScoreIndex index : indices) {
 			if (index.getId().intValue() == parentId) {
 				path = index.getName() + ">" + path;
@@ -236,6 +237,23 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		ScoreIndex parent = new ScoreIndex();
 		parent.setId(0);
 		childIndices = getLeafIndex(parent, indices);// 20180708更新为排序方式
+		// 修复叶子指标获取
+		if (childIndices.size()==1) {
+			childIndices = new ArrayList<ScoreIndex>();
+			for (ScoreIndex index : indices) {
+				Boolean flag = true;
+				for (ScoreIndex index1 : indices) {
+					if (index.getId().intValue() == index1.getParentId()
+							.intValue()) {
+						flag = false;
+					}
+				}
+				if (flag) {
+					childIndices.add(index);
+				}
+			}
+		}
+		//修复叶子指标获取end
 		/*
 		 * for (ScoreIndex index : indices) { Boolean flag = true; for
 		 * (ScoreIndex index1 : indices) { if (index.getId().intValue() ==
@@ -282,6 +300,7 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		itemDto.setPlaceholder(item.getPlaceholder());
 		itemDto.setRow(item.getRow());
 		itemDto.setInfo(item.getInfo());
+		itemDto.setHideUploadFile(item.getHideUploadFile());
 		List<OptionDto> itemOptions = new ArrayList<>();
 		ScoreItemOption scoreItemOption = new ScoreItemOption();
 		scoreItemOption.setSort_("option_sort_asc");
@@ -1086,13 +1105,13 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 
 	}
 
-	/*public static void main(String[] args) {
-		Attachment attachment = new Attachment();
-		attachment
-				.setAttachmentPath("D:\\app_note\\qita\\中国科协\\数据\\答案导入数据\\查询结果(汇总wd)终 - 副本.xls");
-		ScorePaperServiceImpl q = new ScorePaperServiceImpl();
-		q.importAnswer(attachment, 2);
-	}*/
+	/*
+	 * public static void main(String[] args) { Attachment attachment = new
+	 * Attachment(); attachment .setAttachmentPath(
+	 * "D:\\app_note\\qita\\中国科协\\数据\\答案导入数据\\查询结果(汇总wd)终 - 副本.xls");
+	 * ScorePaperServiceImpl q = new ScorePaperServiceImpl();
+	 * q.importAnswer(attachment, 2); }
+	 */
 
 	@Override
 	public void importAnswer(Attachment attachment, Integer paperId) {
@@ -1150,15 +1169,15 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 								if (!thiscontent.equals("")) {
 									content += "," + thiscontent;
 								}
-								//System.out.println(content);
+								// System.out.println(content);
 							} else {
 								System.out.println("k:" + (k - 1));
 								break;
 							}
 						}
 						if (!itemId.equals("itemId")) {
-							insertAnswer(perOrg,paperId, itemId, reg, content, title,
-									org_user,ling);
+							insertAnswer(perOrg, paperId, itemId, reg, content,
+									title, org_user, ling);
 							// break;
 						}
 
@@ -1174,7 +1193,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 	}
 
 	private void insertAnswer(String code, Integer paperId, String itemIdStr,
-			String reg, String content, String title, Map<String, Integer> map,BigDecimal ling) {
+			String reg, String content, String title, Map<String, Integer> map,
+			BigDecimal ling) {
 		Integer itemId;
 		System.out.println("机构编码:" + code + "，题目ID:" + itemIdStr + "，填空规则:"
 				+ reg + "，内容:" + content + "，数据标题:" + title);
@@ -1185,8 +1205,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 			if (userId == null) {
 				String userLoginName = code.trim() + "002";
 				User user = userService.findUserByLoginName(userLoginName);
-				if(user==null)
-					System.out.println("查找用户失败:"+userLoginName);
+				if (user == null)
+					System.out.println("查找用户失败:" + userLoginName);
 				userId = user.getId();
 				map.put(code, userId);
 			}
@@ -1195,75 +1215,78 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 			sa.setItemId(itemId);
 			List<ScoreAnswer> listAw = iScoreAnswerService.selectByFilter(sa);
 			if (listAw.size() > 0) {
-				/*for (ScoreAnswer scoreAnswer : listAw) {
-					iScoreAnswerService.delete(scoreAnswer.getId());
-				}*/
+				/*
+				 * for (ScoreAnswer scoreAnswer : listAw) {
+				 * iScoreAnswerService.delete(scoreAnswer.getId()); }
+				 */
 				sa = listAw.get(0);
-				
+
 			}
 			String[] regs = reg.split("_");
 			String values = sa.getAnswerValue();
-			if(Integer.valueOf(regs[1])!=0){//限制了长度
-				if(values!=null){
+			if (Integer.valueOf(regs[1]) != 0) {// 限制了长度
+				if (values != null) {
 					String[] vs = getArr(values);
-					for(int i=vs.length;i<Integer.valueOf(regs[1]);i++){
-						values+=",";
+					for (int i = vs.length; i < Integer.valueOf(regs[1]); i++) {
+						values += ",";
 					}
-				}else{
-					values="";
-					for(int i=1;i<Integer.valueOf(regs[1]);i++){
-						values+=",";
+				} else {
+					values = "";
+					for (int i = 1; i < Integer.valueOf(regs[1]); i++) {
+						values += ",";
 					}
 				}
 				String[] vs = getArr(values);
 				int step = 1;
-				if(regs.length==3){//如果是组填空
+				if (regs.length == 3) {// 如果是组填空
 					step = Integer.valueOf(regs[2]);
 					String[] contents = getArr(content);
-					int start = Integer.valueOf(regs[0])-1;
-					for(int i=start;i<vs.length&&(i-start)/step<contents.length;i+=step){
-						vs[i]=contents[(i-start)/(step)];
+					int start = Integer.valueOf(regs[0]) - 1;
+					for (int i = start; i < vs.length
+							&& (i - start) / step < contents.length; i += step) {
+						vs[i] = contents[(i - start) / (step)];
 					}
-				}else{
-					int start = Integer.valueOf(regs[0])-1;
-					if(vs.length>start){
-						vs[start]=content;
+				} else {
+					int start = Integer.valueOf(regs[0]) - 1;
+					if (vs.length > start) {
+						vs[start] = content;
 					}
 				}
 				values = getString(vs);
-			}else{//无限长度
-				if(values!=null){
-					if(regs.length==3){//如果是组填空
+			} else {// 无限长度
+				if (values != null) {
+					if (regs.length == 3) {// 如果是组填空
 						String[] vs = getArr(values);
-						int start = Integer.valueOf(regs[0])-1;
+						int start = Integer.valueOf(regs[0]) - 1;
 						int step = Integer.valueOf(regs[2]);
 						String[] contents = getArr(content);
-						for(int i=start;i<vs.length&&(i-start)/step<contents.length;i+=step){
-							vs[i]=contents[(i-start)/(step)];
+						for (int i = start; i < vs.length
+								&& (i - start) / step < contents.length; i += step) {
+							vs[i] = contents[(i - start) / (step)];
 						}
 						values = getString(vs);
-					}else{
+					} else {
 						String[] vs = getArr(values);
-						if(vs.length>Integer.valueOf(regs[0])){
-							vs[Integer.valueOf(regs[0])-1]=content;
+						if (vs.length > Integer.valueOf(regs[0])) {
+							vs[Integer.valueOf(regs[0]) - 1] = content;
 						}
 						values = getString(vs);
 					}
-				}else{
-					values="";
-					for(int i=1;i<Integer.valueOf(regs[0]);i++){
-						values+=",";
+				} else {
+					values = "";
+					for (int i = 1; i < Integer.valueOf(regs[0]); i++) {
+						values += ",";
 					}
-					if(regs.length==3){//如果是组填空
+					if (regs.length == 3) {// 如果是组填空
 						int step = Integer.valueOf(regs[2]);
 						String[] contents = getArr(content);
-						String[] vs = new String[contents.length*step];
-						for(int i=0;i<contents.length*step;i+=step){
-							vs[i]=contents[i/step];
+						String[] vs = new String[contents.length * step];
+						for (int i = 0; i < contents.length * step; i += step) {
+							vs[i] = contents[i / step];
 						}
 						content = getString(vs);
 					}
-					values = values+content;
+					values = values + content;
 				}
 			}
 			ScoreItem scoreItem = iScoreItemService.selectByKey(itemId);
@@ -1272,12 +1295,12 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 			sa.setAnswerValue(values);
 			sa.setIndexId(scoreItem.getIndexId());
 			sa.setAnswerScore(ling);
-			//iScoreAnswerService.divScore(scoreItem, sa);
-			if(sa.getId()==null){
+			// iScoreAnswerService.divScore(scoreItem, sa);
+			if (sa.getId() == null) {
 				sa.setAnswerReal(true);
 				sa.setAnswerReason("");
 				iScoreAnswerService.save(sa);
-			}else	
+			} else
 				iScoreAnswerService.updateNotNull(sa);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1287,35 +1310,36 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 
 	private String[] getArr(String values) {
 		List<String> list = new ArrayList<String>();
-		do{
+		do {
 			int index = values.indexOf(",");
-			if(index==-1){
+			if (index == -1) {
 				list.add(values);
 				break;
 			}
-			if(index==0){
+			if (index == 0) {
 				list.add("");
-				values=values.substring(1);
-			}else{
-				list.add(values.substring(0,index));
-				values=values.substring(index+1);
+				values = values.substring(1);
+			} else {
+				list.add(values.substring(0, index));
+				values = values.substring(index + 1);
 			}
-		}while(true);
+		} while (true);
 		String[] vs = new String[list.size()];
-		int i=0;
-		for(String s:list){
-			vs[i++]=s;
+		int i = 0;
+		for (String s : list) {
+			vs[i++] = s;
 		}
 		return vs;
-		
+
 	}
 
 	private String getString(String[] vs) {
 		StringBuilder s = new StringBuilder("");
-		for(String a:vs){
-			s.append(","+a);
+		for (String a : vs) {
+			s.append("," + a);
 		}
-		if(s.length()==0)return "";
+		if (s.length() == 0)
+			return "";
 		return s.toString().substring(1);
 	}
 

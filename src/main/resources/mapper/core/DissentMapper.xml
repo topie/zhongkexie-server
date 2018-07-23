@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.topie.zhongkexie.database.publicity.dao.DissentMapper" >
+  <resultMap id="BaseResultMap" type="com.topie.zhongkexie.database.publicity.model.Dissent" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="dissent_org" property="dissentOrg" jdbcType="VARCHAR" />
+    <result column="dissent_index" property="dissentIndex" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="input_org" property="inputOrg" jdbcType="VARCHAR" />
+    <result column="input_user" property="inputUser" jdbcType="VARCHAR" />
+    <result column="input_id" property="inputId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="read_status" property="readStatus" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="file_ids" property="fileIds" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>
