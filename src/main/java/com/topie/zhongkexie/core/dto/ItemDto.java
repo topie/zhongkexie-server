@@ -21,6 +21,8 @@ public class ItemDto {
 	private String placeholder;
 	private Boolean hideBtn;
 	private String info;
+	private String templateId;
+	private String templateDesc;
 	private Boolean hideUploadFile;
 
 	private List<OptionDto> items;
@@ -145,5 +147,23 @@ public class ItemDto {
 	public void setHideUploadFile(Boolean hideUploadFile) {
 		this.hideUploadFile = hideUploadFile;
 	}
+
+	public String getTemplateId() {
+		return templateId;
+	}
+
+	public void setTemplateId(String templateId) {
+		this.templateId = templateId;
+	}
+
+	public String getTemplateDesc() {
+		return templateDesc;
+	}
+
+	public void setTemplateDesc(String templateDesc) {
+		this.templateDesc = templateDesc;
+	}
+	
+	
 	
 }

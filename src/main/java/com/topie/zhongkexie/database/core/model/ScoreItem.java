@@ -62,6 +62,10 @@ public class ScoreItem extends Sortable {
 	@Column(name = "hide_upload_file")
 	private Boolean hideUploadFile;
 	private String info;
+	@Column(name = "template_file_id")
+	private String templateFileId;
+	@Column(name = "template_file_desc")
+	private String templateFileDesc;
 
 	/**
 	 * 题目权重
@@ -89,6 +93,22 @@ public class ScoreItem extends Sortable {
 
 	public void setOptionLogic(String optionLogic) {
 		this.optionLogic = optionLogic;
+	}
+
+	public String getTemplateFileId() {
+		return templateFileId;
+	}
+
+	public void setTemplateFileId(String templateFileId) {
+		this.templateFileId = templateFileId;
+	}
+
+	public String getTemplateFileDesc() {
+		return templateFileDesc;
+	}
+
+	public void setTemplateFileDesc(String templateFileDesc) {
+		this.templateFileDesc = templateFileDesc;
 	}
 
 	/**

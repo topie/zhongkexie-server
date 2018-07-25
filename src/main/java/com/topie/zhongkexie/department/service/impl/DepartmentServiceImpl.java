@@ -179,6 +179,8 @@ public class DepartmentServiceImpl extends BaseService<Department> implements
 		itemDto.setPlaceholder(item.getPlaceholder());
 		itemDto.setRow(item.getRow());
 		itemDto.setInfo(item.getInfo());
+		itemDto.setTemplateId(item.getTemplateFileId());
+		itemDto.setTemplateDesc(item.getTemplateFileDesc());
 		itemDto.setHideUploadFile(item.getHideUploadFile());
 		List<OptionDto> itemOptions = new ArrayList<>();
 		ScoreItemOption scoreItemOption = new ScoreItemOption();

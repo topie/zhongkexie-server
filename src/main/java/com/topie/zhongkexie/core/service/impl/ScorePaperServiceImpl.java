@@ -301,6 +301,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		itemDto.setRow(item.getRow());
 		itemDto.setInfo(item.getInfo());
 		itemDto.setHideUploadFile(item.getHideUploadFile());
+		itemDto.setTemplateId(item.getTemplateFileId());
+		itemDto.setTemplateDesc(item.getTemplateFileDesc());
 		List<OptionDto> itemOptions = new ArrayList<>();
 		ScoreItemOption scoreItemOption = new ScoreItemOption();
 		scoreItemOption.setSort_("option_sort_asc");

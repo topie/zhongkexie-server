@@ -23,6 +23,8 @@
         <result column="hide_upload_file" property="hideUploadFile" jdbcType="BIT" />
         <result column="placeholder" property="placeholder" jdbcType="VARCHAR" />
         <result column="score_type" property="scoreType" jdbcType="VARCHAR"/>
+        <result column="template_file_desc" property="templateFileDesc" jdbcType="VARCHAR"/>
+        <result column="template_file_id" property="templateFileId" jdbcType="VARCHAR"/>
     </resultMap>
     
     	<select id="selectByExampleEx" resultMap="BaseResultMap">
