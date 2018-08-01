@@ -54,7 +54,6 @@ public class User extends Sortable {
      * linkman
      */
     @Column(name = "link_man")
-    @NotEmpty
     @Size(max = 20)
     private String linkMan;
 

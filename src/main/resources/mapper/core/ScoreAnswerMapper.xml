@@ -25,4 +25,26 @@
  	item_id=#{itemId} and answer_value &lt; ${answer} 
  	ORDER BY answer_value+0 ASC
   </select>
+  
+  <select id="selectPartIndexScore" resultType="java.util.Map">
+  	SELECT user_id ,SUM(answer_score) score ,u.display_name,u.login_name
+	from d_score_answer an 
+	LEFT JOIN d_user u ON an.user_id = u.id
+	LEFT JOIN d_score_index ind ON ind.id=an.index_id
+	where ind.paper_id=#{paperId}
+	<if test="itemIds!=null">
+		and item_id  in
+		<foreach collection="itemIds" open="(" close=")" item="itemId" separator=",">
+			#{itemId}
+		</foreach>
+	</if>
+	<if test="indexIds!=null">
+		and index_id  in
+		<foreach collection="indexIds" open="(" close=")" item="indexId" separator=",">
+			#{indexId}
+		</foreach>
+	</if>
+	GROUP BY user_id
+	ORDER BY login_name asc
+  </select>
 </mapper>

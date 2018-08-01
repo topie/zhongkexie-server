@@ -35,11 +35,13 @@ import com.topie.zhongkexie.common.utils.Result;
 import com.topie.zhongkexie.core.dto.AnswerDto;
 import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperAnswerDto;
+import com.topie.zhongkexie.core.service.IDeptService;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePagerUserService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
+import com.topie.zhongkexie.database.core.model.Dept;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
@@ -71,6 +73,8 @@ public class ScorePaperController {
 
 	@Autowired
 	private IScorePagerUserService iScorePagerUserService;
+	@Autowired
+	private IDeptService iDeptService;
 	@Autowired
 	private IExpertItemScoreService iExpertItemScoreService;
 	@Autowired
@@ -131,6 +135,27 @@ public class ScorePaperController {
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
 		if(pagerUserDto.getPaperId()==null)return ResponseUtil.success(PageConvertUtil.emptyPage());
+		PageInfo<PagerUserDto> pageInfo = iScorePagerUserService
+				.selectAllUserCommit(pagerUserDto, pageNum, pageSize);
+		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+	}
+	
+	/**
+	 * 公示 查看各个学会提交信息
+	 * 
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping(value = "/publicityList", method = RequestMethod.GET)
+	@ResponseBody
+	public Result publicityList(
+			PagerUserDto pagerUserDto,
+			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+		if(pagerUserDto.getPaperId()==null)return ResponseUtil.success(PageConvertUtil.emptyPage());
+		pagerUserDto.setSort_("code");
 		PageInfo<PagerUserDto> pageInfo = iScorePagerUserService
 				.selectAllUserCommit(pagerUserDto, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -474,6 +499,7 @@ public class ScorePaperController {
 	@RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
 	@ResponseBody
 	public Result getAnswer(@RequestParam(value = "paperId") Integer paperId,
+			@RequestParam(value = "deptId", required = false) Integer deptId,
 			@RequestParam(value = "userId", required = false) Integer userId) {
 		if (userId == null) {
 			SecurityUser user = SecurityUtil.getCurrentSecurityUser();
@@ -489,6 +515,13 @@ public class ScorePaperController {
 				// Mname = CUname ;
 			} else {// 如果不是学会审核员 返回空
 
+			}
+			if(deptId!=null){
+				Dept dept = iDeptService.selectByKey(deptId);
+				if(dept!=null){
+					Mname = dept.getCode() + "002";
+					userId = userService.findUserByLoginName(Mname).getId();
+				}
 			}
 
 		}

@@ -163,6 +163,10 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 	}
 	@Override
 	public List<PagerUserDto> selectAllUserCommit(PagerUserDto pagerUserDto) {
+		if(pagerUserDto.getSort_()!=null && !pagerUserDto.getSort_().equals("")){
+			List<PagerUserDto> list = this.scorePagerUserMapper.selectUserPubulicityPaper(pagerUserDto);
+			return list;
+		}
 		List<PagerUserDto> list = this.scorePagerUserMapper.selectUserCommitPaper(pagerUserDto);
 		return list;
 	}

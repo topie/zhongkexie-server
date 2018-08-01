@@ -3,7 +3,9 @@ package com.topie.zhongkexie.core.dto;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class PagerUserDto {
+import com.topie.zhongkexie.common.handler.Sortable;
+
+public class PagerUserDto extends Sortable {
 	/**
 	 * 未提交审核
 	 */

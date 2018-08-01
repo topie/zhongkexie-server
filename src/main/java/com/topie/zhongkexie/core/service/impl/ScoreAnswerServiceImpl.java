@@ -114,6 +114,9 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	public String getAnswerOfRanking(Integer itemId, String answer) {
 		ScoreItem item = this.iScoreItemService.selectByKey(itemId);
 		String scoreType = item.getScoreType();
+		if(answer==null||answer.trim().equals("")){
+			return "";
+		}
 		switch(scoreType){
 			case "1"://统计项
 				break;
