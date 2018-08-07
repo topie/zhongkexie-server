@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,10 @@ public class IndexController {
             throw new AuthBusinessException(AuBzConstant.IS_NOT_LOGIN);
         }
         User user = userService.findUserById(securityUser.getId());
+        if(StringUtils.isEmpty(user.getUserCode())){
+        	user.setUserCode(UUID.randomUUID().toString().replace("-",""));
+        	userService.updateNotNull(user);
+        }
         return ResponseUtil.success(user);
     }
 

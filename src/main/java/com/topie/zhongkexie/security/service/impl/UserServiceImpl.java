@@ -2,11 +2,15 @@ package com.topie.zhongkexie.security.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -33,6 +37,7 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
     @Override
     public int insertUser(User user) {
         user.setPassword(SecurityUtil.encodeString(user.getPassword()));
+        user.setUserCode(UUID.randomUUID().toString().replace("-", ""));
         int result = getMapper().insertSelective(user);
         if (CollectionUtils.isNotEmpty(user.getRoles())) {
             deleteUserAllRoles(user.getId());
@@ -168,4 +173,15 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
         user.setPassword(password);
         return updateUser(user);
     }
+
+	@Override
+	public User selectByUserCode(String userCode) {
+		Example ex = new Example(User.class);
+		Criteria c = ex.createCriteria();
+		c.andEqualTo("userCode", userCode);
+		List<User> list = selectByExample(ex);
+		if(list.size()>0)
+			return list.get(0);
+		return null;
+	}
 }

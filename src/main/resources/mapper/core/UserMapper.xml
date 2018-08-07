@@ -18,6 +18,7 @@
         <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR"/>
+        <result column="user_code" property="userCode" jdbcType="VARCHAR"/>
         <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="user_type" property="userType" jdbcType="INTEGER"/>
@@ -64,7 +65,7 @@
         -->
         id, login_name, password, display_name, enabled, account_non_locked, account_non_expired,
         credentials_non_expired, last_login_ip, last_login_time, email, contact_phone, insert_time,
-        update_time,last_password_reset,user_type
+        update_time,last_password_reset,user_type,user_code
     </sql>
     <update id="updateAccountNonLocked">
         update d_user set account_non_locked = #{accountNonLocked} where id=#{userId}

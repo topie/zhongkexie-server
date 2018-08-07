@@ -27,6 +27,7 @@ import com.topie.zhongkexie.common.utils.HttpResponseUtil;
 import com.topie.zhongkexie.common.utils.RequestUtil;
 import com.topie.zhongkexie.common.utils.date.DateUtil;
 import com.topie.zhongkexie.database.core.model.SysLog;
+import com.topie.zhongkexie.database.core.model.User;
 import com.topie.zhongkexie.security.constants.SecurityConstant;
 import com.topie.zhongkexie.security.security.AuthenticationRequest;
 import com.topie.zhongkexie.security.security.HttpAuthenticationDetails;
@@ -91,7 +92,7 @@ public class TokenController {
             authentication = this.authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             if (authentication == null) {
             	insertSysLog("登录失败","["+authenticationRequest.getUsername()+"]:未检测到验证信息！",authenticationRequest.getUsername(),RequestUtil.getIpAddress(request));
-                return ResponseEntity.ok(HttpResponseUtil.error("未检测到验证信息"));
+               return ResponseEntity.ok(HttpResponseUtil.error("未检测到验证信息"));
             }
         } catch (InternalAuthenticationServiceException failed) {
             logger.error("An internal error occurred while trying to authenticate the user.", failed);
@@ -99,7 +100,7 @@ public class TokenController {
             return ResponseEntity.ok(HttpResponseUtil.error(failed.getMessage()));
         } catch (AuthenticationException failed) {
         	insertSysLog("登录失败","["+authenticationRequest.getUsername()+"]:"+failed.getMessage()+"！",authenticationRequest.getUsername(),RequestUtil.getIpAddress(request));
-            return ResponseEntity.ok(HttpResponseUtil.error(failed.getMessage()));
+           return ResponseEntity.ok(HttpResponseUtil.error(failed.getMessage()));
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -150,6 +151,52 @@ public class TokenController {
         insertSysLog("登录成功","["+authenticationRequest.getUsername()+"]:登录成功！",authenticationRequest.getUsername(),RequestUtil.getIpAddress(request));
         return ResponseEntity.ok(HttpResponseUtil.success(token));
     }
+    
+    @RequestMapping(value = "/ssogenerate", method = RequestMethod.POST)
+    public ResponseEntity<?> ssogenerate(HttpServletRequest request,
+            @RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException {
+    	redisCache.del(authenticationRequest.getVkey());
+    	String userCode = authenticationRequest.getVcode();
+    	if(StringUtils.isEmpty(userCode)){
+    		 return ResponseEntity.ok(HttpResponseUtil.error("未检测到验证信息"));
+    	}
+    	User user = userService.selectByUserCode(userCode);
+    	if(user==null){
+   		 return ResponseEntity.ok(HttpResponseUtil.error("未找到用户"));
+    	}
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+        		user.getLoginName(), user.getPassword());
+        authenticationRequest.setUsername(user.getLoginName());
+        authenticationRequest.setPassword(user.getPassword());
+        usernamePasswordAuthenticationToken.setDetails(new HttpAuthenticationDetails(request));
+
+        Authentication authentication = null;
+        try {
+            authentication = this.authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            if (authentication == null) {
+            	insertSysLog("单点登录失败","["+authenticationRequest.getUsername()+"]:未检测到验证信息！",authenticationRequest.getUsername(),RequestUtil.getIpAddress(request));
+               return ResponseEntity.ok(HttpResponseUtil.error("未检测到验证信息"));
+            }
+        } catch (InternalAuthenticationServiceException failed) {
+            logger.error("An internal error occurred while trying to authenticate the user.", failed);
+        } catch (AuthenticationException failed) {
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetails userDetails = (UserDetails) redisCache
+                .get(SecurityConstant.USER_CACHE_PREFIX + authenticationRequest.getUsername());
+        if (userDetails == null) {
+            userDetails = this.userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+            redisCache.set(SecurityConstant.USER_CACHE_PREFIX + authenticationRequest.getUsername(), userDetails);
+        }
+        String token = this.tokenUtils.generateToken(userDetails);
+        userService.updateLastLoginInfoByUserName(authenticationRequest.getUsername(), new Date(),
+                request.getRemoteAddr());
+        insertSysLog("登录成功","["+authenticationRequest.getUsername()+"]:登录成功！",authenticationRequest.getUsername(),RequestUtil.getIpAddress(request));
+        return ResponseEntity.ok(HttpResponseUtil.success(token));
+    }
+    
+    
     
     private void insertSysLog(String title,String content,String user,String ip) {
    	 SysLog log = new SysLog();  

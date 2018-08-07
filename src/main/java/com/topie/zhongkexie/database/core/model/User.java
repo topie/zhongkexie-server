@@ -125,6 +125,9 @@ public class User extends Sortable {
     @Column(name = "user_type")
     private Integer userType;
     
+    @Column(name = "user_code")
+    private String userCode;
+    
     /**
      *  7学会 4专家 1协会
      * @return
@@ -414,6 +417,15 @@ public class User extends Sortable {
 
 	public void setLinkMan(String linkMan) {
 		this.linkMan = linkMan;
+	}
+	
+
+	public String getUserCode() {
+		return userCode;
+	}
+
+	public void setUserCode(String userCode) {
+		this.userCode = userCode;
 	}
 
 	@Override

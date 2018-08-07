@@ -112,7 +112,7 @@ public class CommonController {
                 // 定义允许上传的文件扩展名
                 HashMap<String, String> extMap = new HashMap<String, String>();
                 extMap.put(dirName,
-                        "doc,docx,xls,xlsx,ppt,pptx,pdf,txt,gif,tif,jpg,jpeg,png,bmp,swf,flv,mp3,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb");
+                        "doc,docx,xls,xlsx,ppt,pptx,pdf,txt,gif,tif,jpg,jpeg,png,bmp,swf,flv,mp3,mp4,wav,wma,wmv,mid,avi,mpg,asf,rm,rmvb");
 
                 Attachment attachment = iAttachmentService
                         .uploadFileAttachement(request, multipartFile, dirName, maxSize, extMap, FILE);
@@ -128,6 +128,8 @@ public class CommonController {
         if (attachmentId != null) {
             Attachment attachment = iAttachmentService.selectByKey(attachmentId);
             if (attachment != null) {
+            	attachment.setAttachmentPath(null);
+            	attachment.setUploadLoginName(null);
                 return ResponseUtil.success(attachment);
             }
         }

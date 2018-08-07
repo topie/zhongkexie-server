@@ -3,6 +3,7 @@ package com.topie.zhongkexie.core.service.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,6 +225,13 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 				functionBody);
 		return score;
 
+	}
+
+	@Override
+	public PageInfo<Map> selectResultTime(Map map,int pageNum,int pageSize) {
+		PageHelper.startPage(pageNum,pageSize);
+		List<Map> list = scoreAnswerMapper.selectResultTime(map);
+		return new PageInfo<Map>(list);
 	}
 
 }

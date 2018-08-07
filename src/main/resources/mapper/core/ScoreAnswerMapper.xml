@@ -26,6 +26,20 @@
  	ORDER BY answer_value+0 ASC
   </select>
   
+  <select id="selectResultTime" resultType="java.util.Map">
+  	SELECT u.login_name loginName,u.display_name displayName,an.user_id userId,
+	concat((COUNT(an.id)/(
+	SELECT count(1) 
+	from d_score_item item1 
+	LEFT JOIN d_score_index ind1 ON item1.index_id=ind1.id 
+	where ind1.paper_id=#{paperId} and item1.score_type!=4)*100),"%") count
+	from d_score_item item 
+	LEFT JOIN d_score_index ind ON item.index_id = ind.id 
+	LEFT JOIN d_score_answer an ON item.id=an.item_id LEFT JOIN d_user u ON an.user_id=u.id 
+	WHERE ind.paper_id=#{paperId} GROUP BY an.user_id
+	ORDER BY count desc,u.login_name
+  </select>
+  
   <select id="selectPartIndexScore" resultType="java.util.Map">
   	SELECT user_id ,SUM(answer_score) score ,u.display_name,u.login_name
 	from d_score_answer an 

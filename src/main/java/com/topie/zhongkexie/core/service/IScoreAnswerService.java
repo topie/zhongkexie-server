@@ -2,6 +2,7 @@ package com.topie.zhongkexie.core.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
@@ -31,5 +32,12 @@ public interface IScoreAnswerService extends IService<ScoreAnswer> {
 	 * @param sa
 	 */
 	void divScore(ScoreItem scoreItem, ScoreAnswer sa);
+	/**
+	 * loginName,
+	 * displayName,
+	 * userId,
+	 * count  完成百分比
+	 */
+	PageInfo<Map> selectResultTime(Map map, int pageNum, int pageSize);
 
 }
