@@ -33,11 +33,22 @@ public interface IScoreAnswerService extends IService<ScoreAnswer> {
 	 */
 	void divScore(ScoreItem scoreItem, ScoreAnswer sa);
 	/**
+	 * code
 	 * loginName,
 	 * displayName,
 	 * userId,
 	 * count  完成百分比
 	 */
 	PageInfo<Map> selectResultTime(Map map, int pageNum, int pageSize);
+	/**
+	 * code
+	 * loginName,
+	 * displayName,
+	 * userId,
+	 * score 分数
+	 */
+	PageInfo<Map> selectPartIndexScore(Map map, int pageNum, int pageSize);
+
+	List<Map> selectPartIndexScore(Map map);
 
 }

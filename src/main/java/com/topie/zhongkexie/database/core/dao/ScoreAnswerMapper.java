@@ -19,4 +19,11 @@ public interface ScoreAnswerMapper extends Mapper<ScoreAnswer> {
 	 * count
 	 */
 	List<Map> selectResultTime(Map map);
+	/*
+	 * loginName,
+	 * displayName,
+	 * userId,
+	 * score
+	 */
+	List<Map> selectPartIndexScore(Map map);
 }

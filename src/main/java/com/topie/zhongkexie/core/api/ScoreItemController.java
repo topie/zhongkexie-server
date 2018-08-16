@@ -1,5 +1,8 @@
 package com.topie.zhongkexie.core.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +15,7 @@ import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
+import com.topie.zhongkexie.common.utils.TreeNode;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 
@@ -60,6 +64,22 @@ public class ScoreItemController {
     public Result delete(@RequestParam(value = "id") Integer id) {
         iScoreItemService.delete(id);
         return ResponseUtil.success();
+    }
+    
+    @RequestMapping(value = "/getTreeNode")
+    @ResponseBody
+    public Object list(ScoreItem scoreItem) {
+    	List<TreeNode> nodes = new ArrayList<>();
+        List<ScoreItem> list = iScoreItemService.selectByFilter(scoreItem);
+        for (ScoreItem nodeInfo : list) {
+            TreeNode treeNode = new TreeNode();
+            treeNode.setId(-nodeInfo.getId());
+            treeNode.setpId(nodeInfo.getIndexId());
+            treeNode.setName(nodeInfo.getTitle());
+            treeNode.setS(nodeInfo.getScore().toString());
+            nodes.add(treeNode);
+        }
+        return nodes;
     }
 
 }

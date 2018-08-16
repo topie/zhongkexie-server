@@ -41,24 +41,28 @@
   </select>
   
   <select id="selectPartIndexScore" resultType="java.util.Map">
-  	SELECT user_id ,SUM(answer_score) score ,u.display_name,u.login_name
+  	SELECT user_id userId,SUM(answer_score) score ,u.display_name displayName,u.login_name loginName,dd.code
 	from d_score_answer an 
 	LEFT JOIN d_user u ON an.user_id = u.id
 	LEFT JOIN d_score_index ind ON ind.id=an.index_id
+	LEFT JOIN d_dept dd ON dd.`code`=SUBSTR(u.login_name FROM 1 FOR LENGTH(u.login_name)-3)
 	where ind.paper_id=#{paperId}
-	<if test="itemIds!=null">
+	<if test="itemIds!=null and itemIds.size>0">
 		and item_id  in
 		<foreach collection="itemIds" open="(" close=")" item="itemId" separator=",">
 			#{itemId}
 		</foreach>
 	</if>
-	<if test="indexIds!=null">
+	<if test="indexIds!=null and indexIds.size>0">
 		and index_id  in
 		<foreach collection="indexIds" open="(" close=")" item="indexId" separator=",">
 			#{indexId}
 		</foreach>
 	</if>
+	<if test="deptType!=null and deptType!=''">
+		and dd.type =#{deptType}
+	</if>
 	GROUP BY user_id
-	ORDER BY login_name asc
+	ORDER BY score desc,login_name asc
   </select>
 </mapper>

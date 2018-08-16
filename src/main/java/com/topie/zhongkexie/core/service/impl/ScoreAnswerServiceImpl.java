@@ -234,4 +234,17 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		return new PageInfo<Map>(list);
 	}
 
+	@Override
+	public PageInfo<Map> selectPartIndexScore(Map map, int pageNum, int pageSize) {
+		PageHelper.startPage(pageNum,pageSize);
+		List<Map> list = scoreAnswerMapper.selectPartIndexScore(map);
+		return new PageInfo<Map>(list);
+	}
+
+	@Override
+	public List<Map> selectPartIndexScore(Map map) {
+		List<Map> list = scoreAnswerMapper.selectPartIndexScore(map);
+		return list;
+	}
+
 }
