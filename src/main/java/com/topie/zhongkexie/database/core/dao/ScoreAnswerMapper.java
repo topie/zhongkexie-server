@@ -26,4 +26,13 @@ public interface ScoreAnswerMapper extends Mapper<ScoreAnswer> {
 	 * score
 	 */
 	List<Map> selectPartIndexScore(Map map);
+	/*
+	 * loginName,
+	 * displayName,
+	 * userId,
+	 * answerFile
+	 * itemId
+	 */
+	List<Map> selectUserUploadFileCounts(Map map);
+	
 }

@@ -679,9 +679,20 @@ public class ScorePaperController {
 			entity.setItemScore(answerScore);
 			iExpertItemScoreService.save(entity);
 		}else{
-			entity = ls.get(0);
 			entity.setItemScore(answerScore);
-			iExpertItemScoreService.updateAll(entity);
+			Example ex = new Example(ExpertItemScore.class);
+			Criteria c1 = ex.createCriteria();
+			if(entity.getPaperId()!=null)
+			c1.andEqualTo("paperId", entity.getPaperId());
+			if(entity.getOrgUserId()!=null)
+			c1.andEqualTo("orgUserId", entity.getOrgUserId());
+			if(entity.getItemId()!=null)
+			c1.andEqualTo("itemId", entity.getItemId());
+			if(entity.getExpertUserId()!=null)
+			c1.andEqualTo("expertUserId", entity.getExpertUserId());
+			if(entity.getExpertId()!=null)
+			c1.andEqualTo("expertId", entity.getExpertId());
+			iExpertItemScoreService.updateByExample(entity,ex);
 		}
 		BigDecimal score = iExpertItemScoreService.divScore(one);
 		one.setAnswerScore(score);

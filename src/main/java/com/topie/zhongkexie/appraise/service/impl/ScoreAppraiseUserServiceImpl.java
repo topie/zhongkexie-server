@@ -61,6 +61,8 @@ public class ScoreAppraiseUserServiceImpl extends BaseService<ScoreAppraiseUser>
 			c.andEqualTo("paperId", scoreAppraiseUser.getPaperId());
 		}if (null!= scoreAppraiseUser.getUserId()) {
 			c.andEqualTo("userId", scoreAppraiseUser.getUserId());
+		}if (null!= scoreAppraiseUser.getItemId()) {
+			c.andEqualTo("itemId", scoreAppraiseUser.getItemId());
 		}
 		return getMapper().selectByExample(ex);
 	}
@@ -178,6 +180,7 @@ public class ScoreAppraiseUserServiceImpl extends BaseService<ScoreAppraiseUser>
 				iScoreAnswerService.updateNotNull(scoreAnswer);
 			}else{//新增
 				scoreAnswer.setItemScore(itemScore);
+				scoreAnswer.setIndexId(scoreItem.getIndexId());
 				scoreAnswer.setAnswerReal(true);
 				String answerValue ="";
 				answerValue = title==0?"":itemtitle+",";

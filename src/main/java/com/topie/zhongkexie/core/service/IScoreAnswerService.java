@@ -51,4 +51,6 @@ public interface IScoreAnswerService extends IService<ScoreAnswer> {
 
 	List<Map> selectPartIndexScore(Map map);
 
+	List<Map> selectUserUploadFileCounts(Map map);
+
 }

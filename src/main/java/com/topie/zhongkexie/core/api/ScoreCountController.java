@@ -95,6 +95,7 @@ public class ScoreCountController {
         PageInfo<Map> pageInfo = iScoreAnswerService.selectPartIndexScore(map, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
+	
 	@RequestMapping(value = "/partIndexScoreExport", method = RequestMethod.GET)
     public void partIndexScoreExport(String itemIds,String indexIds,Integer paperId,String deptType,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -131,7 +132,14 @@ public class ScoreCountController {
 				e.printStackTrace();
 			}
 	}
-
+	@RequestMapping(value = "/userUploadFileCounts", method = RequestMethod.GET)
+    @ResponseBody
+    public Result userUploadFileCounts(Integer paperId) {
+		Map map = new HashMap();
+		map.put("paperId", paperId);
+        List<Map> pageInfo = iScoreAnswerService.selectUserUploadFileCounts(map);
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
 	private static void outWrite(HttpServletRequest request,
 			HttpServletResponse response, HSSFWorkbook wb, String fileName)
 			throws IOException {

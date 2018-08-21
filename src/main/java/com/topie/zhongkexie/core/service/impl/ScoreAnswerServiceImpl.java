@@ -2,6 +2,7 @@ package com.topie.zhongkexie.core.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -244,6 +245,35 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	@Override
 	public List<Map> selectPartIndexScore(Map map) {
 		List<Map> list = scoreAnswerMapper.selectPartIndexScore(map);
+		return list;
+	}
+
+	@Override
+	public List<Map> selectUserUploadFileCounts(Map map) {
+		List<Map> list = new ArrayList<Map>();
+		List<Map> result = scoreAnswerMapper.selectUserUploadFileCounts(map);
+		String name="";
+		for(int i=0;i<result.size();){
+			Map xh = new HashMap<String,Object>();
+			while(true){
+				if(i>=result.size())break;
+				Map m = result.get(i);
+				if(i==0){
+					name = m.get("userId").toString();
+				}
+				if(!name.equals(m.get("userId").toString())){
+					name = m.get("userId").toString();
+					break;
+				}
+				xh.put(m.get("itemId").toString(), m.get("answerFile").toString());
+				i++;
+			}
+			Map m = result.get(i-1);
+			xh.put("displayName", m.get("displayName").toString());
+			xh.put("userId", m.get("userId").toString());
+			xh.put("loginName", m.get("loginName").toString());
+			list.add(xh);
+		}
 		return list;
 	}
 
