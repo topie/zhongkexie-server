@@ -24,6 +24,7 @@ public class ItemDto {
 	private String templateId;
 	private String templateDesc;
 	private Boolean hideUploadFile;
+	private String optionLogicDesc;
 
 	private List<OptionDto> items;
 	private String customItems;
@@ -162,6 +163,14 @@ public class ItemDto {
 
 	public void setTemplateDesc(String templateDesc) {
 		this.templateDesc = templateDesc;
+	}
+
+	public String getOptionLogicDesc() {
+		return optionLogicDesc;
+	}
+
+	public void setOptionLogicDesc(String optionLogicDesc) {
+		this.optionLogicDesc = optionLogicDesc;
 	}
 	
 	

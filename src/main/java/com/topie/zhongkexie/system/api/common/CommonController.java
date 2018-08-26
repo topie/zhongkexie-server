@@ -21,8 +21,12 @@ import com.topie.zhongkexie.common.tools.filemanager.DefaultFileManagerTool;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
 import com.topie.zhongkexie.common.utils.ZipUtil;
+import com.topie.zhongkexie.core.service.IDeptService;
 import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.database.core.model.Attachment;
+import com.topie.zhongkexie.database.core.model.Dept;
+import com.topie.zhongkexie.database.core.model.User;
+import com.topie.zhongkexie.security.service.UserService;
 import com.topie.zhongkexie.security.utils.SecurityUtil;
 import com.topie.zhongkexie.system.service.IAttachmentService;
 
@@ -44,6 +48,10 @@ public class CommonController {
     private DefaultFileManagerTool defaultFileManagerTool;
     @Autowired
     private IScoreItemService scoreItemService;
+    @Autowired
+    private IDeptService deptService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/uploadFile", method = { RequestMethod.POST })
     @ResponseBody
@@ -139,7 +147,10 @@ public class CommonController {
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     @ResponseBody
     public void download(HttpServletResponse response, HttpServletRequest httpServletRequest,
-    		@RequestParam("id") Integer attachmentId,@RequestParam(value="itemId",required=false) Integer itemId) throws Exception {
+    		@RequestParam("id") Integer attachmentId,
+    		@RequestParam(value="itemId",required=false) Integer itemId,
+    		@RequestParam(value="deptId",required=false) Integer deptId,
+    		@RequestParam(value="userId",required=false) Integer userId) throws Exception {
     	
     	if (attachmentId != null) {
             Attachment attachment = iAttachmentService.selectByKey(attachmentId);
@@ -149,16 +160,34 @@ public class CommonController {
                 if(itemId!=null){
                 	path = scoreItemService.selectPath(itemId)+"_";
                 }
+                path = addDeptName(path,deptId,userId);
                 defaultFileManagerTool.download(response, filePath, path+attachment.getAttachmentName());
             }
         }
     	
     }
     
-    @RequestMapping(value = "/downloadzip", method = RequestMethod.GET)
+    private String addDeptName(String path, Integer deptId, Integer userId) {
+    	if(deptId!=null){
+			Dept d = deptService.selectByKey(deptId);
+			if(d!=null)
+				return d.getName()+"_"+path;
+		}
+    	if(userId!=null){
+			User d = userService.selectByKey(userId);
+			if(d!=null)
+				return d.getDisplayName()+"_"+path;
+		}
+		return path;
+	}
+
+	@RequestMapping(value = "/downloadzip", method = RequestMethod.GET)
     @ResponseBody
     public void download(HttpServletResponse response, HttpServletRequest httpServletRequest,
-    		@RequestParam("id") String attachmentId,@RequestParam(value="itemId",required=false) Integer itemId) throws Exception {
+    		@RequestParam("id") String attachmentId,
+    		@RequestParam(value="itemId",required=false) Integer itemId,
+    		@RequestParam(value="deptId",required=false) Integer deptId,
+    		@RequestParam(value="userId",required=false) Integer userId) throws Exception {
     	
     	if (attachmentId != null) {
     		String[] atts = attachmentId.split("_");
@@ -181,6 +210,7 @@ public class CommonController {
                 if(itemId!=null){
                 	itemPath = scoreItemService.selectPath(itemId)+"_";
                 }
+                itemPath = addDeptName(itemPath,deptId,userId);
     			defaultFileManagerTool.download(response, zipfile, itemPath+"上传资料.zip");
     		}
         }

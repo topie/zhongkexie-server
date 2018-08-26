@@ -18,9 +18,22 @@ public class JavaExecScript {
 	    //System.out.println(Arrays.toString(getArray()));
 	    //System.out.println(jsCalculate("a=1+2+3+(2*2)"));
 	    //jsFunction();
-	   // jsVariables();
-	    String fn = "var s = that;s = s.split(',')[0]; return 'hello,'+s; ";
-	    jsFunction("我,ni =",fn);
+//	   // jsVariables();
+//	    String fn = "var s = that;s = s.split(',')[0]; return 'hello,'+s; ";
+//	    jsFunction("我,ni =",fn);
+	    String functionBody="var v = value.split(\",\")[0];var sc1 = 0;if(v!=0){ if(v>=50000){  sc1 = score*0.5; }else{ sc1 = score*v/100000; }}var v1 = value.split(\",\")[1];var sc2 = 0;var s = 80;if(v>=10000 && v<30000)s=70;if(v>=30000 && v<50000)s=60;if(v>=50000)s=50;var bai = (parseFloat(v1)/parseFloat(v)*100);if(bai>=s) sc2 = score*0.5;else sc2=(score*0.5)*(bai/parseFloat(s));return sc1+sc2;";
+	    ScriptEngineManager sem = new ScriptEngineManager();
+	    ScriptEngine se = sem.getEngineByName("javascript");
+	    try {
+	      String script = "function getSocre(that,options,refer,value,score){ "+functionBody+" }";
+	      se.eval(script);
+	      Invocable inv2 = (Invocable) se;
+	      BigDecimal res = new BigDecimal((Double)inv2.invokeFunction("getSocre", null,null,null,"29404,1483",9.875));
+	      System.out.print(res.toString());
+	    } catch (Exception e) {
+	    	System.err.println(functionBody);
+	    	e.printStackTrace();
+	    }
 	  }
 	  
 	  /**
