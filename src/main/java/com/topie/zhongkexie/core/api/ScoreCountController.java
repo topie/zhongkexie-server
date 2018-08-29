@@ -76,7 +76,7 @@ public class ScoreCountController {
 	
 	@RequestMapping(value = "/partIndexScore", method = RequestMethod.GET)
     @ResponseBody
-    public Result selectPartIndexScore(String itemIds,String indexIds,Integer paperId,String deptType,
+    public Result selectPartIndexScore(String itemIds,String indexIds,Integer paperId,String deptType,//String scoreType,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
 		Map map = new HashMap();
@@ -92,6 +92,7 @@ public class ScoreCountController {
 		map.put("itemIds", itemIdList);
 		map.put("indexIds", indexIdList);
 		map.put("deptType", deptType);
+		//map.put("scoreType", scoreType);
         PageInfo<Map> pageInfo = iScoreAnswerService.selectPartIndexScore(map, pageNum, pageSize);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }

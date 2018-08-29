@@ -154,7 +154,7 @@ public class ScoreAppraiseUserServiceImpl extends BaseService<ScoreAppraiseUser>
 			Dept d = dList.get(0);
 			String loginName = d.getCode()+"002";
 			User user = userService.findUserByLoginName(loginName);
-			if(user==null)throw new RuntimeBusinessException("学会对应的机构未找到："+orgName+"-登录名："+loginName);
+			if(user==null)throw new RuntimeBusinessException("学会用户未找到："+orgName+"-登录名："+loginName);
 			ScoreAnswer scoreAnswer = new ScoreAnswer();
 			scoreAnswer.setUserId(user.getId());
 			scoreAnswer.setItemId(itemId);

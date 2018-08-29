@@ -25,8 +25,9 @@ public class DeptServiceImpl extends BaseService<Dept> implements IDeptService {
 		if(StringUtils.isNotEmpty(dept.getField()))c.andEqualTo("field", dept.getField());
 		if(StringUtils.isNotEmpty(dept.getDuty()))c.andEqualTo("duty", dept.getDuty());
 		if(StringUtils.isNotEmpty(dept.getType()))c.andEqualTo("type", dept.getType());
+		if(StringUtils.isNotEmpty(dept.getType()))c.andEqualTo("code", dept.getCode());
 		if(dept.getPid()!=null && dept.getPid()!=-1) c.andEqualTo("pid",dept.getPid());
-		ex.setOrderByClause("seq asc");
+		ex.setOrderByClause("code asc");
 		return getMapper().selectByExample(ex);
 	}
 

@@ -51,11 +51,22 @@ public class ExpertItemScoreServiceImpl extends BaseService<ExpertItemScore> imp
 		entity.setOrgUserId(one.getUserId());
 		List<ExpertItemScore> lis = selectByFilter(entity );
 		BigDecimal score = new BigDecimal(0);
+		BigDecimal max = null;
+		BigDecimal min = null;
 		for(ExpertItemScore is:lis){
+			if(max==null || max.compareTo(is.getItemScore())<0)
+				max = is.getItemScore();
+			if(min==null || min.compareTo(is.getItemScore())>0)
+				min = is.getItemScore();
 			score  = score.add(is.getItemScore());
 		}
+		int count = lis.size();
+		if(lis.size()>2){
+			score = score.subtract(max).subtract(min);
+			count = count-2;
+		}
 		if(lis.size()!=0){
-			score = score.divide( new BigDecimal(lis.size()),4);
+			score = score.divide( new BigDecimal(count),4);
 		}
 		return score;
 	}

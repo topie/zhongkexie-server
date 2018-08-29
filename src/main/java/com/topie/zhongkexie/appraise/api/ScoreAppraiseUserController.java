@@ -48,8 +48,10 @@ public class ScoreAppraiseUserController {
     @RequestMapping(value = "/userItems", method = RequestMethod.GET)
     @ResponseBody
     public Result userItems(ScoreAppraiseUser scoreAppraiseUser){
-    	int userId = SecurityUtil.getCurrentUserId();
-    	scoreAppraiseUser.setUserId(userId);
+    	if(scoreAppraiseUser.getUserId()==null){
+	    	int userId = SecurityUtil.getCurrentUserId();
+	    	scoreAppraiseUser.setUserId(userId);
+    	}
         List<ScoreAppraiseUser> list = iScoreAppraiseUserService.selectByFilter(scoreAppraiseUser);
         List<ScoreItem> result = new ArrayList<ScoreItem>();
         for(ScoreAppraiseUser au:list){

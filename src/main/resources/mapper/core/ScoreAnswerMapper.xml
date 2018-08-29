@@ -47,6 +47,9 @@
 	LEFT JOIN d_score_index ind ON ind.id=an.index_id
 	LEFT JOIN d_dept dd ON dd.`code`=SUBSTR(u.login_name FROM 1 FOR LENGTH(u.login_name)-3)
 	where ind.paper_id=#{paperId}
+	<if test="scoreType!=null and scoreType!=''">
+		<!-- and  -->
+	</if>
 	<if test="itemIds!=null and itemIds.size>0">
 		and item_id  in
 		<foreach collection="itemIds" open="(" close=")" item="itemId" separator=",">
