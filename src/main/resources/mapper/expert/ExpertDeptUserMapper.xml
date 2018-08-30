@@ -11,5 +11,35 @@
     <result column="dept_user_id" property="deptUserId" jdbcType="INTEGER" />
     <result column="index_coll_id" property="indexCollId" jdbcType="INTEGER" />
     <result column="index_coll_expert_id" property="indexCollExpertId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
   </resultMap>
+  
+  <select id="countExpertFinish" resultType="java.util.Map">
+  	SELECT
+  	e.user_id expertId,
+	e.real_name expertName,
+	sum(
+		CASE WHEN u.`STATUS` = 0 OR u.`STATUS` IS NULL THEN 1 ELSE 0 END
+	) commited,
+	sum(
+		CASE WHEN u.`STATUS` = 1 THEN 1 ELSE 0 END
+	) finished
+FROM
+	d_score_paper_user p
+LEFT JOIN e_expert_dept_user u ON p.user_id = u.dept_user_id
+AND p.paper_id = u.paper_id
+LEFT JOIN e_expert_info e ON u.expert_id = e.id
+WHERE
+	p.paper_id = #{paperId}
+	AND p.`status` = 2
+	<if test="expertId!=null">
+		and e.user_id = #{expertId}
+	</if>
+	<if test="expertName!=null and expertName!=''">
+		and e.real_name = #{expertName}
+	</if>
+GROUP BY
+	expert_user_id
+  	
+  </select>
 </mapper>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.topie.zhongkexie.common.utils.ExcelExportUtils;
 import com.topie.zhongkexie.common.utils.PageConvertUtil;
 import com.topie.zhongkexie.common.utils.ResponseUtil;
 import com.topie.zhongkexie.common.utils.Result;
+import com.topie.zhongkexie.common.utils.date.DateUtil;
 import com.topie.zhongkexie.core.service.IDeptService;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.core.service.IScoreItemOptionService;
@@ -32,6 +34,7 @@ import com.topie.zhongkexie.core.service.IScoreItemService;
 import com.topie.zhongkexie.core.service.IScorePagerUserService;
 import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
+import com.topie.zhongkexie.expert.service.IExpertDeptUserService;
 import com.topie.zhongkexie.expert.service.IExpertItemScoreService;
 import com.topie.zhongkexie.security.service.UserService;
 
@@ -60,6 +63,8 @@ public class ScoreCountController {
 	private IDeptService iDeptService;
 	@Autowired
 	private IExpertItemScoreService iExpertItemScoreService;
+	@Autowired
+	private IExpertDeptUserService iExpertDeptUserService;
 	@Autowired
 	private UserService userService;
 
@@ -141,6 +146,55 @@ public class ScoreCountController {
         List<Map> pageInfo = iScoreAnswerService.selectUserUploadFileCounts(map);
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
+	
+	@RequestMapping(value = "/countExpertFinishList", method = RequestMethod.GET)
+    @ResponseBody
+    public Result countExpertFinishList(String expertName ,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize){
+		Map map = new HashMap();
+		map.put("expertName", expertName);
+		PageInfo<Map> pageInfo = iExpertDeptUserService.countExpertFinishPage(map, pageNum, pageSize); 
+        return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+    }
+	@RequestMapping(value = "/countExpertFinish", method = RequestMethod.GET)
+    @ResponseBody
+    public Result countExpertFinish(){
+		Map pageInfo = iExpertDeptUserService.countCurrentExpertFinish(); 
+        return ResponseUtil.success(pageInfo);
+    }
+	
+	@RequestMapping(value = "/countExpertFinishExport", method = RequestMethod.GET)
+    public void countExpertFinishExport(String expertName,
+			HttpServletRequest request, HttpServletResponse response) {
+		Map map = new HashMap();
+		map.put("expertName", expertName);
+		PageInfo<Map> pageInfo = iExpertDeptUserService.countExpertFinishPage(map, 0, 1000);  
+		List<Map> list= pageInfo.getList();
+		 String[] fields = "expertName,commited,finished".split(",");
+	        String[] names = "专家,未完成,已完成".split(",");
+	        try {
+	        	String name = "导出专家评价情况-"+DateUtil.getDate(new Date());
+	        	HSSFWorkbook wb = ExcelExportUtils.getInstance().inExcelMoreSheet(list, fields, names);
+	        	outWrite(request, response, wb, name);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
+	
+	
+	
+	
+	
+	
 	private static void outWrite(HttpServletRequest request,
 			HttpServletResponse response, HSSFWorkbook wb, String fileName)
 			throws IOException {
