@@ -61,15 +61,18 @@ public class ExpertItemScoreServiceImpl extends BaseService<ExpertItemScore> imp
 			score  = score.add(is.getItemScore());
 		}
 		int count = lis.size();
-		if(lis.size()>2){
+		if(lis.size()>3){
 			score = score.subtract(max).subtract(min);
 			count = count-2;
 		}
 		if(lis.size()!=0){
-			score = score.divide( new BigDecimal(count),4);
+			score = score.divide( new BigDecimal(count),6);
 		}
+		//=======修改为百分比打分=======
+		score = one.getItemScore().multiply(score).divide(new BigDecimal(100), 4);
 		return score;
 	}
+	
 
 	
 }

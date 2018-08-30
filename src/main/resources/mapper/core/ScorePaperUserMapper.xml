@@ -116,6 +116,6 @@
 			and de.type=#{type}
 		</if>
 	</where>
-	ORDER BY du.`status` 
+	ORDER BY de.code 
   </select>
 </mapper>
