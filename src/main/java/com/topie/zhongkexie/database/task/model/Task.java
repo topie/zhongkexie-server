@@ -39,7 +39,7 @@ public class Task {
      * 牵头部门
      */
     @Column(name = "task_dept")
-    private Integer taskDept;
+    private String taskDept;
 
     /**
      * 是否有子任务
@@ -90,10 +90,9 @@ public class Task {
     private String taskCweight;
 
     /**
-     * 是否为父任务
      */
-    @Column(name = "task_top")
-    private Boolean taskTop;
+    @Column(name = "task_check_user")
+    private String taskCheckUser;
 
     /**
      * 顺序
@@ -198,7 +197,7 @@ public class Task {
      *
      * @return task_dept - 牵头部门
      */
-    public Integer getTaskDept() {
+    public String getTaskDept() {
         return taskDept;
     }
 
@@ -207,7 +206,7 @@ public class Task {
      *
      * @param taskDept 牵头部门
      */
-    public void setTaskDept(Integer taskDept) {
+    public void setTaskDept(String taskDept) {
         this.taskDept = taskDept;
     }
 
@@ -356,21 +355,17 @@ public class Task {
     }
 
     /**
-     * 获取是否为父任务
      *
-     * @return task_top - 是否为父任务
      */
-    public Boolean getTaskTop() {
-        return taskTop;
+    public String getTaskCheckUser() {
+        return taskCheckUser;
     }
 
     /**
-     * 设置是否为父任务
      *
-     * @param taskTop 是否为父任务
      */
-    public void setTaskTop(Boolean taskTop) {
-        this.taskTop = taskTop;
+    public void setTaskCheckUser(String taskCheckUser) {
+        this.taskCheckUser = taskCheckUser;
     }
 
     /**

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,8 +46,22 @@ public class TaskController {
     @ResponseBody
     public Result list(Task task){
     	Integer user = SecurityUtil.getCurrentUserId();
-    	task.setTaskDept(user);
+    	task.setTaskDept(user.toString());
         List<Task> list = iTaskService.selectByFilter(task);
+        return ResponseUtil.success(list);
+    }
+    @RequestMapping(value = "/allTask", method = RequestMethod.GET)
+    @ResponseBody
+    public Result allTask(Task task){
+        List<Task> list = iTaskService.selectByFilter(task);
+        return ResponseUtil.success(list);
+    }
+    @RequestMapping(value = "/deptCheckTask", method = RequestMethod.GET)
+    @ResponseBody
+    public Result deptCheckTask(Task task){
+    	Integer user = SecurityUtil.getCurrentUserId();
+    	task.setTaskDept(user.toString());
+        List<Task> list = iTaskService.selectByFilterCheck(task);
         return ResponseUtil.success(list);
     }
     
@@ -71,7 +86,6 @@ public class TaskController {
 					weightsString+=","+weights[i];
 				}
 				weightsString = weightsString.substring(1);
-				
 				Task task = new Task();
 				task.setId(Integer.valueOf(taskId));
 				task.setTaskCweight(weightsString);
@@ -151,6 +165,19 @@ public class TaskController {
     @ResponseBody
     public Result delete(@RequestParam(value = "id") Integer id) {
         iTaskService.delete(id);
+        return ResponseUtil.success();
+    }
+    @RequestMapping(value = "/updateStatus")
+    @ResponseBody
+    public Result updateStatus(String taskIds,String status) {
+        if(StringUtils.isNotEmpty(taskIds)){
+        	for(String s:taskIds.split(",")){
+        		Task t = new Task();
+        		t.setId(Integer.valueOf(s));
+        		t.setTaskStatus(status);
+                int result = iTaskService.updateStatus(t);
+        	}
+        }
         return ResponseUtil.success();
     }
 

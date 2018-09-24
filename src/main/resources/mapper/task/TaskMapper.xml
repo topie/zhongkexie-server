@@ -20,7 +20,65 @@
     <result column="link_dept" jdbcType="VARCHAR" property="linkDept" />
     <result column="task_value" jdbcType="VARCHAR" property="taskValue" />
     <result column="task_cweight" jdbcType="VARCHAR" property="taskCweight" />
-    <result column="task_top" jdbcType="BIT" property="taskTop" />
+    <result column="task_check_user" jdbcType="VARCHAR" property="taskCheckUser" />
     <result column="task_seq" jdbcType="INTEGER" property="taskSeq" />
   </resultMap>
+  
+  <select id="selectByExampleReport" resultMap="BaseResultMap">
+  	SELECT DISTINCT t.* 
+  	FROM t_task t 
+  	LEFT JOIN t_task_report_user u 
+  	ON t.id=u.task_id 
+  	<where>
+	<foreach collection="example.oredCriteria" item="ite" index="ind">
+		<foreach collection="ite.criteria" item="item" index="index">
+			<if test="item.listValue">
+				and ${item.condition} 
+				<foreach collection="item.value" item="citem" open="(" close=")" separator=",">
+					#{citem}
+				</foreach>
+			</if>
+			<if test="item.singleValue">
+				and ${item.condition} #{item.value}
+			</if>
+		</foreach>
+	</foreach>
+	<if test="taskDept!=null">
+		<!-- and FIND_IN_SET(#{taskDept},task_dept) -->
+		and u.user_id = #{taskDept}
+	</if>
+	</where>
+	<if test="example.orderByClause!=null and example.orderByClause!=''">
+		ORDER BY ${example.orderByClause}
+	</if>
+  </select>
+  
+  <select id="selectByExampleCheck" resultMap="BaseResultMap">
+  	SELECT DISTINCT t.* 
+  	FROM t_task t 
+  	LEFT JOIN t_task_check_user u 
+  	ON t.id=u.task_id 
+  	<where>
+	<foreach collection="example.oredCriteria" item="ite" index="ind">
+		<foreach collection="ite.criteria" item="item" index="index">
+			<if test="item.listValue">
+				and ${item.condition} 
+				<foreach collection="item.value" item="citem" open="(" close=")" separator=",">
+					#{citem}
+				</foreach>
+			</if>
+			<if test="item.singleValue">
+				and ${item.condition} #{item.value}
+			</if>
+		</foreach>
+	</foreach>
+	<if test="checkDept!=null">
+		<!-- and FIND_IN_SET(#{taskDept},task_dept) -->
+		and u.user_id = #{checkDept}
+	</if>
+	</where>
+	<if test="example.orderByClause!=null and example.orderByClause!=''">
+		ORDER BY ${example.orderByClause}
+	</if>
+  </select>
 </mapper>

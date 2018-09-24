@@ -11,6 +11,9 @@ public interface ITaskService extends IService<Task> {
 	PageInfo<Task> selectByFilterAndPage(Task task, int pageNum, int pageSize);
 
 	List<Task> selectByFilter(Task task);
+	List<Task> selectByFilterCheck(Task task);
+
+	int updateStatus(Task t);
 
 	
 }
