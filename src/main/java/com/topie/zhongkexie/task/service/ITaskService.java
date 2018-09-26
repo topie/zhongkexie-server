@@ -1,10 +1,13 @@
 package com.topie.zhongkexie.task.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
+import com.topie.zhongkexie.database.core.model.User;
 import com.topie.zhongkexie.database.task.model.Task;
+import com.topie.zhongkexie.database.task.model.TaskScore;
 
 public interface ITaskService extends IService<Task> {
 
@@ -14,6 +17,13 @@ public interface ITaskService extends IService<Task> {
 	List<Task> selectByFilterCheck(Task task);
 
 	int updateStatus(Task t);
+
+	User testOrg(String org);
+
+	PageInfo<Map> selectScoreCountsByFilterAndPage(Task task,
+			int pageNum, int pageSize);
+
+	List<TaskScore> selectByFilter(TaskScore taskScore);
 
 	
 }

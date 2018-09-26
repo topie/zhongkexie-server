@@ -1,6 +1,7 @@
 package com.topie.zhongkexie.database.task.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -13,4 +14,5 @@ public interface TaskMapper extends Mapper<Task> {
 
 	List<Task> selectByExampleReport( @Param("example")Example example , @Param("taskDept")Integer taskDept);
 	List<Task> selectByExampleCheck( @Param("example")Example example , @Param("checkDept")Integer checkDept);
+	List<Map> selectScoreCountsByFilter(Task task);
 }

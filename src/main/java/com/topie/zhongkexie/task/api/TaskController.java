@@ -78,7 +78,11 @@ public class TaskController {
 				String[] weights = request.getParameterValues(weightp);
 				String orgsString = "";
 				for(int i=0;i<orgs.length;i++){
-					orgsString+=","+orgs[i].replace(",", "；").replace("，", "；").replace(";", "；");
+					String org = orgs[i].replace(",", "；").replace("，", "；").replace(";", "；").replace(" ", "").trim();
+					for(String o:org.split("；")){
+						this.iTaskService.testOrg(o.trim());
+					}
+					orgsString+=","+org;
 				}
 				orgsString = orgsString.substring(1);
 				String weightsString = "";
@@ -97,7 +101,7 @@ public class TaskController {
         return ResponseUtil.success();
     }
     
-    @RequestMapping(value = "/insert", method = RequestMethod.POST)
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
     @ResponseBody
     public Result insert(Task task) {
     	if(task.getParentId()==0){

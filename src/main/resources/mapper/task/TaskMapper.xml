@@ -81,4 +81,26 @@
 		ORDER BY ${example.orderByClause}
 	</if>
   </select>
+  
+  <select id="selectScoreCountsByFilter" resultType="java.util.Map">
+  	SELECT u.id,
+  	u.login_name loginName,
+  	u.display_name displayName,
+  	ts.paper_id paperId,
+  	sum(ts.score) score 
+  	
+	from t_task_score ts 
+	LEFT JOIN d_user u
+	ON ts.user_id = u.id 
+	<if test="indexId!=null">
+		LEFT JOIN t_task t
+		ON t.id = ts.task_id
+	</if>
+	WHERE paper_id =#{paperId} 
+	<if test="indexId!=null">
+		and t.index_id = #{indexId}
+	</if>
+	GROUP BY ts.user_id 
+	ORDER BY sum(ts.score) desc
+  </select>
 </mapper>

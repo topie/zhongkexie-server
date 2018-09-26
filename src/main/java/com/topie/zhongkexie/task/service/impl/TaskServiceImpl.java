@@ -2,12 +2,14 @@ package com.topie.zhongkexie.task.service.impl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -182,11 +184,11 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 				String orgs100 = vs[i];
 				updateScore(orgs100,new BigDecimal(ss[i]),entity,i);
 				String orgs75 = vs[i+1];
-				updateScore(orgs75,new BigDecimal(ss[i+1]),entity,i);
+				updateScore(orgs75,new BigDecimal(ss[i+1]),entity,i+1);
 				String orgs50 = vs[i+2];
-				updateScore(orgs50,new BigDecimal(ss[i+2]),entity,i);
+				updateScore(orgs50,new BigDecimal(ss[i+2]),entity,i+2);
 				String orgs25 = vs[i+3];
-				updateScore(orgs25,new BigDecimal(ss[i+3]),entity,i);
+				updateScore(orgs25,new BigDecimal(ss[i+3]),entity,i+3);
 			}
 		}
 		
@@ -207,14 +209,7 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 		for (int j = 0; j < orgList.length; j++) {
 			String orgName = orgList[j];
 			if(StringUtils.isEmpty(orgName))continue;
-			Dept dept= new Dept();
-			dept.setName(orgName.trim());
-			List<Dept> dList = iDeptService.selectByFilter(dept);
-			if(dList.size()==0)throw new RuntimeBusinessException("学会未找到："+orgName);
-			Dept d = dList.get(0);
-			String loginName = d.getCode()+"002";
-			User user = userService.findUserByLoginName(loginName);
-			if(user==null)throw new RuntimeBusinessException("学会用户未找到："+orgName+"-登录名："+loginName);
+			User user = testOrg(orgName);
 			//开始保存
 			TaskScore score = new TaskScore();
 			score.setTaskId(taskId);
@@ -234,6 +229,42 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 		if(t.getTaskStatus().equals("2"));
 			divScore(t);
 		return i;
+	}
+
+	@Override
+	public User testOrg(String org) {
+		Dept dept= new Dept();
+		dept.setName(org.trim());
+		List<Dept> dList = iDeptService.selectByFilter(dept);
+		if(dList.size()==0)throw new RuntimeBusinessException("学会未找到："+org);
+		Dept d = dList.get(0);
+		String loginName = d.getCode()+"002";
+		User user = userService.findUserByLoginName(loginName);
+		if(user==null)throw new RuntimeBusinessException("学会用户未找到："+org+"-登录名："+loginName);
+		return user;
+	}
+
+	@Override
+	public PageInfo<Map> selectScoreCountsByFilterAndPage(Task task,
+			int pageNum, int pageSize) {
+		PageHelper.startPage(pageNum,pageSize);
+		List<Map> list = this.taskMapper.selectScoreCountsByFilter(task);
+		
+		return new PageInfo<Map>(list);
+	}
+
+	@Override
+	public List<TaskScore> selectByFilter(TaskScore taskScore) {
+		Example ex = new Example(TaskScore.class);
+		Criteria c = ex.createCriteria();
+		if(taskScore.getPaperId()!=null)
+			c.andEqualTo("paperId", taskScore.getPaperId());
+		if(taskScore.getUserId()!=null)
+			c.andEqualTo("userId", taskScore.getUserId());
+		if(taskScore.getTaskId()!=null)
+			c.andEqualTo("taskId", taskScore.getTaskId());
+		List<TaskScore> list = taskScoreMapper.selectByExample(ex);
+		return list;
 	}
 
 
