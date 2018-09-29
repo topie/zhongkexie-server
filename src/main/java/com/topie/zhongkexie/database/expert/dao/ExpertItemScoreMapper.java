@@ -12,4 +12,5 @@ import com.topie.zhongkexie.database.expert.model.ExpertItemScore;
 public interface ExpertItemScoreMapper extends Mapper<ExpertItemScore> {
 
 	List<Map> selectScoreInfo(@Param("userId")Integer userId, @Param("itemId") String itemId);
+	List<Map> selectScoreCount(@Param("paperId") Integer paperId);
 }

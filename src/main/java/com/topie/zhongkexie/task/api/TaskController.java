@@ -184,6 +184,16 @@ public class TaskController {
         }
         return ResponseUtil.success();
     }
+    @RequestMapping(value = "/updateScore")
+    @ResponseBody
+    public Result updateScore(Task task) {
+    	task.setTaskStatus("2");
+        List<Task> list = iTaskService.selectByFilter(task);
+        for(Task t:list){
+        	iTaskService.divScore(t);
+        }
+        return ResponseUtil.success();
+    }
 
 
 }

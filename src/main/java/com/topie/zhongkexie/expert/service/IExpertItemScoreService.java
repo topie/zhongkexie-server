@@ -15,5 +15,6 @@ public interface IExpertItemScoreService extends IService<ExpertItemScore> {
 	List<Map> selectScoreInfo(Integer userId, String itemId);
 
 	BigDecimal divScore(ScoreAnswer one);
+	List<Map> selectScoreCount(Integer paperId);
 
 }

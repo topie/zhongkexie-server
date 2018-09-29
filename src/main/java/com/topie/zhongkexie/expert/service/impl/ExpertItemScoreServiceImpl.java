@@ -61,7 +61,7 @@ public class ExpertItemScoreServiceImpl extends BaseService<ExpertItemScore> imp
 			score  = score.add(is.getItemScore());
 		}
 		int count = lis.size();
-		if(lis.size()>3){
+		if(lis.size()>3){//如果超过三个专家则 去掉最高分最低分
 			score = score.subtract(max).subtract(min);
 			count = count-2;
 		}
@@ -71,6 +71,11 @@ public class ExpertItemScoreServiceImpl extends BaseService<ExpertItemScore> imp
 		//=======修改为百分比打分=======
 		score = one.getItemScore().multiply(score).divide(new BigDecimal(100), 4);
 		return score;
+	}
+
+	@Override
+	public List<Map> selectScoreCount(Integer paperId) {
+		return this.expertItemScoreMapper.selectScoreCount(paperId);
 	}
 	
 

@@ -1,8 +1,10 @@
 package com.topie.zhongkexie.task.service.impl;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,7 +166,7 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 		Integer taskId = entity.getId();
 		//先清空上次得分
 		Example ex = new Example(TaskScore.class);
-		ex.createCriteria().andEqualTo("taskId",entity.getId());
+		ex.createCriteria().andEqualTo("taskId",taskId);
 		taskScoreMapper.deleteByExample(ex);
 		
 		if(!StringUtils.isEmpty(value)){
@@ -181,14 +183,15 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 			}
 			String[] ss = scores.split(",");
 			for(int i=0;i<vs.length;i+=4){
+				Set<String> names = new HashSet<String>();//去重复如果一个学会多次出现，则只记一次最高分
 				String orgs100 = vs[i];
-				updateScore(orgs100,new BigDecimal(ss[i]),entity,i);
+				updateScore(orgs100,new BigDecimal(ss[i]),entity,i,names);
 				String orgs75 = vs[i+1];
-				updateScore(orgs75,new BigDecimal(ss[i+1]),entity,i+1);
+				updateScore(orgs75,new BigDecimal(ss[i+1]),entity,i+1,names);
 				String orgs50 = vs[i+2];
-				updateScore(orgs50,new BigDecimal(ss[i+2]),entity,i+2);
+				updateScore(orgs50,new BigDecimal(ss[i+2]),entity,i+2,names);
 				String orgs25 = vs[i+3];
-				updateScore(orgs25,new BigDecimal(ss[i+3]),entity,i+3);
+				updateScore(orgs25,new BigDecimal(ss[i+3]),entity,i+3,names);
 			}
 		}
 		
@@ -200,7 +203,7 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 	 * @param i  分值百分比
 	 * @param entity  Task
 	 */
-	private void updateScore(String orgs, BigDecimal i, Task entity,int type) {
+	private void updateScore(String orgs, BigDecimal i, Task entity,int type,Set<String> names) {
 		int taskId = entity.getId();
 		int paperId = entity.getPaperId();
 		BigDecimal itemScore = entity.getTaskScore();
@@ -210,6 +213,10 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 			String orgName = orgList[j];
 			if(StringUtils.isEmpty(orgName))continue;
 			User user = testOrg(orgName);
+			if(names.contains(orgName)){
+				continue;
+			}
+			names.add(orgName);
 			//开始保存
 			TaskScore score = new TaskScore();
 			score.setTaskId(taskId);

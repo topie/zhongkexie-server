@@ -18,4 +18,11 @@
 	LEFT JOIN d_user u ON s.expert_user_id=u.id 
 	WHERE s.org_user_id=#{userId} and s.item_id=${itemId}
   </select>
+  <select id="selectScoreCount" resultType="java.util.HashMap">
+  	SELECT count(*) count,u.display_name displayName ,u.id from e_pxpert_item_score t 
+	LEFT JOIN d_user u ON t.expert_user_id = u.id 
+	where t.paper_id=#{paperId}
+	GROUP BY u.display_name
+	ORDER BY count desc
+  </select>
 </mapper>

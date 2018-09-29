@@ -24,6 +24,7 @@ public interface ITaskService extends IService<Task> {
 			int pageNum, int pageSize);
 
 	List<TaskScore> selectByFilter(TaskScore taskScore);
+	 void divScore(Task entity);
 
 	
 }

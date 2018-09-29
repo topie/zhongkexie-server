@@ -157,6 +157,46 @@ public class ScoreCountController {
 		PageInfo<Map> pageInfo = iExpertDeptUserService.countExpertFinishPage(map, pageNum, pageSize); 
         return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
     }
+	/**
+     * 获取专家打分情况
+     * @param userId
+     * @param itemId
+     * @return
+     */
+    @RequestMapping(value = "/countExpertFinishInfo", method = RequestMethod.GET)
+    @ResponseBody
+    public Result getPaperScoreInfo(Integer paperId) {
+    	List<Map> list = iExpertItemScoreService.selectScoreCount(paperId);
+    	
+        return ResponseUtil.success(list);
+    }
+    /**
+     * 获取专家打分情况
+     * @param userId
+     * @param itemId
+     * @return
+     */
+    @RequestMapping(value = "/countExpertFinishInfoExport", method = RequestMethod.GET)
+    public void getPaperScoreInfoExport(Integer paperId,
+			HttpServletRequest request, HttpServletResponse response) {
+    	List<Map> list = iExpertItemScoreService.selectScoreCount(paperId);
+    	String[] fields = "displayName,count".split(",");
+        String[] names = "专家,评分个数".split(",");
+        try {
+        	String name = "导出专家详细评价情况-"+DateUtil.getDate(new Date());
+        	HSSFWorkbook wb = ExcelExportUtils.getInstance().inExcelMoreSheet(list, fields, names);
+        	outWrite(request, response, wb, name);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 	@RequestMapping(value = "/countExpertFinish", method = RequestMethod.GET)
     @ResponseBody
     public Result countExpertFinish(){
