@@ -44,17 +44,17 @@
                         password="${jdbc_password}">
         </jdbcConnection>
 
-        <javaModelGenerator targetPackage="com.topie.zhongkexie.database.core.model"
+        <javaModelGenerator targetPackage="com.topie.zhongkexie.database.task.model"
                             targetProject="${targetBasedir}/src/main/java"/>
 
-        <sqlMapGenerator targetPackage="mapper/core"
+        <sqlMapGenerator targetPackage="mapper/task"
                          targetProject="${targetBasedir}/src/main/resources"/>
 
-        <javaClientGenerator targetPackage="com.topie.zhongkexie.database.core.dao"
+        <javaClientGenerator targetPackage="com.topie.zhongkexie.database.task.dao"
                              targetProject="${targetBasedir}/src/main/java" type="XMLMAPPER"/>
 
         
-        <table tableName="d_paper_expert_conf" domainObjectName="PaperExpertConf">
+        <table tableName="t_task_check_user" domainObjectName="TaskCheckUser">
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
     </context>

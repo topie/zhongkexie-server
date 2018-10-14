@@ -28,9 +28,12 @@
     </resultMap>
     
     	<select id="selectByExampleEx" resultMap="BaseResultMap">
-  	SELECT *
+  	SELECT t.*
 	FROM d_score_item t 
-	
+	<if test="paperId!=null">
+		LEFT JOIN d_score_index t1 
+		ON t.index_id = t1.id
+	</if>
 	<where>
 	<foreach collection="example.oredCriteria" item="ite" index="ind">
 		<foreach collection="ite.criteria" item="item" index="index">
@@ -47,6 +50,9 @@
 	</foreach>
 	<if test="responsibleDepartment!=null">
 		and FIND_IN_SET(#{responsibleDepartment},responsible_department)
+	</if>
+	<if test="paperId!=null">
+		and t1.paper_id=#{paperId}
 	</if>
 	</where>
 	<if test="example.orderByClause!=null and example.orderByClause!=''">

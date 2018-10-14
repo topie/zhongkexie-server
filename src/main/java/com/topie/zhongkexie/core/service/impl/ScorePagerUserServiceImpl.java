@@ -1,7 +1,6 @@
 package com.topie.zhongkexie.core.service.impl;
 
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -200,8 +199,8 @@ public class ScorePagerUserServiceImpl  extends BaseService<ScorePaperUser> impl
 		List<ScorePaperUser> list = this.scorePagerUserMapper.selectByPagerId(paperId);
 		for(ScorePaperUser pu:list){
 			Integer userId = pu.getUserId();
-			BigDecimal score = this.iScoreAnswerService.getUserScore(paperId, userId);
-			pu.setScore(score);
+			 this.iScoreAnswerService.setUserScore(paperId, userId,pu);
+			
 			this.updateNotNull(pu);
 		}
 		

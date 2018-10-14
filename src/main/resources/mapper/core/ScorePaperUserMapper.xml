@@ -99,7 +99,7 @@
 			and du.paper_id = #{paperId}
 		</if>
 		<if test="userName != null and userName != ''">
-			and u.display_name like concat('%',concat(#{userName},'%')
+			and u.display_name like concat('%',concat(#{userName},'%'))
 		</if>
 		<if test="approveStatus !=null">
 			<if test="approveStatus == 1">
@@ -117,5 +117,14 @@
 		</if>
 	</where>
 	ORDER BY de.code 
+  </select>
+  
+  <select id="selectAllCommit" resultType="java.util.Map">
+  	SELECT  u.id userId, replace(u.login_name,'002','') login_name,u.display_name  from
+	`d_score_paper_user` spu
+	LEFT JOIN d_user u 
+	ON spu.user_id = u.id 
+	WHERE paper_id=#{paperId}
+	and spu.status=2
   </select>
 </mapper>

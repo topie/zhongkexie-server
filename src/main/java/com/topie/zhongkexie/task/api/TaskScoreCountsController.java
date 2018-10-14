@@ -48,8 +48,8 @@ public class TaskScoreCountsController {
     public void list(Task task,HttpServletRequest request, HttpServletResponse response) {
         PageInfo<Map> pageInfo = iTaskService.selectScoreCountsByFilterAndPage(task, 1, 1000);
         List list = pageInfo.getList();
-        String[] fields = "displayName,score".split(",");
-        String[] names = "学会,分数".split(",");
+        String[] fields = "loginName,displayName,score".split(",");
+        String[] names = "学会编码,学会,分数".split(",");
         try {
         	String name = "部门考核分数_"+DateUtil.getDate(new Date());
         	HSSFWorkbook wb = ExcelExportUtils.getInstance().inExcelMoreSheet(list, fields, names);

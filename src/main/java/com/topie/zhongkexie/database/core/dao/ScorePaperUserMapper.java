@@ -1,6 +1,10 @@
 package com.topie.zhongkexie.database.core.dao;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import tk.mybatis.mapper.common.Mapper;
 
@@ -24,4 +28,6 @@ public interface ScorePaperUserMapper extends Mapper<ScorePaperUser> {
 	 * @return
 	 */
 	List<PagerUserDto> selectUserPubulicityPaper(PagerUserDto pagerUserDto);
+
+	ArrayList<Map> selectAllCommit(@Param("paperId")Integer paperId);
 }

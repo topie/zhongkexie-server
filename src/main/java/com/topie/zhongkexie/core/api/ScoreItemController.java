@@ -77,6 +77,7 @@ public class ScoreItemController {
             treeNode.setpId(nodeInfo.getIndexId());
             treeNode.setName(nodeInfo.getTitle());
             treeNode.setS(nodeInfo.getScore().toString());
+            treeNode.setType(nodeInfo.getScoreType());
             nodes.add(treeNode);
         }
         return nodes;

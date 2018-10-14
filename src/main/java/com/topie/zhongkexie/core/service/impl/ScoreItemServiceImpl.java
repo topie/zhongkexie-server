@@ -36,22 +36,7 @@ public class ScoreItemServiceImpl extends BaseService<ScoreItem> implements ISco
 
     @Override
     public List<ScoreItem> selectByFilter(ScoreItem scoreItem) {
-        Example example = new Example(ScoreItem.class);
-        Example.Criteria criteria = example.createCriteria();
-        if (StringUtils.isNotEmpty(scoreItem.getTitle())) criteria.andLike("title", "%" + scoreItem.getTitle() + "%");
-        if (scoreItem.getIndexId() != null) criteria.andEqualTo("indexId", scoreItem.getIndexId());
-        if (scoreItem.getType() != null) criteria.andEqualTo("type", scoreItem.getType());
-        if (StringUtils.isNotEmpty(scoreItem.getScoreType())) criteria.andEqualTo("scoreType", scoreItem.getScoreType());
-        if (StringUtils.isNotEmpty(scoreItem.getRelatedField())) criteria.andEqualTo("relatedField", scoreItem.getRelatedField());
-        if (StringUtils.isNotEmpty(scoreItem.getSortWithOutOrderBy())){
-            example.setOrderByClause(scoreItem.getSortWithOutOrderBy());
-        }else{
-        	example.setOrderByClause("sort asc");
-        }
-        if (StringUtils.isNotEmpty(scoreItem.getResponsibleDepartment())) {
-        	return scoreItemMapper.selectByExampleEx(example,scoreItem.getResponsibleDepartment());
-        }
-        return getMapper().selectByExample(example);
+        return selectByFilter(null, scoreItem);
     }
 
 	@Override
@@ -74,6 +59,27 @@ public class ScoreItemServiceImpl extends BaseService<ScoreItem> implements ISco
 			path = getPath(index.getParentId())+"_"+index.getName();
 		}
 		return path;
+	}
+
+	@Override
+	public List<ScoreItem> selectByFilter(Integer paperId, ScoreItem scoreItem) {
+		Example example = new Example(ScoreItem.class);
+        Example.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotEmpty(scoreItem.getTitle())) criteria.andLike("title", "%" + scoreItem.getTitle() + "%");
+        if (scoreItem.getIndexId() != null) criteria.andEqualTo("indexId", scoreItem.getIndexId());
+        if (scoreItem.getType() != null) criteria.andEqualTo("type", scoreItem.getType());
+        if (StringUtils.isNotEmpty(scoreItem.getScoreType())) criteria.andEqualTo("scoreType", scoreItem.getScoreType());
+        if (StringUtils.isNotEmpty(scoreItem.getRelatedField())) criteria.andEqualTo("relatedField", scoreItem.getRelatedField());
+        if (StringUtils.isNotEmpty(scoreItem.getSortWithOutOrderBy())){
+            example.setOrderByClause(scoreItem.getSortWithOutOrderBy());
+        }else{
+        	example.setOrderByClause("sort asc");
+        }
+        if (StringUtils.isNotEmpty(scoreItem.getResponsibleDepartment())||paperId!=null) {
+        	return scoreItemMapper.selectByExampleEx(example,scoreItem.getResponsibleDepartment(),paperId);
+        }
+        return getMapper().selectByExample(example);
+		
 	}
 
 }

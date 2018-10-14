@@ -1,12 +1,14 @@
 package com.topie.zhongkexie.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
+import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.database.core.model.Attachment;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 
@@ -71,5 +73,22 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	 * @param paperId
 	 */
 	void importAnswer(Attachment attachment, Integer paperId);
+	/**
+	 * 导出专家详细得分情况
+	 * @param paperId
+	 * @param orgIds
+	 * @return
+	 */
+	HSSFWorkbook exportEPScore(Integer paperId, String orgIds,String scoreType);
+	/**
+	 * 导出专家未完成评分的学会
+	 * @param paperId
+	 * @return
+	 */
+	HSSFWorkbook exportEPNotFinished(Integer paperId);
+
+	List<Map> getiNotFinishedDept(PagerUserDto pagerUserDto);
+
+	List<Map> getiNotFinishedDeptColl(PagerUserDto pagerUserDto);
 
 }

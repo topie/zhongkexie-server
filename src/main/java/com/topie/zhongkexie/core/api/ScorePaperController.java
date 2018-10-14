@@ -1,5 +1,7 @@
 package com.topie.zhongkexie.core.api;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
@@ -180,6 +182,44 @@ public class ScorePaperController {
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
 
 	}
+	
+	/**
+	 * 专家 获取未完成评分的学会
+	 * 
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping(value = "/zjcheckListNotFinished", method = RequestMethod.GET)
+	@ResponseBody
+	public Result zjcheckListNotFinished(
+			PagerUserDto pagerUserDto) {
+		List<Map> m = iScorePaperService
+				.getiNotFinishedDept(pagerUserDto);
+		return ResponseUtil.success(m);
+
+	}
+	/**
+	 * 专家 获取未完成评分的学会整合
+	 * 
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	@RequestMapping(value = "/zjcheckListNotFinishedColl", method = RequestMethod.GET)
+	@ResponseBody
+	public Result zjcheckListNotFinishedColl(
+			PagerUserDto pagerUserDto) {
+		List<Map> list = iScorePaperService
+				.getiNotFinishedDeptColl(pagerUserDto);
+		Map m = new HashMap();
+		m.put("total", list.size());
+		m.put("data", list);
+		return ResponseUtil.success(m);
+
+	}
 	/**
 	 * 专家 获取各个学会提交信息
 	 * 
@@ -307,14 +347,55 @@ public class ScorePaperController {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * 导出专家详细打分情况
+	 * @param paperId
+	 * @param orgIds
+	 * @param scoreType
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/exportEPScore", method = RequestMethod.GET)
+	public void exportPaper(Integer paperId,String orgIds,String scoreType,
+			HttpServletRequest request, HttpServletResponse response) {
+		HSSFWorkbook wb = iScorePaperService.exportEPScore(paperId, 
+				orgIds,scoreType);
+		try {
+			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"专家详细得分情况";
+			outWrite(request, response, wb, p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * 导出专家未完成评分的学会
+	 * @param paperId
+	 * @param orgIds
+	 * @param scoreType
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/exportEPNotFinished", method = RequestMethod.GET)
+	public void exportEPNotFinished(Integer paperId,
+			HttpServletRequest request, HttpServletResponse response) {
+		HSSFWorkbook wb = iScorePaperService.exportEPNotFinished(paperId);
+		try {
+			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"专家未完成情况";
+			outWrite(request, response, wb, p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	@RequestMapping(value = "/exportPaperScore", method = RequestMethod.GET)
 	public void exportPaperScore(PagerUserDto pagerUserDto,
 			HttpServletRequest request, HttpServletResponse response) {
 		List<PagerUserDto> list = iScorePagerUserService
 				.selectAllUserCommit(pagerUserDto);
-		 String[] fields = "userName,score".split(",");
-	        String[] names = "学会,分数".split(",");
+		 String[] fields = "code,userName,score".split(",");
+	        String[] names = "学会编码,学会,分数".split(",");
 	        try {
 	        	String name = "分数导出";
 	        	name = list.get(0).getTitle()+name;
@@ -335,8 +416,22 @@ public class ScorePaperController {
 	private static void outWrite(HttpServletRequest request,
 			HttpServletResponse response, HSSFWorkbook wb, String fileName)
 			throws IOException {
+		
 		OutputStream output = null;
 		try {
+			//保存在本地
+			String filename = fileName+".xls";
+	        String dicPath = new File(".").getCanonicalPath();
+	        String srcPath = dicPath +"/Excel/"+ filename;
+	        File newPath = new File(dicPath+"/Excel/");
+	        if(!newPath.exists())
+	        	newPath.mkdirs();
+	        File file = new File(srcPath);
+	        System.out.println(srcPath);
+	        FileOutputStream fos = new FileOutputStream(file);
+	        wb.write(fos);// 写文件
+	        //输出到网络
+	        //if(1==1)return;
 			output = response.getOutputStream();
 			response.reset();
 			// fileName=new String((fileName+"导出数据.xls").getBytes(),
@@ -639,7 +734,11 @@ public class ScorePaperController {
 		c.andEqualTo("paperId", paperId);
 		c.andEqualTo("userId", userId);
 		c.andEqualTo("itemId", itemId);
-		Integer cuserId = SecurityUtil.getCurrentUserId();
+		SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+		Integer cuserId = user.getId();
+		if(user.getUserType()!=4){
+			return ResponseUtil.error("专家才能评分");
+		}
 		List<ScoreAnswer> list = iScoreAnswerService.selectByExample(example);
 		if (list.size() == 0) {
 			ScoreAnswer one = new ScoreAnswer();
@@ -678,7 +777,7 @@ public class ScorePaperController {
 		if(ls.size()==0){
 			entity.setItemScore(answerScore);
 			iExpertItemScoreService.save(entity);
-		}else{
+		}else if(ls.size()==1){
 			entity.setItemScore(answerScore);
 			Example ex = new Example(ExpertItemScore.class);
 			Criteria c1 = ex.createCriteria();
@@ -693,6 +792,8 @@ public class ScorePaperController {
 			if(entity.getExpertId()!=null)
 			c1.andEqualTo("expertId", entity.getExpertId());
 			iExpertItemScoreService.updateByExample(entity,ex);
+		}else{//删除后添加
+			//iExpertItemScoreService.deleteByExample(ex)
 		}
 		BigDecimal score = iExpertItemScoreService.divScore(one);
 		one.setAnswerScore(score);
@@ -719,7 +820,7 @@ public class ScorePaperController {
 
 	/**
 	 * 计算得分
-	 * 
+	 * 未用到
 	 * @return
 	 */
 	@RequestMapping(value = "/getUserScore", method = RequestMethod.GET)

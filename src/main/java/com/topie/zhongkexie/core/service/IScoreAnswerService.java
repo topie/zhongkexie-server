@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -52,5 +53,13 @@ public interface IScoreAnswerService extends IService<ScoreAnswer> {
 	List<Map> selectPartIndexScore(Map map);
 
 	List<Map> selectUserUploadFileCounts(Map map);
+	/**
+	 * 设置分项分数  返回总分
+	 * @param paperId
+	 * @param userId
+	 * @param pu
+	 * @return
+	 */
+	BigDecimal setUserScore(Integer paperId, Integer userId, ScorePaperUser pu);
 
 }

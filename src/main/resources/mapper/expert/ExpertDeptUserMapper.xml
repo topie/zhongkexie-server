@@ -42,4 +42,84 @@ GROUP BY
 	expert_user_id
   	
   </select>
+  
+  <select id="selectExportItemMap" resultType="java.util.Map">
+  	SELECT ic.id indexCollExpertId,ic.related_field,i.user_id,i.real_name,item.*
+	from d_score_item item 
+	LEFT JOIN d_score_index t
+	ON item.index_id = t.id
+	LEFT JOIN d_score_index_collection c
+	on FIND_IN_SET(t.id,c.index_collection)
+	LEFT JOIN e_index_coll_expert ic
+	ON ic.related_field = c.related_field
+	LEFT JOIN e_expert_info i
+	ON FIND_IN_SET(i.id,ic.expert_ids)
+	where c.paper_id=#{paperId}
+	and item.score_type=3
+	and ic.paper_id=#{paperId}
+	<if test="userId!=null">
+		and i.user_id = #{userId}
+	</if>
+	ORDER BY ic.related_field,i.real_name,item.id  	
+  </select>
+  
+  <select id="selectNotFinishedDept" resultType="java.util.Map">
+  	SELECT u.id userId,replace(u.login_name,'002','') login_name,u.display_name  from
+	`d_score_paper_user` spu
+	LEFT JOIN d_user u 
+	ON spu.user_id = u.id 
+	LEFT JOIN (SELECT u.id,u.display_name from d_user u
+			LEFT JOIN e_pxpert_item_score s
+			ON u.id=s.org_user_id
+			where
+			s.expert_user_id=#{expertUserId}
+			and s.item_id=#{itemId}
+			and s.paper_id=#{paperId}
+			) t
+	ON t.id = u.id
+	WHERE 
+	 spu.paper_id=#{paperId}
+	and spu.`status`=2
+	and t.display_name is null
+  </select>
+  <select id="selectFinishedDept" resultType="java.util.Map">
+  	SELECT u.id userId,replace(u.login_name,'002','') login_name,u.display_name  from d_user u
+	LEFT JOIN e_pxpert_item_score s
+	ON u.id=s.org_user_id
+	where
+	s.expert_user_id=#{expertUserId}
+	and s.item_id=#{itemId}
+	and s.paper_id=#{paperId}
+			
+  </select>
+  
+  <update id="updateExpertUserIncludeStatus">
+  	UPDATE `e_expert_dept_user` SET 
+  	 `status`=#{status}
+  	  WHERE `paper_id`=#{paperId}
+  	  AND `expert_user_id`=#{expertUserId} 
+  	  <!-- AND index_coll_expert_id=#{indexCollExpertId} -->
+  	  <if test="orgUserIds!=null">
+	  	  AND `dept_user_id` in 
+	  	  <foreach collection="orgUserIds" open="(" close=")" index="index" separator="," item="item">
+	  	  	#{item}
+	  	  </foreach>
+  	  </if>
+  	
+  </update>
+  
+  <update id="updateExpertUserExcludeStatus">
+  	UPDATE `e_expert_dept_user` SET 
+  	 `status`=#{status}
+  	  WHERE `paper_id`=#{paperId}
+  	  AND `expert_user_id`=#{expertUserId} 
+  	  <!-- AND index_coll_expert_id=#{indexCollExpertId} -->
+  	  <if test="orgUserIds!=null">
+	  	  AND `dept_user_id` not in 
+	  	  <foreach collection="orgUserIds" open="(" close=")" index="index" separator="," item="item">
+	  	  	#{item}
+	  	  </foreach>
+  	  </if>
+  	
+  </update>
 </mapper>

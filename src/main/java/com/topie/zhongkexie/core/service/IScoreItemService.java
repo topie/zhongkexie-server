@@ -17,4 +17,6 @@ public interface IScoreItemService extends IService<ScoreItem> {
 
 	String selectPath(Integer itemId);
 
+	List<ScoreItem> selectByFilter(Integer paperId, ScoreItem scoreItem);
+
 }

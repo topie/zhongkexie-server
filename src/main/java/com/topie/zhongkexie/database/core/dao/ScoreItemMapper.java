@@ -12,5 +12,5 @@ import com.topie.zhongkexie.database.core.model.ScoreItem;
 public interface ScoreItemMapper extends Mapper<ScoreItem> {
 
 	List<ScoreItem> selectByExampleEx(@Param("example")Example example,
-			@Param("responsibleDepartment") String responsibleDepartment);
+			@Param("responsibleDepartment") String responsibleDepartment,@Param("paperId") Integer paperId);
 }

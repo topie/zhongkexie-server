@@ -84,7 +84,7 @@
   
   <select id="selectScoreCountsByFilter" resultType="java.util.Map">
   	SELECT u.id,
-  	u.login_name loginName,
+  	replace(u.login_name,"002","") loginName,
   	u.display_name displayName,
   	ts.paper_id paperId,
   	sum(ts.score) score 

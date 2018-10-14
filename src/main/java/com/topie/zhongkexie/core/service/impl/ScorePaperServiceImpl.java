@@ -6,9 +6,13 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -40,6 +44,7 @@ import com.topie.zhongkexie.core.dto.PagerUserDto;
 import com.topie.zhongkexie.core.dto.PaperIndexDto;
 import com.topie.zhongkexie.core.exception.RuntimeBusinessException;
 import com.topie.zhongkexie.core.service.IDeptService;
+import com.topie.zhongkexie.core.service.IPaperExpertConfService;
 import com.topie.zhongkexie.core.service.IScoreAnswerService;
 import com.topie.zhongkexie.core.service.IScoreIndexCollectionService;
 import com.topie.zhongkexie.core.service.IScoreIndexService;
@@ -49,6 +54,7 @@ import com.topie.zhongkexie.core.service.IScorePaperService;
 import com.topie.zhongkexie.database.core.dao.ScorePaperUserMapper;
 import com.topie.zhongkexie.database.core.model.Attachment;
 import com.topie.zhongkexie.database.core.model.Dept;
+import com.topie.zhongkexie.database.core.model.PaperExpertConf;
 import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreIndex;
 import com.topie.zhongkexie.database.core.model.ScoreIndexCollection;
@@ -56,8 +62,10 @@ import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.User;
+import com.topie.zhongkexie.database.expert.dao.ExpertDeptUserMapper;
 import com.topie.zhongkexie.database.expert.model.ExpertInfo;
 import com.topie.zhongkexie.expert.service.IExpertInfoService;
+import com.topie.zhongkexie.expert.service.IExpertItemScoreService;
 import com.topie.zhongkexie.mem.service.IMemUserScoreService;
 import com.topie.zhongkexie.security.security.SecurityUser;
 import com.topie.zhongkexie.security.service.UserService;
@@ -74,7 +82,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 	private IScoreIndexService iScoreIndexService;
 	@Autowired
 	private IScoreIndexCollectionService iScoreIndexCollectionService;
-
+	@Autowired
+	private IExpertItemScoreService iExpertItemScoreService;
 	@Autowired
 	private IScoreItemService iScoreItemService;
 
@@ -83,6 +92,9 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 
 	@Autowired
 	private ScorePaperUserMapper dScorePaperUserMapper;
+	
+	@Autowired
+	private IPaperExpertConfService iPaperExpertConfService;
 
 	@Autowired
 	private IDeptService deptService;
@@ -98,6 +110,8 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 	private IScoreAppraiseUserService iScoreAppraiseUserService;
 	@Autowired
 	private IMemUserScoreService iMemUserScoreService;
+	@Autowired
+	private  ExpertDeptUserMapper expertDeptUserMapper;
 
 	@Override
 	public PageInfo<ScorePaper> selectByFilterAndPage(ScorePaper scorePaper,
@@ -1347,5 +1361,290 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 			return "";
 		return s.toString().substring(1);
 	}
+
+	@Override
+	public HSSFWorkbook exportEPScore(Integer paperId, String orgIds,String scoreType) {
+		ScorePaper p = this.getMapper().selectByPrimaryKey(paperId);
+		if (p == null)
+			throw new RuntimeBusinessException("paperId不能为空");
+		Example example = new Example(Dept.class);
+		List<Dept> depts = new ArrayList<Dept>();
+		if (orgIds != null && !orgIds.equals("")) {
+			example.createCriteria().andIn("id",
+					Arrays.asList(orgIds.split(",")));
+			depts = deptService.selectByExample(example);
+		}
+		ScoreItem scoreItem = new ScoreItem();
+		scoreItem.setScoreType(scoreType);//专家评分
+		List<ScoreItem> list = this.iScoreItemService.selectByFilter(paperId, scoreItem);
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("sheet1");
+		sheet.autoSizeColumn(1);// 设置每个单元格宽度根据字多少自适应
+		exportItems(sheet,list,depts);
+		return wb;
+	}
+
+	private void exportItems(HSSFSheet sheet, List<ScoreItem> list,
+			List<Dept> depts) {
+		int rownum=0;
+		HSSFRow titleRow = sheet.createRow(rownum++);
+		HSSFRow titleScoreRow = sheet.createRow(rownum++);
+		for(int i=0;i<list.size();i++){
+			titleRow.createCell(2*(i+1));
+			titleRow.createCell(2*(i+1)+1).setCellValue(list.get(i).getTitle());
+			titleScoreRow.createCell(2*(i+1));
+			titleScoreRow.createCell(2*(i+1)+1).setCellValue(list.get(i).getScore().toString());
+		}
+		for(Dept dept:depts){
+			HSSFRow dataRow = sheet.createRow(rownum++);
+			HSSFCell cell = dataRow.createCell(0);
+			cell.setCellValue(dept.getCode());
+			HSSFCell cell2 = dataRow.createCell(1);
+			cell2.setCellValue(dept.getName());
+			Integer userId= userService.findUserByLoginName(dept.getCode()+"002").getId();
+			int max = 0;
+			HSSFRow maxRow = sheet.createRow(rownum++),
+					minRow = sheet.createRow(rownum++),
+					avgWRow = sheet.createRow(rownum++),
+					avgRow = sheet.createRow(rownum++);
+			
+			for(int i=0;i<list.size();i++){
+				ScoreItem item = list.get(i);
+				ScoreAnswer answer = new ScoreAnswer();
+				answer.setUserId(userId);
+				answer.setItemId(item.getId());
+				List<ScoreAnswer> las = this.iScoreAnswerService.selectByFilter(answer);
+				if(las.size()>0){
+					dataRow.createCell(2*(i+1)).setCellValue("得分");
+					dataRow.createCell(2*(i+1)+1).setCellValue(las.get(0).getAnswerScore().toString());
+				}
+				BigDecimal itemScore =item.getScore();
+				List<Map> values = iExpertItemScoreService.selectScoreInfo(userId,item.getId()+"");
+				BigDecimal maxScore=null,minScore=null,avgScore=null,avgScoreW=null,totalScore=new BigDecimal("0");
+				
+				for(int j=0;j<values.size();j++){
+					Map recored = values.get(j);
+					BigDecimal score = new BigDecimal(recored.get("item_score").toString());
+					if(maxScore==null||maxScore.compareTo(score)<0){
+						maxScore = score;
+					}
+					if(minScore==null||minScore.compareTo(score)>0){
+						minScore = score;
+					}
+					totalScore = totalScore.add(score);
+					HSSFRow row =null;
+					if(j+1>max){
+						max++;
+						row = sheet.createRow(rownum+max);
+					}else{
+						row = sheet.getRow(rownum+j+1);
+					}
+					row.createCell(2*(i+1)).setCellValue((String)recored.get("display_name"));
+					row.createCell(2*(i+1)+1).setCellValue(recored.get("item_score").toString());
+				}
+				int count = values.size();
+				if(values.size()>3){//如果超过三个专家则 去掉最高分最低分
+					totalScore = totalScore.subtract(maxScore).subtract(minScore);
+					count = count-2;
+					maxRow.createCell(2*(i+1)).setCellValue("最大值");
+					maxRow.createCell(2*(i+1)+1).setCellValue(maxScore.toString());
+					minRow.createCell(2*(i+1)).setCellValue("最小值");
+					minRow.createCell(2*(i+1)+1).setCellValue(minScore.toString());
+				}
+				if(values.size()!=0){
+					avgWRow.createCell(2*(i+1)).setCellValue("平局值");
+					avgRow.createCell(2*(i+1)).setCellValue("平均分");
+					if(totalScore.compareTo(new BigDecimal("0"))==0){
+						avgWRow.createCell(2*(i+1)+1).setCellValue(totalScore.toString());
+						avgRow.createCell(2*(i+1)+1).setCellValue(totalScore.toString());
+						
+					}else{
+						avgScoreW = totalScore.divide( new BigDecimal(count),6);
+						//=======修改为百分比打分=======
+						avgScore = itemScore.multiply(avgScoreW).divide(new BigDecimal(100), 4);
+						avgWRow.createCell(2*(i+1)+1).setCellValue(avgScoreW.toString());
+						avgRow.createCell(2*(i+1)+1).setCellValue(avgScore.setScale(4,BigDecimal.ROUND_HALF_DOWN).toString());
+					}
+				}
+			}
+			rownum += max+1;
+		}
+		
+		
+	}
+
+	@Override
+	public HSSFWorkbook exportEPNotFinished(Integer paperId) {
+		ScorePaper p = this.getMapper().selectByPrimaryKey(paperId);
+		if (p == null)
+			throw new RuntimeBusinessException("paperId不能为空");
+		
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("sheet1");
+		sheet.autoSizeColumn(1);// 设置每个单元格宽度根据字多少自适应
+		exportItems(sheet,paperId);
+		return wb;
+	}
+
+	private void exportItems(HSSFSheet sheet, Integer paperId) {
+		List<Map> list = this.expertDeptUserMapper.selectExportItemMap(paperId,null);
+		ArrayList<Map> allDept =this.dScorePaperUserMapper.selectAllCommit(paperId);
+		int rownum=0;
+		String type="";
+		String itemId="";
+		String zhuanjian = "";
+		Integer lastExpertUserId = 0;
+		HSSFRow head = sheet.createRow(rownum++);
+		head.createCell(0).setCellValue("专业领域");
+		head.createCell(1).setCellValue("指标");
+		head.createCell(2).setCellValue("专家名称");
+		head.createCell(3).setCellValue("未完成个数");
+		head.createCell(4).setCellValue("未完成学会名称");
+		Set<Map> set = new HashSet<Map>();
+		int c = 0;
+		for(Map<String,Object> map:list){
+			c++;
+			//String indexCollExpertId = map.get("indexCollExpertId").toString();
+			String realname = map.get("real_name").toString();
+			Integer expertUserId = Integer.valueOf(map.get("user_id").toString());
+			String relatedType = map.get("related_field").toString();
+			//更新评分状态
+			if((c!=1&&!realname.equals(zhuanjian))){
+				updateStatus(set,null,lastExpertUserId,paperId);
+				set= new HashSet<Map>();
+			}
+			zhuanjian = realname;
+			lastExpertUserId = expertUserId;
+			//更新评分状态结束
+			
+			HSSFRow titleRow = sheet.createRow(rownum++);
+			if(!type.equals(relatedType)){
+				titleRow.createCell(0).setCellValue(relatedType);
+				type=relatedType;
+			}
+			String item_id = map.get("id").toString();
+			String title = map.get("title").toString();
+			if(!itemId.equals(item_id)){
+				titleRow.createCell(1).setCellValue(title);
+				itemId=item_id;
+			}
+			//List<Map> depts = this.expertDeptUserMapper.selectNotFinishedDept(paperId, Integer.valueOf(itemId), expertUserId);
+			List<Map> depts = getiNotFinishedDept(paperId, Integer.valueOf(itemId), expertUserId,allDept);
+			set.addAll(depts);
+			String names = getNames(depts);
+			titleRow.createCell(2).setCellValue(realname);
+			titleRow.createCell(3).setCellValue(depts.size());
+			titleRow.createCell(4).setCellValue(names);
+			//更新评分状态  最后一个
+			if(c==list.size()){
+				updateStatus(set,null,expertUserId,paperId);
+				set= new HashSet<Map>();
+			}
+			//更新评分状态结束
+		}
+	}
+	
+	private List<Map> getiNotFinishedDept(Integer paperId, Integer itemId,
+			Integer expertUserId, ArrayList<Map> allDept) {
+		ArrayList<Map> a = (ArrayList<Map>) allDept.clone();
+		List<Map> depts = this.expertDeptUserMapper.selectFinishedDept(paperId, itemId, expertUserId);
+		if(depts.size()==0)return a;
+		if( a.removeAll(depts)){
+			return a;
+		}
+		return a;
+	}
+
+	@Override
+	public List<Map> getiNotFinishedDept(PagerUserDto pagerUserDto) {
+		Integer userId = SecurityUtil.getCurrentUserId();
+		Integer paperId = pagerUserDto.getPaperId();
+		if(paperId==null){
+			PaperExpertConf paperExpertConf = new PaperExpertConf();
+			paperExpertConf.setStatus(1);
+	        List<PaperExpertConf> pageInfo = iPaperExpertConfService.selectByFilter(paperExpertConf);
+	       	if(pageInfo.size()>0)
+	       		paperId =  pageInfo.get(0).getPaperId();
+	       	else
+	       		paperId = 0;//表示没有
+				
+		}
+		List<Map> list = this.expertDeptUserMapper.selectExportItemMap(paperId, userId);
+		ArrayList<Map> allDept =this.dScorePaperUserMapper.selectAllCommit(paperId);
+		for(Map m:list){
+			Integer itemId = Integer.valueOf(m.get("id").toString());
+			List<Map> depts = getiNotFinishedDept(paperId, itemId, userId, allDept);
+			m.put("list", depts);
+		}
+		return list;
+	}
+	@Override
+	public List<Map> getiNotFinishedDeptColl(PagerUserDto pagerUserDto) {
+		Integer userId = SecurityUtil.getCurrentUserId();
+		Integer paperId = pagerUserDto.getPaperId();
+		if(paperId==null){
+			PaperExpertConf paperExpertConf = new PaperExpertConf();
+			paperExpertConf.setStatus(1);
+	        List<PaperExpertConf> pageInfo = iPaperExpertConfService.selectByFilter(paperExpertConf);
+	       	if(pageInfo.size()>0)
+	       		paperId =  pageInfo.get(0).getPaperId();
+	       	else
+	       		paperId = 0;//表示没有
+				
+		}
+		ScorePaper p = this.mapper.selectByPrimaryKey(paperId);
+		List<Map> list = this.expertDeptUserMapper.selectExportItemMap(paperId, userId);
+		ArrayList<Map> allDept =this.dScorePaperUserMapper.selectAllCommit(paperId);
+		Set<Map> set = new HashSet<Map>();
+		for(Map m:list){
+			Integer itemId = Integer.valueOf(m.get("id").toString());
+			List<Map> depts = getiNotFinishedDept(paperId, itemId, userId, allDept);
+			//m.put("list", depts);
+			set.addAll(depts);
+		}
+		for(Map m:set){
+			m.put("title", p.getTitle());
+			m.put("id", paperId);
+			m.put("userName", m.get("display_name"));
+		}
+		List<Map> l = new ArrayList(set);
+		Collections.sort(l,new Comparator<Map>(){
+
+			@Override
+			public int compare(Map arg0, Map arg1) {
+				return arg0.get("login_name").toString().compareTo(arg1.get("login_name").toString());
+			}
+			
+		});
+		return l;
+	}
+	private void updateStatus(Set<Map> depts, String indexCollExpertId,
+			Integer expertUserId, Integer paperId) {
+		Set<Integer> set = new HashSet<Integer>();
+		for(Map m: depts){
+			set.add(Integer.valueOf(m.get("userId").toString()));
+		}
+		if(depts.size()==0){
+			this.expertDeptUserMapper.updateExpertUserIncludeStatus(paperId,indexCollExpertId,expertUserId,null,"1");
+			return ;
+		}
+		this.expertDeptUserMapper.updateExpertUserIncludeStatus(paperId,indexCollExpertId,expertUserId,set,"0");
+		this.expertDeptUserMapper.updateExpertUserExcludeStatus(paperId,indexCollExpertId,expertUserId,set,"1");
+		
+		
+		
+	}
+
+	private String getNames(List<Map> depts) {
+		if(depts.size()==0)return "";
+		StringBuilder s = new StringBuilder("");
+		for(Map m:depts){
+			s.append(","+m.get("display_name"));
+		}
+		return s.toString().substring(1);
+	}
+
+
+
 
 }

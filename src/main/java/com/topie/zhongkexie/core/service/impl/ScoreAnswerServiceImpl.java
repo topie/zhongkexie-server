@@ -25,7 +25,10 @@ import com.topie.zhongkexie.database.core.model.ScoreAnswer;
 import com.topie.zhongkexie.database.core.model.ScoreItem;
 import com.topie.zhongkexie.database.core.model.ScoreItemOption;
 import com.topie.zhongkexie.database.core.model.ScorePaper;
+import com.topie.zhongkexie.database.core.model.ScorePaperUser;
+import com.topie.zhongkexie.database.task.model.TaskScore;
 import com.topie.zhongkexie.expert.service.IExpertItemScoreService;
+import com.topie.zhongkexie.task.service.ITaskService;
 
 /**
  * Created by chenguojun on 2017/4/19.
@@ -43,7 +46,9 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	private IScoreItemOptionService iScoreItemOptionService;
 	@Autowired
 	private IExpertItemScoreService iExpertItemScoreService;
-	
+	@Autowired
+	private ITaskService iTaskService;
+
 	@Override
 	public PageInfo<ScoreAnswer> selectByFilterAndPage(ScoreAnswer scoreAnswer,
 			int pageNum, int pageSize) {
@@ -101,7 +106,7 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 				count = 0;
 				indexScores.clear();
 			}
-			if(!an.getAnswerReal()){
+			if (!an.getAnswerReal()) {
 				count++;
 			}
 			BigDecimal score = an.getAnswerScore();
@@ -113,48 +118,107 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	}
 
 	@Override
+	public BigDecimal setUserScore(Integer paperId, Integer userId,ScorePaperUser pu) {
+		ScorePaper scorePaper = iScorePaperService.selectByKey(paperId);
+		int maxFilse = scorePaper.getFalsityCountItem();// 一个指标下试题虚假次数
+		int maxIndexFilse = scorePaper.getFalsityCount();// 指标虚假次数
+		ScoreAnswer scoreAnswer = new ScoreAnswer();
+		scoreAnswer.setPaperId(paperId);
+		scoreAnswer.setUserId(userId);
+		scoreAnswer.setSort_("indexId_asc");
+		List<ScoreAnswer> list = selectByFilter(scoreAnswer);
+		int indexId = 0;
+		int count = 0;
+		int indexCount = 0;
+		BigDecimal totalScore = new BigDecimal(0);
+		List<BigDecimal> indexScores = new ArrayList<BigDecimal>();
+		for (ScoreAnswer an : list) {
+			int index = an.getIndexId();
+			if (index != indexId) {
+				if (count >= maxFilse) {
+					// 试题虚假
+					for (BigDecimal arg0 : indexScores) {
+						totalScore = totalScore.subtract(arg0);
+					}
+					indexCount++;
+					if (indexCount >= maxIndexFilse) {// 指标虚假次数过多
+						return new BigDecimal(0);
+					}
+				}
+				indexId = an.getIndexId();
+				count = 0;
+				indexScores.clear();
+			}
+			if (!an.getAnswerReal()) {
+				count++;
+			}
+			BigDecimal score = an.getAnswerScore();
+			indexScores.add(score);
+			totalScore = totalScore.add(score);
+		}
+		// 重大任务分数
+		TaskScore taskScore = new TaskScore();
+		taskScore.setPaperId(paperId);
+		taskScore.setUserId(userId);
+		List<TaskScore> ls = iTaskService.selectByFilter(taskScore);
+		BigDecimal taskScore1 = new BigDecimal("0");
+		for (TaskScore ts : ls) {
+			taskScore1 = taskScore1.add(ts.getScore());
+		}
+		
+		pu.setScore(taskScore1.add(totalScore));
+		pu.setSubjectiveScore(taskScore1);
+		return totalScore;
+
+	}
+
+	@Override
 	public String getAnswerOfRanking(Integer itemId, String answer) {
 		ScoreItem item = this.iScoreItemService.selectByKey(itemId);
 		String scoreType = item.getScoreType();
-		if(answer==null||answer.trim().equals("")){
+		if (answer == null || answer.trim().equals("")) {
 			return "";
 		}
-		switch(scoreType){
-			case "1"://统计项
-				break;
-			case "2"://线性打分
-				break;
-			case "3"://专家打分
-				return "";
-			default:break;
+		switch (scoreType) {
+		case "1":// 统计项
+			break;
+		case "2":// 线性打分
+			break;
+		case "3":// 专家打分
+			return "";
+		default:
+			break;
 		}
 		Integer type = item.getType();
-		switch(type){
-			case 0://填空
-				return "";
-			case 1://单选
-				
-			case 2://多选
-				return ranking_check(itemId,answer);
-			case 3://填空 多
-				return "";
-			case 4://数字填空
-				return ranking_input(itemId,answer);
-			default:break;
+		switch (type) {
+		case 0:// 填空
+			return "";
+		case 1:// 单选
+
+		case 2:// 多选
+			return ranking_check(itemId, answer);
+		case 3:// 填空 多
+			return "";
+		case 4:// 数字填空
+			return ranking_input(itemId, answer);
+		default:
+			break;
 		}
-		
+
 		return "";
 	}
 
 	private String ranking_input(Integer itemId, String answer) {
-		Integer rank = this.scoreAnswerMapper.selectRankingInput(itemId,answer);
+		Integer rank = this.scoreAnswerMapper
+				.selectRankingInput(itemId, answer);
 		ScoreAnswer scoreAnswer = new ScoreAnswer();
 		scoreAnswer.setItemId(itemId);
 		int s = this.mapper.selectCount(scoreAnswer);
-		double r = (double)rank/s*100;
-		r =new BigDecimal(r).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue(); 
-		//return "超过了"+r+"%的用户，共"+s;
-		return "共"+s+"个学会填报，超过了"+r+"%的学会";
+		double r = (double) rank / s * 100;
+		r = new BigDecimal(r).setScale(2, BigDecimal.ROUND_HALF_UP)
+				.doubleValue();
+		// return "超过了"+r+"%的用户，共"+s;
+		return "共" + s + "个学会填报，超过了" + r + "%的学会";
 	}
 
 	private String ranking_check(Integer itemId, String answer) {
@@ -163,10 +227,11 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 		int s = this.mapper.selectCount(scoreAnswer);
 		scoreAnswer.setAnswerValue(answer);
 		int checks = this.mapper.selectCount(scoreAnswer);
-		double rank = (double)checks/s*100;
-		rank =new BigDecimal(rank).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue(); 
-		//return rank+"%的用户选择了此选项，共"+s;
-		return "共"+s+"个学会填报，其中"+rank+"%的学会选择此选项";
+		double rank = (double) checks / s * 100;
+		rank = new BigDecimal(rank).setScale(2, BigDecimal.ROUND_HALF_UP)
+				.doubleValue();
+		// return rank+"%的用户选择了此选项，共"+s;
+		return "共" + s + "个学会填报，其中" + rank + "%的学会选择此选项";
 	}
 
 	@Override
@@ -176,45 +241,47 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 			String logic = scoreItem.getOptionLogic();
 		} else if (scoreItem.getType() == 1) {
 			// 单选
-			try{
-			Integer optionId = Integer.parseInt(sa.getAnswerValue());
-			ScoreItemOption option = iScoreItemOptionService
-					.selectByKey(optionId);
-			sa.setAnswerScore(scoreItem.getScore().multiply(
-					option.getOptionRate()));
-			}catch(Exception e){e.printStackTrace();}
+			try {
+				Integer optionId = Integer.parseInt(sa.getAnswerValue());
+				ScoreItemOption option = iScoreItemOptionService
+						.selectByKey(optionId);
+				sa.setAnswerScore(scoreItem.getScore().multiply(
+						option.getOptionRate()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else if (scoreItem.getType() == 2) {
 			// 多选
-			
+
 		}
 		Integer indexId = scoreItem.getIndexId();
 		sa.setIndexId(indexId);
 		// 计算分数
 		if (scoreItem.getScoreType().equals("2")) {// 线性打分
 			try {
-				BigDecimal s = getScore(scoreItem,sa);
-				if(s!=null)
+				BigDecimal s = getScore(scoreItem, sa);
+				if (s != null)
 					sa.setAnswerScore(s);
 			} catch (Exception e) {
 				sa.setAnswerScore(new BigDecimal("0"));
 				System.err.println("线性打分项评分时出现异常：");
 				e.printStackTrace();
 			}
-		} else if(scoreItem.getScoreType().equals("3")){//专家打分项
+		} else if (scoreItem.getScoreType().equals("3")) {// 专家打分项
 			sa.setAnswerScore(iExpertItemScoreService.divScore(sa));
-			
-		}else if(scoreItem.getScoreType().equals("1")){// 统计项 
+
+		} else if (scoreItem.getScoreType().equals("1")) {// 统计项
 			sa.setAnswerScore(new BigDecimal("0"));
-		}else{//其他
-			
+		} else {// 其他
+
 		}
-		
+
 	}
-	
-	private BigDecimal getScore(ScoreItem scoreItem,ScoreAnswer sa) {
+
+	private BigDecimal getScore(ScoreItem scoreItem, ScoreAnswer sa) {
 		BigDecimal score = null;
 		String functionBody = scoreItem.getOptionLogic();
-		if(StringUtils.isEmpty(functionBody.trim())){
+		if (StringUtils.isEmpty(functionBody.trim())) {
 			return null;
 		}
 		ScoreAnswer referItemValue = new ScoreAnswer();
@@ -229,15 +296,15 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	}
 
 	@Override
-	public PageInfo<Map> selectResultTime(Map map,int pageNum,int pageSize) {
-		PageHelper.startPage(pageNum,pageSize);
+	public PageInfo<Map> selectResultTime(Map map, int pageNum, int pageSize) {
+		PageHelper.startPage(pageNum, pageSize);
 		List<Map> list = scoreAnswerMapper.selectResultTime(map);
 		return new PageInfo<Map>(list);
 	}
 
 	@Override
 	public PageInfo<Map> selectPartIndexScore(Map map, int pageNum, int pageSize) {
-		PageHelper.startPage(pageNum,pageSize);
+		PageHelper.startPage(pageNum, pageSize);
 		List<Map> list = scoreAnswerMapper.selectPartIndexScore(map);
 		return new PageInfo<Map>(list);
 	}
@@ -252,23 +319,25 @@ public class ScoreAnswerServiceImpl extends BaseService<ScoreAnswer> implements
 	public List<Map> selectUserUploadFileCounts(Map map) {
 		List<Map> list = new ArrayList<Map>();
 		List<Map> result = scoreAnswerMapper.selectUserUploadFileCounts(map);
-		String name="";
-		for(int i=0;i<result.size();){
-			Map xh = new HashMap<String,Object>();
-			while(true){
-				if(i>=result.size())break;
+		String name = "";
+		for (int i = 0; i < result.size();) {
+			Map xh = new HashMap<String, Object>();
+			while (true) {
+				if (i >= result.size())
+					break;
 				Map m = result.get(i);
-				if(i==0){
+				if (i == 0) {
 					name = m.get("userId").toString();
 				}
-				if(!name.equals(m.get("userId").toString())){
+				if (!name.equals(m.get("userId").toString())) {
 					name = m.get("userId").toString();
 					break;
 				}
-				xh.put(m.get("itemId").toString(), m.get("answerFile").toString());
+				xh.put(m.get("itemId").toString(), m.get("answerFile")
+						.toString());
 				i++;
 			}
-			Map m = result.get(i-1);
+			Map m = result.get(i - 1);
 			xh.put("displayName", m.get("displayName").toString());
 			xh.put("userId", m.get("userId").toString());
 			xh.put("loginName", m.get("loginName").toString());
