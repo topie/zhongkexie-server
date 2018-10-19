@@ -1,12 +1,16 @@
 package com.topie.zhongkexie.task.service.impl;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -272,6 +276,99 @@ public class TaskServiceImpl extends BaseService<Task> implements ITaskService {
 			c.andEqualTo("taskId", taskScore.getTaskId());
 		List<TaskScore> list = taskScoreMapper.selectByExample(ex);
 		return list;
+	}
+
+	@Override
+	public XSSFWorkbook taskScoreInfoExport(Task task) {
+		
+		List<Task> list = this.selectByFilter(task);
+		XSSFWorkbook wb = new XSSFWorkbook();
+		XSSFSheet sheet = wb.createSheet("sheet1");
+		sheet.autoSizeColumn(1);// 设置每个单元格宽度根据字多少自适应
+		exportItems(sheet,list);
+		return wb;
+	}
+
+	private void exportItems(XSSFSheet sheet, List<Task> list) {
+		Map<Integer,Integer> tmap = new HashMap<Integer,Integer>();
+		int rowNum = 0;
+		XSSFRow title = sheet.createRow(rowNum++);
+		XSSFRow wight = sheet.createRow(rowNum++);
+		XSSFRow score = sheet.createRow(rowNum++);
+		XSSFRow data = sheet.createRow(rowNum++);
+		Dept dept = new Dept();
+		List<Dept> listDept = iDeptService.selectByFilter(dept);
+		Map<String,Integer> deptMap = new HashMap<String, Integer>();
+		for(Dept d:listDept){
+			deptMap.put(d.getName(), rowNum);
+			XSSFRow code = sheet.createRow(rowNum++);
+			code.createCell(0).setCellValue(d.getCode());
+			code.createCell(1).setCellValue(d.getName());
+			//sheet.createRow(rowNum++);
+		}
+		int column = 2;
+		for(Task task:list){
+			tmap.put(task.getId(), column);
+			title.createCell(column).setCellValue(task.getTaskName());
+			double d1 = Double.valueOf(task.getTaskCweight().split(",")[0]);
+			double d2 = Double.valueOf(task.getTaskCweight().split(",")[1]);
+			double d3 = Double.valueOf(task.getTaskCweight().split(",")[2]);
+			double d4 = Double.valueOf(task.getTaskCweight().split(",")[3]);
+			wight.createCell(column).setCellValue(d1);
+			wight.createCell(column+1).setCellValue(d2);
+			wight.createCell(column+2).setCellValue(d3);
+			wight.createCell(column+3).setCellValue(d4);
+			
+			double s1 = task.getTaskScore().doubleValue()*d1/100;
+			double s2 = task.getTaskScore().doubleValue()*d2/100;
+			double s3 = task.getTaskScore().doubleValue()*d3/100;
+			double s4 = task.getTaskScore().doubleValue()*d4/100;
+			Double[] scores = new Double[]{s1,s2,s3,s4}; 
+			score.createCell(column+0).setCellValue(s1);;
+			score.createCell(column+1).setCellValue(s2);;
+			score.createCell(column+2).setCellValue(s3);;
+			score.createCell(column+3).setCellValue(s4);;
+			
+			int i = 0;
+			Map m = new HashMap();
+			for(String names:task.getTaskValue().split(",")){
+				data.createCell(column+i).setCellValue(names);
+				for(String name:names.split("；")){
+					name = name.trim();
+					if(name.equals(""))break;
+					if(m.containsKey(name)){
+						continue;
+					}
+					m.put(name, name);
+					try{
+					int row = getname(deptMap,name);
+					XSSFRow dr = sheet.getRow(row);
+					dr.createCell(column+i).setCellValue(scores[i]);
+					}catch(Exception e){
+						System.err.println(name);
+						e.printStackTrace();
+						throw new RuntimeBusinessException(1);
+					}
+					
+				}
+				i++;
+			}
+			
+			column+=4;
+		}
+		
+		
+
+	}
+
+	private int getname(Map<String, Integer> deptMap, String name) {
+		if(name.equals("人工智能学会")){
+			name = "中国人工智能学会";
+		}
+		if(name.equals("中医药学会")){
+			name = "中华中医药学会";
+		}
+		 return deptMap.get(name);
 	}
 
 

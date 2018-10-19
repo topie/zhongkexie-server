@@ -3,6 +3,8 @@ package com.topie.zhongkexie.task.service;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.github.pagehelper.PageInfo;
 import com.topie.zhongkexie.common.baseservice.IService;
 import com.topie.zhongkexie.database.core.model.User;
@@ -25,6 +27,8 @@ public interface ITaskService extends IService<Task> {
 
 	List<TaskScore> selectByFilter(TaskScore taskScore);
 	 void divScore(Task entity);
+
+	XSSFWorkbook taskScoreInfoExport(Task task);
 
 	
 }

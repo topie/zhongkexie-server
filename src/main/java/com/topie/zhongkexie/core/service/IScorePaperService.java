@@ -3,7 +3,7 @@ package com.topie.zhongkexie.core.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
@@ -49,7 +49,7 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	 * @param orgIds
 	 * @param type 
 	 */
-	HSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds, String type);
+	XSSFWorkbook exportPaper(Integer paperId, String indexIds, String orgIds, String type);
 	/**
 	 * 专家获取当前用户的可查看试卷信息
 	 * @param paperId
@@ -79,13 +79,13 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	 * @param orgIds
 	 * @return
 	 */
-	HSSFWorkbook exportEPScore(Integer paperId, String orgIds,String scoreType);
+	XSSFWorkbook exportEPScore(Integer paperId, String orgIds,String scoreType);
 	/**
 	 * 导出专家未完成评分的学会
 	 * @param paperId
 	 * @return
 	 */
-	HSSFWorkbook exportEPNotFinished(Integer paperId);
+	XSSFWorkbook exportEPNotFinished(Integer paperId);
 
 	List<Map> getiNotFinishedDept(PagerUserDto pagerUserDto);
 

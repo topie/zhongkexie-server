@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -177,6 +178,9 @@ public class ScorePaperController {
 			PagerUserDto pagerUserDto,
 			@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+		if(pagerUserDto.getPaperId()==null){
+			return ResponseUtil.success(PageConvertUtil.emptyPage());
+		}
 		PageInfo<PagerUserDto> pageInfo = iScorePagerUserService
 				.selectZJUserCommit(pagerUserDto, pageNum, pageSize);
 		return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
@@ -337,16 +341,17 @@ public class ScorePaperController {
 	@RequestMapping(value = "/exportPaper", method = RequestMethod.GET)
 	public void exportPaper(Integer paperId, String indexIds, String orgIds,@RequestParam(required=false)String type,
 			HttpServletRequest request, HttpServletResponse response) {
-		HSSFWorkbook wb = iScorePaperService.exportPaper(paperId, indexIds,
+		XSSFWorkbook wb = iScorePaperService.exportPaper(paperId, indexIds,
 				orgIds,type);
 		try {
 			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"详细得分情况";
 			outWrite(request, response, wb, p);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * 导出专家详细打分情况
 	 * @param paperId
@@ -358,7 +363,7 @@ public class ScorePaperController {
 	@RequestMapping(value = "/exportEPScore", method = RequestMethod.GET)
 	public void exportPaper(Integer paperId,String orgIds,String scoreType,
 			HttpServletRequest request, HttpServletResponse response) {
-		HSSFWorkbook wb = iScorePaperService.exportEPScore(paperId, 
+		XSSFWorkbook wb = iScorePaperService.exportEPScore(paperId, 
 				orgIds,scoreType);
 		try {
 			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"专家详细得分情况";
@@ -379,7 +384,7 @@ public class ScorePaperController {
 	@RequestMapping(value = "/exportEPNotFinished", method = RequestMethod.GET)
 	public void exportEPNotFinished(Integer paperId,
 			HttpServletRequest request, HttpServletResponse response) {
-		HSSFWorkbook wb = iScorePaperService.exportEPNotFinished(paperId);
+		XSSFWorkbook wb = iScorePaperService.exportEPNotFinished(paperId);
 		try {
 			String p = this.iScorePaperService.selectByKey(paperId).getTitle()+"专家未完成情况";
 			outWrite(request, response, wb, p);
@@ -437,6 +442,47 @@ public class ScorePaperController {
 			// fileName=new String((fileName+"导出数据.xls").getBytes(),
 			// "ISO_8859_1");
 			fileName = URLEncoder.encode(fileName + "导出数据.xls", "UTF-8");
+			response.setHeader("Content-disposition", "attachment; filename="
+					+ fileName);
+			// response.setHeader("Content-disposition",
+			// "attachment;filename*=UTF-8 "
+			// + URLEncoder.encode(fileName,"UTF-8"));
+			response.setContentType("application/vnd.ms-excel;charset=utf-8");
+			response.setCharacterEncoding("utf-8");
+			wb.write(output);
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (output != null) {
+				output.close();
+			}
+		}
+	}
+	private static void outWrite(HttpServletRequest request,
+			HttpServletResponse response, XSSFWorkbook wb, String fileName)
+			throws IOException {
+		
+		OutputStream output = null;
+		try {
+			//保存在本地
+			String filename = fileName+".xls";
+	        String dicPath = new File(".").getCanonicalPath();
+	        String srcPath = dicPath +"/Excel/"+ filename;
+	        File newPath = new File(dicPath+"/Excel/");
+	        if(!newPath.exists())
+	        	newPath.mkdirs();
+	        File file = new File(srcPath);
+	        System.out.println(srcPath);
+	        FileOutputStream fos = new FileOutputStream(file);
+	        wb.write(fos);// 写文件
+	        //输出到网络
+	        //if(1==1)return;
+			output = response.getOutputStream();
+			response.reset();
+			// fileName=new String((fileName+"导出数据.xls").getBytes(),
+			// "ISO_8859_1");
+			fileName = URLEncoder.encode(fileName + "导出数据.xlsx", "UTF-8");
 			response.setHeader("Content-disposition", "attachment; filename="
 					+ fileName);
 			// response.setHeader("Content-disposition",
