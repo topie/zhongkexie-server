@@ -1642,7 +1642,31 @@ public class ScorePaperServiceImpl extends BaseService<ScorePaper> implements
 		return s.toString().substring(1);
 	}
 
-
+	@Override
+	public PageInfo<ScorePaper> selectCurrentUserHistoryPaper(
+			ScorePaper scorePaper, int pageNum, int pageSize) {
+		SecurityUser user = SecurityUtil.getCurrentSecurityUser();
+		Integer type = user.getUserType();
+		// 不是科协用户
+		if (type != 7) {
+			return new PageInfo<ScorePaper>();
+		}
+		Integer userId = user.getId();
+		if(!user.getLoginName().endsWith("002")){
+			String userLoginName = user.getLoginName().substring(0,user.getLoginName().length()-3)+"002";
+			User cuser = userService.findUserByLoginName(userLoginName);
+			if (cuser == null){
+				System.out.println("查找用户失败:" + userLoginName);
+			}else{
+				userId = cuser.getId();
+			}
+			
+		}
+		PageHelper.startPage(pageNum, pageSize);
+		List<ScorePaper> list = dScorePaperUserMapper.selectHistoryPaperByUserId(userId);
+		
+		return new PageInfo<ScorePaper>(list);
+	}
 
 
 }

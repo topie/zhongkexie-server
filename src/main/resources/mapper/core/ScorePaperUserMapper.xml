@@ -11,6 +11,24 @@
     <result column="score" property="score" jdbcType="DECIMAL" />
     <result column="feedback" property="feedback" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="scoerPaperResultMap" type="com.topie.zhongkexie.database.core.model.ScorePaper" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="begin" property="begin" jdbcType="TIMESTAMP" />
+    <result column="end" property="end" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="score" property="score" jdbcType="DECIMAL" />
+    <result column="approve_status" property="approveStatus" jdbcType="SMALLINT" />
+    <result column="content_json" property="contentJson" jdbcType="LONGVARCHAR" />
+    <result column="falsity_count" property="falsityCount" jdbcType="INTEGER" />
+    <result column="falsity_count_item" property="falsityCountItem" jdbcType="INTEGER" />
+
+  </resultMap>
   <resultMap id="PagerUserDtoResultMap" type="com.topie.zhongkexie.core.dto.PagerUserDto" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="title" property="title" jdbcType="VARCHAR" />
@@ -126,5 +144,13 @@
 	ON spu.user_id = u.id 
 	WHERE paper_id=#{paperId}
 	and spu.status=2
+  </select>
+  <select id="selectHistoryPaperByUserId" resultMap="scoerPaperResultMap">
+  	SELECT t1.* from d_score_paper t1 LEFT JOIN 
+	d_score_paper_user t 
+	ON t.paper_id = t1.id 
+	where  t.`status`=2
+	and t.user_id = #{userId}
+	order by t1.id desc
   </select>
 </mapper>

@@ -967,4 +967,18 @@ public class ScorePaperController {
 		
 		return ResponseUtil.success();
 	}
+	
+	/**
+	 * 查询当前用户 历史填报内容
+	 */
+	@RequestMapping("/historyPaper")
+	@ResponseBody
+	public Result historyPaper(
+		ScorePaper scorePaper,
+		@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+		@RequestParam(value = "pageSize", required = false, defaultValue = "15") int pageSize) {
+	scorePaper.setSort_("createTime_desc");
+	PageInfo<ScorePaper> pageInfo = iScorePaperService.selectCurrentUserHistoryPaper(scorePaper, pageNum, pageSize);
+	return ResponseUtil.success(PageConvertUtil.grid(pageInfo));
+	}
 }

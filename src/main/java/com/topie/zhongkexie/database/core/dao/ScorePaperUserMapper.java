@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
 import com.topie.zhongkexie.core.dto.PagerUserDto;
+import com.topie.zhongkexie.database.core.model.ScorePaper;
 import com.topie.zhongkexie.database.core.model.ScorePaperUser;
 
 public interface ScorePaperUserMapper extends Mapper<ScorePaperUser> {
@@ -30,4 +31,6 @@ public interface ScorePaperUserMapper extends Mapper<ScorePaperUser> {
 	List<PagerUserDto> selectUserPubulicityPaper(PagerUserDto pagerUserDto);
 
 	ArrayList<Map> selectAllCommit(@Param("paperId")Integer paperId);
+
+	List<ScorePaper> selectHistoryPaperByUserId(@Param("userId")Integer userId);
 }

@@ -90,5 +90,14 @@ public interface IScorePaperService extends IService<ScorePaper> {
 	List<Map> getiNotFinishedDept(PagerUserDto pagerUserDto);
 
 	List<Map> getiNotFinishedDeptColl(PagerUserDto pagerUserDto);
+	/**
+	 * 查询当前用户历史填报
+	 * @param scorePaper
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
+	PageInfo<ScorePaper> selectCurrentUserHistoryPaper(ScorePaper scorePaper,
+			int pageNum, int pageSize);
 
 }
